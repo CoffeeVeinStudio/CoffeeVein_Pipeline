@@ -1,0 +1,119 @@
+set cut_paste_input [stack 0]
+version 13.0 v2
+push $cut_paste_input
+Group {
+ name TimecodeCalc_TimeOffset
+ tile_color 0xc9b281ff
+ label "Sync offline and plate"
+ selected true
+ xpos 49373
+ ypos 2097
+ addUserKnob {20 User}
+ addUserKnob {41 calcOffset l "calc offset" T TimeOffset8.calcOffset}
+ addUserKnob {41 framerate T TimeOffset8.framerate}
+ addUserKnob {41 startframe l "start frame" -STARTLINE T TimeOffset8.startframe}
+ addUserKnob {41 offset -STARTLINE T TimeOffset8.offset}
+ addUserKnob {41 framerate_float l framerate -STARTLINE +INVISIBLE T TimeOffset8.framerate_float}
+ addUserKnob {41 goalTimecode l "Goal timecode" T TimeOffset8.goalTimecode}
+ addUserKnob {41 setCurrentTimecode l "Set Current input" -STARTLINE T TimeOffset8.setCurrentTimecode}
+ addUserKnob {41 startTimecode l "Start timecode" T TimeOffset8.startTimecode}
+ addUserKnob {41 inputframe l "input startframe" -STARTLINE T TimeOffset8.inputframe}
+ addUserKnob {41 importmetadata l "Import from metadata" -STARTLINE T TimeOffset8.importmetadata}
+ addUserKnob {26 ""}
+ addUserKnob {6 view_node_boolean l "Goal timecode through timeoffset" +STARTLINE}
+ addUserKnob {22 expression_active l "expression on / off" t "The expression keept getting called, which slows down our script. \n\nI've added this option if we wanted to generate multiple timeoffset." -STARTLINE T "view_node_boolean_knob = nuke.thisNode().knob(\"view_node_boolean\")\nif view_node_boolean_knob.hasExpression():\n    view_node_boolean_knob.clearAnimated()\nelse:\n    view_node_boolean_knob.setExpression(\"\[python nuke.activeViewer().node().input(0) == nuke.thisNode()]\")\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 gen_timeoffset l "Generate timeoffset" +INVISIBLE T "#nuke.nodes.TimeOffset(time_offset = nuke.thisNode().knob(\"int_timeoffset\"))\n\nnuke.createNode(\"TimeOffset\")" +STARTLINE}
+ addUserKnob {3 int_timeoffset l "" -STARTLINE +INVISIBLE}
+ int_timeoffset {{"((offset - startframe) * -1) -inputframe"}}
+}
+ Input {
+  inputs 0
+  name InputReference
+  xpos -221
+  ypos -295
+ }
+ Dot {
+  name Dot1
+  xpos -187
+  ypos -201
+ }
+set N3cfe800 [stack 0]
+ TimeOffset {
+  time_offset {{"((offset - startframe) * -1) -inputframe"}}
+  time ""
+  name TimeOffset8
+  onCreate "seq = paths.get_sequence()\nshot = paths.get_shot()\n\n\ntry: \n    if nuke.thisNode()\[\"autoupdate\"].value() == True:\n        if not nuke.thisNode()\[\"sequence\"] == seq:\n            if not nuke.thisNode()\[\"shot\"] == shot:\n                nukeAsk = nuke.ask(\"Would you like to update to current shot?\")\n                if nukeAsk:\n                    nuke.thisNode()\[\"getshot\"].execute()\nexcept:\n    pass"
+  selected true
+  xpos -221
+  ypos -133
+  addUserKnob {20 User}
+  addUserKnob {22 calcOffset l "calc offset" T "this = nuke.thisNode()\n\n\nframerate = this\[\"framerate_float\"].getValue()\n\n\nif int(framerate) != int(nuke.root().fps()):\n    ask = nuke.ask(\"Framerates don't match, Current: \" + str(framerate) + \". Script:\" + str(int(nuke.root().fps())) + \", would you like to match it to the scripts settings?\")\n    if ask:\n        nuke.thisNode()\[\"framerate_float\"].setValue(nuke.root().fps())\n        framerate = this\[\"framerate_float\"].getValue()\n\ndef timecode_to_frames(timecode):\n    return sum(f * int(t) for f,t in zip((3600*framerate, 60*framerate, framerate, 1), timecode.split(':')))\n\nthis\[\"offset\"].setValue( timecode_to_frames(this\[\"goalTimecode\"].getValue()) - timecode_to_frames(this\[\"startTimecode\"].getValue()))" +STARTLINE}
+  addUserKnob {3 offset -STARTLINE}
+  addUserKnob {3 startframe l "start frame"}
+  startframe 1001
+  addUserKnob {3 framerate -STARTLINE}
+  framerate 24
+  addUserKnob {7 framerate_float l framerate -STARTLINE}
+  framerate_float 24
+  addUserKnob {4 sequence l Sequence +INVISIBLE M {- TRL_sc019 TRL_sc031 TRL_sc037 TRL_sc051 TRL_sc081 TRL_sc096 TRL_sc135 TRL_sc150 "" "" "" "" ""}}
+  sequence TRL_sc081
+  addUserKnob {4 shot l Shot +INVISIBLE M {- sh0940 sh0960 sh0980 sh1000 sh1020 sh1040 sh1080 sh1090 sh1100 sh1110 sh1120 sh1140 sh1160 sh1180 sh1220 sh1240 sh1260 sh1280 "" "" "" "" "" "" "" ""}}
+  shot sh1120
+  addUserKnob {22 getshot l "Get shot" +INVISIBLE T "nuke.thisNode()\[\"sequence\"].setValue(paths.get_sequence())\nnuke.thisNode()\[\"shot\"].setValue(paths.get_shot())" +STARTLINE}
+  addUserKnob {6 autoupdate l "auto Update" -STARTLINE +INVISIBLE}
+  addUserKnob {26 ""}
+  addUserKnob {2 filename +INVISIBLE}
+  addUserKnob {1 goalTimecode l "Goal timecode"}
+  addUserKnob {22 setCurrentTimecode l "Set Current input" -STARTLINE T "current = nuke.toNode(\"ViewMetaDataCurrent\").metadata(\"input/timecode\")\n\nnuke.thisNode()\[\"goalTimecode\"].setValue(current)\n\nask = nuke.ask(\"Update timeoffset?\")\nif ask:\n    nuke.thisNode()\[\"calcOffset\"].execute()"}
+  addUserKnob {1 startTimecode l "Start timecode"}
+  addUserKnob {3 inputframe l "input startframe" -STARTLINE}
+  inputframe 1
+  addUserKnob {22 importmetadata l "Import from metadata" -STARTLINE T "start = nuke.toNode(\"ViewMetaData_first\").metadata(\"input/timecode\")\n\nnuke.thisNode()\[\"startTimecode\"].setValue(start)\n\nfirstframe = nuke.toNode(\"FrameHold_first\")\[\"firstFrame\"].getValue()\n\nnuke.thisNode()\[\"inputframe\"].setValue(firstframe)\n\n"}
+  addUserKnob {22 timecode l "Timecode calc link" +INVISIBLE T "nukescripts.openurl.start(\"http://www.michaelcinquin.com/tools/timecode_keykode\")" +STARTLINE}
+ }
+set N3db1d00 [stack 0]
+ Output {
+  name Output1
+  xpos -221
+  ypos -11
+ }
+push $N3cfe800
+ Dot {
+  name Dot3
+  xpos -342
+  ypos -201
+ }
+set N3cfe000 [stack 0]
+ Dot {
+  name Dot2
+  xpos -491
+  ypos -201
+ }
+ FrameHold {
+  firstFrame {{"input.frame - input.frame + 1"}}
+  name FrameHold_first
+  xpos -525
+  ypos -150
+ }
+ ViewMetaData {
+  name ViewMetaData_first
+  xpos -525
+  ypos -52
+ }
+push $N3db1d00
+push $N3cfe000
+ Switch {
+  inputs 2
+  which {{parent.view_node_boolean}}
+  name Switch_currentFrame
+  label "Looking through timeOffset or input?"
+  xpos -376
+  ypos -139
+ }
+ ViewMetaData {
+  name ViewMetaDataCurrent
+  xpos -376
+  ypos -53
+ }
+end_group

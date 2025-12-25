@@ -1,0 +1,85 @@
+set cut_paste_input [stack 0]
+version 12.0 v4
+push $cut_paste_input
+Group {
+ name Reformat_Log1
+ tile_color 0xaa79a9ff
+ selected true
+ xpos -240
+ ypos 602
+ addUserKnob {20 User l Reformat}
+ addUserKnob {41 type T Reformat3.type}
+ addUserKnob {41 format l "output format" T Reformat3.format}
+ addUserKnob {26 ""}
+ addUserKnob {41 resize l "resize type" T Reformat3.resize}
+ addUserKnob {41 center -STARTLINE T Reformat3.center}
+ addUserKnob {41 flip -STARTLINE T Reformat3.flip}
+ addUserKnob {41 flop -STARTLINE T Reformat3.flop}
+ addUserKnob {41 turn -STARTLINE T Reformat3.turn}
+ addUserKnob {41 filter T Reformat3.filter}
+ addUserKnob {41 pbb l "preserve bounding box" -STARTLINE T Reformat3.pbb}
+ addUserKnob {41 clamp -STARTLINE T Reformat3.clamp}
+ addUserKnob {41 black_outside l "black outside" -STARTLINE T Reformat3.black_outside}
+ addUserKnob {26 ""}
+ addUserKnob {6 logConversion l "log conversion" +STARTLINE}
+ logConversion true
+ addUserKnob {6 offsetGrade l "offset negative values" -STARTLINE}
+ addUserKnob {41 add l offset T Grade1.add}
+ addUserKnob {20 tab}
+ addUserKnob {26 ""}
+ addUserKnob {41 box_width l width/height T Reformat3.box_width}
+ addUserKnob {41 box_height l "" -STARTLINE T Reformat3.box_height}
+ addUserKnob {41 box_fixed l "force this shape" -STARTLINE T Reformat3.box_fixed}
+ addUserKnob {41 box_pixel_aspect l "pixel aspect" T Reformat3.box_pixel_aspect}
+ addUserKnob {41 scale T Reformat3.scale}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos -101
+  ypos 196
+ }
+ Grade {
+  add 0.5
+  black_clamp false
+  name Grade1
+  xpos -101
+  ypos 236
+  disable {{parent.offsetGrade-1}}
+ }
+ Colorspace {
+  colorspace_out SLog
+  name Colorspace3
+  xpos -101
+  ypos 272
+  disable {{parent.logConversion-1}}
+ }
+ Reformat {
+  filter Lanczos6
+  name Reformat3
+  label "\[value filter]"
+  xpos -101
+  ypos 300
+ }
+ Colorspace {
+  colorspace_in SLog
+  name Colorspace4
+  xpos -101
+  ypos 348
+  disable {{parent.logConversion-1}}
+ }
+ Grade {
+  add {{Grade1.add}}
+  reverse true
+  black_clamp false
+  name Grade2
+  xpos -101
+  ypos 384
+  disable {{parent.offsetGrade-1}}
+ }
+ Output {
+  name Output1
+  xpos -101
+  ypos 484
+ }
+end_group

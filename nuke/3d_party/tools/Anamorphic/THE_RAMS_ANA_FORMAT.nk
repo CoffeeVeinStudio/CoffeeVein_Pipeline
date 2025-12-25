@@ -1,0 +1,19 @@
+set cut_paste_input [stack 0]
+version 8.0 v6
+push $cut_paste_input
+Reformat {
+ format "2048 1536 0 0 2048 1536 2 THE_RAMS_UNSQUEEZE"
+ resize none
+ name Reformat3
+ selected true
+ xpos 382
+ ypos 234
+}
+Reformat {
+ format "2048 1536 0 0 2048 1536 1 THE_RAMS_ANA"
+ resize none
+ name Reformat5
+ selected true
+ xpos 382
+ ypos 286
+}

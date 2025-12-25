@@ -1,0 +1,56 @@
+set cut_paste_input [stack 0]
+version 9.0 v5
+push $cut_paste_input
+Group {
+name VIEWER_INPUT
+selected true
+xpos -719
+ypos 1765
+}
+Constant {
+inputs 0
+channels rgb
+color 1
+format "2048 858 0 0 2048 858 1 Framelines"
+name Constant1
+xpos -767
+ypos 350
+}
+Reformat {
+resize height
+black_outside true
+name Reformat1
+xpos -767
+ypos 483
+}
+Invert {
+name Invert1
+xpos -767
+ypos 509
+}
+Input {
+inputs 0
+name Input1
+xpos -491
+ypos 436
+}
+Merge2 {
+inputs 2
+mix 0.035
+name Merge12
+xpos -491
+ypos 515
+}
+set N28282000 [stack 0]
+Output {
+name Output1
+xpos -491
+ypos 588
+}
+push $N28282000
+Output {
+name Output1
+xpos -491
+ypos 615
+}
+end_group

@@ -1,0 +1,289 @@
+set cut_paste_input [stack 0]
+version 14.0 v3
+push $cut_paste_input
+Group {
+ name TransformV2
+ tile_color 0xa77bb2ff
+ selected true
+ postage_stamp_frame 1001
+ addUserKnob {20 User}
+ addUserKnob {41 translate T Transform1.translate}
+ addUserKnob {41 rotate T Transform1.rotate}
+ addUserKnob {41 scale T Transform1.scale}
+ addUserKnob {41 skewX l "skew X" T Transform1.skewX}
+ addUserKnob {41 skewY l "skew Y" T Transform1.skewY}
+ addUserKnob {41 skew_order l "skew order" T Transform1.skew_order}
+ addUserKnob {41 center T Transform1.center}
+ addUserKnob {41 invert_matrix l invert T Transform1.invert_matrix}
+ addUserKnob {41 filter T Transform1.filter}
+ addUserKnob {41 clamp -STARTLINE T Transform1.clamp}
+ addUserKnob {41 black_outside l "black outside" -STARTLINE T Transform1.black_outside}
+ addUserKnob {6 mirror -STARTLINE}
+ mirror true
+ addUserKnob {41 motionblur T Transform1.motionblur}
+ addUserKnob {41 shutter T Transform1.shutter}
+ addUserKnob {41 shutteroffset l "shutter offset" T Transform1.shutteroffset}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 27
+  ypos -260
+ }
+ Dot {
+  name Dot13
+  xpos 61
+  ypos -144
+ }
+set N2ec44c00 [stack 0]
+ Dot {
+  name Dot11
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos 308
+  ypos -144
+ }
+ Dot {
+  name Dot4
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos 308
+  ypos 440
+ }
+push $N2ec44c00
+ Dot {
+  name Dot10
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -77
+  ypos -76
+ }
+set N175b2000 [stack 0]
+ Mirror {
+  Horizontal true
+  name Mirror8
+  xpos -111
+  ypos -58
+ }
+ Transform {
+  translate {{-input.format.w} 0}
+  center {1075 860}
+  shutteroffset centred
+  name Transform8
+  xpos -111
+  ypos -32
+ }
+push $N175b2000
+ Dot {
+  name Dot9
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -187
+  ypos -76
+ }
+set N175b2c00 [stack 0]
+ Mirror {
+  Horizontal true
+  Vertical true
+  name Mirror7
+  xpos -218
+  ypos -56
+ }
+ Transform {
+  translate {{-input.format.w} {input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform7
+  xpos -218
+  ypos -30
+ }
+push $N175b2c00
+ Dot {
+  name Dot8
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -305
+  ypos -76
+ }
+set N175b3800 [stack 0]
+ Dot {
+  name Dot7
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -415
+  ypos -76
+ }
+set N175b3c00 [stack 0]
+ Dot {
+  name Dot6
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -525
+  ypos -76
+ }
+set N2f2ea000 [stack 0]
+ Dot {
+  name Dot5
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -635
+  ypos -76
+ }
+set N2f2ea400 [stack 0]
+ Dot {
+  name Dot14
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -738
+  ypos -76
+ }
+set N2f2ea800 [stack 0]
+ Mirror {
+  Vertical true
+  name Mirror2
+  xpos -772
+  ypos -59
+ }
+ Transform {
+  translate {0 {-input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform4
+  xpos -772
+  ypos -33
+ }
+push $N2f2ea400
+ Mirror {
+  Horizontal true
+  Vertical true
+  name Mirror3
+  xpos -669
+  ypos -58
+ }
+ Transform {
+  translate {{input.format.w} {-input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform5
+  xpos -669
+  ypos -32
+ }
+push $N2f2ea000
+ Mirror {
+  Horizontal true
+  name Mirror4
+  xpos -559
+  ypos -59
+ }
+ Transform {
+  translate {{input.format.w} 0}
+  center {1075 860}
+  shutteroffset centred
+  name Transform6
+  xpos -559
+  ypos -33
+ }
+push $N175b3c00
+ Mirror {
+  Horizontal true
+  Vertical true
+  name Mirror5
+  xpos -449
+  ypos -58
+ }
+ Transform {
+  translate {{input.format.w} {input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform9
+  xpos -449
+  ypos -32
+ }
+push 0
+push $N175b3800
+ Mirror {
+  Vertical true
+  name Mirror6
+  xpos -339
+  ypos -58
+ }
+ Transform {
+  translate {0 {input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform10
+  xpos -339
+  ypos -32
+ }
+push $N2f2ea800
+ Dot {
+  name Dot15
+  label "  "
+  note_font "Arial Black"
+  note_font_size 16
+  xpos -841
+  ypos -76
+ }
+ Mirror {
+  Horizontal true
+  Vertical true
+  name Mirror1
+  xpos -875
+  ypos -58
+ }
+ Transform {
+  translate {{-input.format.w} {-input.format.h}}
+  center {1075 860}
+  shutteroffset centred
+  name Transform11
+  xpos -875
+  ypos -32
+ }
+ Merge2 {
+  inputs 8+1
+  name Merge1
+  xpos -449
+  ypos 26
+ }
+push $N2ec44c00
+ Merge2 {
+  inputs 2
+  name Merge2
+  selected true
+  xpos 27
+  ypos 26
+  disable {{1-parent.mirror x1034 1}}
+ }
+ Transform {
+  translate {623 0}
+  rotate -12
+  center {2224 1548}
+  black_outside false
+  shutteroffset centred
+  name Transform1
+  label "\[value filter]"
+  xpos 27
+  ypos 145
+  postage_stamp_frame 1001
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos 27
+  ypos 437
+ }
+ Output {
+  name Output1
+  xpos 27
+  ypos 610
+ }
+end_group

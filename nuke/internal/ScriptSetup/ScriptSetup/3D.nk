@@ -1,0 +1,181 @@
+#! C:/Program Files/Nuke15.0v2/nuke-15.0.2.dll -nx
+version 15.0 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-1" y="-8" w="5120" h="1377" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1250"/>
+            <splitter orientation="2">
+                <split size="963"/>
+                <dock id="" activePageId="NukeServerSocket.MainWindow">
+                    <page id="uk.co.thefoundry.scripteditor.1"/>
+                    <page id="Error Console.1"/>
+                    <page id="NukeServerSocket.MainWindow"/>
+                </dock>
+                <split size="372"/>
+                <splitter orientation="1">
+                    <split size="465"/>
+                    <dock id="" activePageId="uk.co.thefoundry.waveformscope.1">
+                        <page id="uk.co.thefoundry.waveformscope.1"/>
+                        <page id="Pixel Analyzer.1"/>
+                    </dock>
+                    <split size="472"/>
+                    <dock id="" activePageId="uk.co.thefoundry.histogram.1">
+                        <page id="uk.co.thefoundry.histogram.1"/>
+                    </dock>
+                    <split size="305"/>
+                    <dock id="" activePageId="uk.co.thefoundry.vectorscope.1">
+                        <page id="uk.co.thefoundry.vectorscope.1"/>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="2507" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1339"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="1311"/>
+            <splitter orientation="2">
+                <split size="668"/>
+                <dock id="" activePageId="Properties.1">
+                    <page id="Properties.1"/>
+                    <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+                </dock>
+                <split size="667"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/Users/chris/.nuke/Cinegrace/_tools/studio/ScriptSetup/3D.nk
+ project_directory "\[python \{nuke.script_directory()\}]"
+ fps 25
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ monitorOutLUT sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+ onScriptSave Cinegracepipe.relativepath()
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode41
+ tile_color 0xaa7a75ff
+ label <H1>Camera
+ note_font_size 42
+ selected true
+ xpos 0
+ bdwidth 497
+ bdheight 623
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode43
+ tile_color 0xaa9997ff
+ label <H3>Scene
+ note_font_size 42
+ selected true
+ xpos 672
+ ypos 2
+ bookmark false
+ bdwidth 563
+ bdheight 606
+}
+Camera3 {
+ inputs 0
+ name Camera2
+ tile_color 0x720000ff
+ label "CPH pipeline\nFocal: \[value focal]\nfps: \[value frame_rate]"
+ selected true
+ xpos 187
+ ypos 251
+ postage_stamp_frame 1001
+ addUserKnob {20 pipeline l Pipeline}
+ addUserKnob {22 getCam l "Get Camera" T "import nuke\nimport os\nimport paths\n\nrootPath = paths.get_rootpath()\nproject = paths.get_project()\nsequence = paths.get_sequence()\nshot = paths.get_shot()\n\nshotFolder = sequence + \"_\" + shot\n\nversionPath = rootPath + project + \"/vfx/_publish/camera/\" + shotFolder + \"/standard/\"\n\n\ndef chooseCam():\n    versionNames = os.listdir(versionPath)\n    versionNamesString = \" \".join(versionNames)\n\n    panel = nuke.Panel(\"Pick Version\")\n    panel.addEnumerationPulldown(\"version\", versionNamesString)\n    confirm = panel.show()\n    # Cancel if user clicks Cancel\n    if confirm == 0:\n        return\n\n    camVersion = panel.value(\"version\")\n    camVersionPath = versionPath + camVersion\n\n    fileNames = os.listdir(camVersionPath)\n    fileNamesString = \" \".join(fileNames)\n\n\n    panel = nuke.Panel(\"Pick File\")\n    panel.addEnumerationPulldown(\"file\", fileNamesString)\n    confirm = panel.show()\n \n    # Cancel if user clicks Cancel\n    if confirm == 0:\n        return\n\n    camFile = panel.value(\"file\")\n    camFilePath = camVersionPath + \"/\" + camFile\n    nuke.thisNode().knob(\"file\").setValue(camFilePath)\n    #nuke.thisNode().knob(\"frame_rate\").setValue(nuke.root().knob('fps').value())\n    read_file = nuke.thisNode().knob(\"read_from_file\")\n\n    if read_file.value() == False:\n        read_file.setValue(True)\n    else:\n        nuke.thisNode().knob(\"reload\").execute()\n\n\nif os.path.exists(versionPath) == False:\n    nuke.message(\"Path does not exist: \" + str(versionPath))\nelse:\n    chooseCam()" +STARTLINE}
+}
+NoOp {
+ name Anchor_2d5a533ef2
+ help "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021"
+ onCreate "if nuke.GUI:\n    try:\n        import stamps; stamps.anchorOnCreate()\n    except:\n        pass"
+ knobChanged stamps.anchorKnobChanged()
+ autolabel "nuke.thisNode().knob(\"title\").value()"
+ tile_color 0xffffff01
+ note_font_size 20
+ selected true
+ xpos 177
+ ypos 379
+ addUserKnob {20 anchor_tab l "Anchor Stamp"}
+ addUserKnob {26 identifier -STARTLINE +HIDDEN T anchor}
+ addUserKnob {1 title l Title: t "Displayed name on the Node Graph for this Stamp and its Anchor.\nIMPORTANT: This is only for display purposes, and is different from the real/internal name of the Stamps."}
+ title cam
+ addUserKnob {26 prev_title l "" +STARTLINE +HIDDEN T Camera1}
+ addUserKnob {26 prev_name l "" +STARTLINE +HIDDEN T Anchor_2d5a533ef2}
+ addUserKnob {3 showing l "" +STARTLINE +HIDDEN}
+ addUserKnob {1 tags l Tags t "Comma-separated tags you can define for each Anchor, that will help you find it when invoking the Stamp Selector by pressing the Stamps shortkey with nothing selected."}
+ tags Camera,
+ addUserKnob {26 line1 l "" +STARTLINE}
+ addUserKnob {26 stamps_label l Stamps: T " "}
+ addUserKnob {22 createStamp l new t "Create a new Stamp for this Anchor." -STARTLINE T stamps.stampCreateWired(nuke.thisNode())}
+ addUserKnob {22 selectStamps l select t "Reconnect all of this Anchor's Stamps." -STARTLINE T stamps.wiredSelectSimilar(nuke.thisNode().name())}
+ addUserKnob {22 reconnectStamps l reconnect -STARTLINE T stamps.anchorReconnectWired()}
+ addUserKnob {22 zoomNext l "zoom next" t "Navigate to this Anchor's next Stamp on the Node Graph." -STARTLINE T stamps.wiredZoomNext(nuke.thisNode().name())}
+ addUserKnob {26 line2 l "" +STARTLINE}
+ addUserKnob {22 buttonHelp l Help -STARTLINE T stamps.showHelp()}
+ addUserKnob {26 version l " " t "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021." -STARTLINE T "<a href=\"http://www.nukepedia.com/gizmos/other/stamps\" style=\"color:#666;text-decoration: none;\"><span style=\"color:#666\"> <big>Stamps v1.1</big></b></a>"}
+}
+NoOp {
+ inputs 0
+ name Anchor_7126f8d2
+ help "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021"
+ onCreate "if nuke.GUI:\n    try:\n        import stamps; stamps.anchorOnCreate()\n    except:\n        pass"
+ knobChanged stamps.anchorKnobChanged()
+ autolabel "nuke.thisNode().knob(\"title\").value()"
+ tile_color 0xffffff01
+ note_font_size 20
+ selected true
+ xpos 908
+ ypos 267
+ addUserKnob {20 anchor_tab l "Anchor Stamp"}
+ addUserKnob {26 identifier -STARTLINE +HIDDEN T anchor}
+ addUserKnob {1 title l Title: t "Displayed name on the Node Graph for this Stamp and its Anchor.\nIMPORTANT: This is only for display purposes, and is different from the real/internal name of the Stamps."}
+ title Scene
+ addUserKnob {26 prev_title l "" +STARTLINE +HIDDEN T Scene}
+ addUserKnob {26 prev_name l "" +STARTLINE +HIDDEN T Anchor_7126f8d2}
+ addUserKnob {3 showing l "" +STARTLINE +HIDDEN}
+ addUserKnob {1 tags l Tags t "Comma-separated tags you can define for each Anchor, that will help you find it when invoking the Stamp Selector by pressing the Stamps shortkey with nothing selected."}
+ tags 3D,
+ addUserKnob {26 line1 l "" +STARTLINE}
+ addUserKnob {26 stamps_label l Stamps: T " "}
+ addUserKnob {22 createStamp l new t "Create a new Stamp for this Anchor." -STARTLINE T stamps.stampCreateWired(nuke.thisNode())}
+ addUserKnob {22 selectStamps l select t "Reconnect all of this Anchor's Stamps." -STARTLINE T stamps.wiredSelectSimilar(nuke.thisNode().name())}
+ addUserKnob {22 reconnectStamps l reconnect -STARTLINE T stamps.anchorReconnectWired()}
+ addUserKnob {22 zoomNext l "zoom next" t "Navigate to this Anchor's next Stamp on the Node Graph." -STARTLINE T stamps.wiredZoomNext(nuke.thisNode().name())}
+ addUserKnob {26 line2 l "" +STARTLINE}
+ addUserKnob {22 buttonHelp l Help -STARTLINE T stamps.showHelp()}
+ addUserKnob {26 version l " " t "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021." -STARTLINE T "<a href=\"http://www.nukepedia.com/gizmos/other/stamps\" style=\"color:#666;text-decoration: none;\"><span style=\"color:#666\"> <big>Stamps v1.1</big></b></a>"}
+}
+Scene {
+ name Scene1
+ selected true
+ xpos 918
+ ypos 363
+}

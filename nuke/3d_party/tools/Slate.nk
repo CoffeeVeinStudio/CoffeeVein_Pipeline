@@ -1,0 +1,547 @@
+set cut_paste_input [stack 0]
+version 13.0 v2
+push $cut_paste_input
+Group {
+ name Slate_cph
+ knobChanged "\n"
+ selected true
+ xpos -940
+ ypos 7991
+ addUserKnob {20 User}
+ addUserKnob {41 message l Notes T Text_notes.message}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -155
+  ypos -465
+  addUserKnob {20 User}
+  addUserKnob {6 disable l "node disabled" +STARTLINE}
+  disable {{parent.disable}}
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  pbb true
+  name Reformat_4k
+  label "\[value filter]"
+  xpos -155
+  ypos -405
+ }
+set N78ef7c00 [stack 0]
+ Dot {
+  name Dot1
+  xpos -305
+  ypos -301
+ }
+ Reformat {
+  type "to box"
+  box_width 1000
+  box_height 560
+  box_fixed true
+  scale 0.25
+  filter Lanczos6
+  name Reformat1
+  label "\[value filter]"
+  xpos -339
+  ypos -231
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  resize none
+  center false
+  black_outside true
+  pbb true
+  name Reformat4
+  label "\[value filter]"
+  xpos -339
+  ypos -147
+ }
+ Transform {
+  translate {2568 882}
+  center {960 540}
+  filter Lanczos6
+  shutteroffset centred
+  name Transform2
+  label "\[value filter]"
+  xpos -339
+  ypos -87
+ }
+ FrameHold {
+  firstFrame 1001
+  name FrameHold1
+  xpos -339
+  ypos -39
+ }
+ Dot {
+  name Dot3
+  xpos -305
+  ypos 28
+ }
+push $N78ef7c00
+ Remove {
+  name Remove1
+  xpos -155
+  ypos -159
+ }
+ Merge2 {
+  inputs 2
+  name Merge1
+  label "\[value bbox] \n \[value mix]"
+  xpos -155
+  ypos 13
+ }
+ Dot {
+  name Dot2
+  xpos -121
+  ypos 176
+ }
+set N78ef5000 [stack 0]
+ Reformat {
+  format "1920 1080 0 0 1920 1080 1 HD_1080"
+  pbb true
+  name Reformat5
+  label "\[value filter]"
+  xpos -457
+  ypos 161
+ }
+ Expression {
+  expr0 "1-(x / width)"
+  expr1 "1-(x / width)"
+  expr2 "1-(x / width)"
+  expr3 1
+  name Expression1
+  xpos -457
+  ypos 209
+ }
+ Group {
+  name Pixelate
+  xpos -457
+  ypos 269
+  addUserKnob {20 User}
+  addUserKnob {7 size R 0.001 1}
+  size 0.004
+ }
+  Input {
+   inputs 0
+   name Input1
+   xpos 231
+   ypos -311
+  }
+  Reformat {
+   type scale
+   scale {{parent.size}}
+   filter impulse
+   name Reformat6
+   xpos 231
+   ypos -271
+  }
+  ColorCorrect {
+   name break
+   xpos 231
+   ypos -247
+  }
+  Reformat {
+   type scale
+   scale {{1/parent.Reformat6.scale}}
+   filter impulse
+   name Reformat7
+   xpos 231
+   ypos -219
+  }
+  Output {
+   name Output1
+   xpos 231
+   ypos -119
+  }
+ end_group
+ Grade {
+  blackpoint 0.06304931641
+  whitepoint 0.9379882813
+  white_clamp true
+  name Grade1
+  xpos -457
+  ypos 300
+ }
+ Reformat {
+  type "to box"
+  box_width {{Reformat_4k.width}}
+  box_height {{(Reformat_4k.height)/4}}
+  box_fixed true
+  center false
+  filter impulse
+  clamp true
+  name Reformat6
+  label "\[value filter]"
+  xpos -457
+  ypos 383
+ }
+ Crop {
+  box {{"input.width - input.width"} {"input.height - input.height "} {input.width} {input.height}}
+  name Crop2
+  xpos -457
+  ypos 419
+ }
+push $N78ef5000
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "\[value bbox] \n \[value mix]"
+  xpos -155
+  ypos 407
+ }
+ Dot {
+  name Dot6
+  xpos -121
+  ypos 487
+ }
+set N78e98c00 [stack 0]
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[lrange \[split \[metadata input/filename]  \"./_\"] end-2 end-2]\n"
+  old_message {{82 79 87 95 49 48 50 95 48 48 49 95 48 48 49 48 95 118 48 48 49 10}
+    }
+  old_expression_markers {{0 6 8 15 17 20}
+    }
+  box {389 1315.5 2364 1444.5}
+  transforms {{0 2}
+    }
+  cursor_position 101
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version_preview
+  xpos 25
+  ypos 567
+  addUserKnob {20 User}
+ }
+push $N78e98c00
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[lrange \[split \[lrange \[split \[value root.name] \"./\"] end-1 end-1] \"_\"] 6 6]\n\n\n\n\n\n"
+  old_message {{82 79 87 95 49 48 49 95 48 49 55 95 48 51 48 48 95 118 48 48 51 10 10 10 10 10 10}
+    }
+  old_expression_markers {{0 6 8 15 17 20}
+    }
+  box {389 1315.5 2364 1444.5}
+  transforms {{0 2}
+    }
+  cursor_position 178
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version3
+  xpos -155
+  ypos 543
+  addUserKnob {20 User}
+ }
+ Switch {
+  inputs 2
+  which {{"\[python \\\"preview\\\"\\ in\\ nuke.scriptName()]"}}
+  name Switch2
+  xpos -155
+  ypos 591
+ }
+ Text2 {
+  font_size_toolbar 46
+  font_width_toolbar 100
+  font_height_toolbar 100
+  box {389 884 2348 1180}
+  transforms {{0 2}
+    }
+  font_size 46
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_notes
+  xpos -155
+  ypos 640
+  addUserKnob {20 User}
+ }
+push $N78ef7c00
+ Dot {
+  name Dot4
+  xpos -365
+  ypos -390
+ }
+ Dot {
+  name Dot5
+  xpos -666
+  ypos -390
+ }
+set N78e1f000 [stack 0]
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]"
+  old_message {{82 79 87 95 49 48 49 95 48 49 55 95 48 51 48 48}
+    }
+  old_expression_markers {{0 6 8 15}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify center
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64 0 64 1 64 2 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64}
+    }
+  cursor_position 101
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Text_version1
+  xpos -700
+  ypos -153
+  addUserKnob {20 User}
+ }
+ Text2 {
+  font_size_toolbar 65
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[date %Y_%m_%d]"
+  old_message {{50 48 50 50 95 49 48 95 50 52}
+    }
+  old_expression_markers {{0 9}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{2 65 3 65 4 65 5 65 6 65 7 65 8 65 9 65 0 65 1 65}
+    }
+  cursor_position 15
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 65
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Date
+  xpos -700
+  ypos -23
+ }
+ Text2 {
+  font_size_toolbar 65
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "frame: \[frame]"
+  old_message {{102 114 97 109 101 58 32 49 48 51 55}
+    }
+  old_expression_markers {{7 10}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{7 65 8 65 9 65 10 65 0 65 1 65 2 65 3 65 4 65 5 65 6 65}
+    }
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 65
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1152}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Frame
+  xpos -700
+  ypos 49
+ }
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Copenhagen Visual"
+  old_message {{67 111 112 101 110 104 97 103 101 110 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64 16 64}
+    }
+  cursor_position 17
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor
+  xpos -700
+  ypos 135
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[timecode]"
+  old_message {{91 116 105 109 101 99 111 100 101 93}
+    }
+  box {60 37 {"input.width - box.x "} {"input.height - box.y - 1"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{32 20 32 93 0 100 1 100 2 100 3 100 4 100 5 100 6 100 7 100 8 100 9 100}
+    }
+  cursor_position 10
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.63
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name timecode
+  xpos -700
+  ypos 241
+ }
+ Dot {
+  name Dot11
+  xpos -661
+  ypos 686
+ }
+ Switch {
+  inputs 2
+  which {{"frame<(\[topnode].first_frame)?1:0" x1000 1 0}}
+  name Switch1
+  xpos -155
+  ypos 683
+ }
+ Reformat {
+  type "to box"
+  box_width {{input.width}}
+  box_height {{input.height}}
+  box_fixed true
+  center false
+  clamp true
+  name Reformat7
+  label "\[value filter]"
+  xpos -155
+  ypos 729
+ }
+ Output {
+  name Output1
+  xpos -155
+  ypos 813
+ }
+push $N78e1f000
+ Dot {
+  name Dot7
+  xpos -973
+  ypos -218
+ }
+set N78e1c400 [stack 0]
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[metadata input/filename]  \"./_\"] 6 6]_\[lrange \[split \[metadata input/filename]  \"./_\"] 7 7]_\[string tolower \[lrange \[split \[metadata input/filename]  \"./_\"] end-2 end-2]]\n"
+  old_message {{82 78 68 95 115 104 105 109 109 101 114 109 97 103 105 99 95 118 48 48 57 10}
+    }
+  old_expression_markers {{0 2 4 15 17 20}
+    }
+  box {389 1315.5 2364 1444.5}
+  transforms {{0 2}
+    }
+  cursor_position 187
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version2
+  xpos -1007
+  ypos -162
+  addUserKnob {20 User}
+ }
+push $N78e1c400
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"./_\"] 6 6]_\[lrange \[split \[value root.name] \"./_\"] end-3 end-3]_\[lrange \[split \[value root.name] \"./_\"] end-1 end-1]\n\n"
+  old_message {{82 78 68 95 100 101 108 105 118 101 114 121 87 111 114 107 105 110 103 83 112 101 99 115 95 118 48 48 52 10 10}
+    }
+  old_expression_markers {{0 2 4 23 25 28}
+    }
+  box {389 1315.5 2364 1444.5}
+  transforms {{0 2}
+    }
+  cursor_position 150
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version4
+  xpos -887
+  ypos -161
+  addUserKnob {20 User}
+ }
+ Switch {
+  inputs 2
+  which {{"\[python \\\"preview\\\"\\ in\\ nuke.scriptName()]"}}
+  name Switch3
+  xpos -1007
+  ypos -105
+ }
+push $N78e98c00
+ ViewMetaData {
+  metadatafilter filen
+  name ViewMetaData1
+  xpos 112
+  ypos 495
+ }
+end_group

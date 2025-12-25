@@ -1,0 +1,23 @@
+set cut_paste_input [stack 0]
+version 10.0 v1
+push 0
+push $cut_paste_input
+LensDistortion {
+ inputs 2
+ serializeKnob ""
+ serialiseKnob "22 serialization::archive 9 0 0 0 0 0 0 0 0 0 0 0 0"
+ distortion1 -0.0002478416136
+ distortion2 0.0001315286936
+ distortionCenter {0.0002055835939 0.0005858624936}
+ invertDistortion true
+ cardScale {1.000116348 1.000116348 1}
+ a 0.0002533441002
+ b -0.0002815505723
+ c -0.0001419852342
+ alignmentCorrection {0.9863842726 -0.01075308304 -5.71831697e-006 0.006196151953 1.003151059 -4.478918356e-007 -8.443902969 -0.02336847782 1}
+ name LeicaMacro_80mm
+ tile_color 0xff00
+ selected true
+ xpos 2324
+ ypos -164
+}

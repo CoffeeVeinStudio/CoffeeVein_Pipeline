@@ -1,0 +1,1275 @@
+set cut_paste_input [stack 0]
+version 14.0 v3
+push $cut_paste_input
+Group {
+ name Slate_cph_default
+ selected true
+ xpos -2188
+ ypos 848
+ addUserKnob {20 User}
+ addUserKnob {6 aces_check l "ACES check" +INVISIBLE +STARTLINE}
+ aces_check {{"\[python 'aces'\\ in\\ nukesession.get_colorManagement().lower()]"}}
+ addUserKnob {41 message l Notes T Text_vendor_notes.message}
+ addUserKnob {7 preview_aspect R 0.8 3}
+ preview_aspect 1
+ addUserKnob {4 vendor_pulldown l vendor M {CPHVISUAL RKVVISUAL MLMVISUAL HMBVISUAL NONE}}
+ addUserKnob {1 project_name}
+}
+ Read {
+  inputs 0
+  file_type dpx
+  file //fs/data/_pipeline/_bin/nuke/graphics/colorcharts/Digital_LAD_4096x3112.dpx
+  localizationPolicy onDemand
+  format "4096 3112 0 0 4096 3112 1 4K_Super_35(full-ap)"
+  origset true
+  raw true
+  name Read6
+  xpos 546
+  ypos -114
+ }
+ Dot {
+  name Dot12
+  xpos 580
+  ypos 36
+ }
+set N890c5000 [stack 0]
+ Dot {
+  name Dot13
+  xpos 695
+  ypos 36
+ }
+ OCIOColorSpace {
+  in_colorspace "Input - ADX - ADX10"
+  out_colorspace "ACES - ACEScg"
+  name OCIOColorSpace1
+  xpos 661
+  ypos 99
+ }
+ Dot {
+  name Dot14
+  xpos 695
+  ypos 164
+ }
+push $N890c5000
+ Colorspace {
+  colorspace_in Cineon
+  name Colorspace2
+  xpos 546
+  ypos 100
+ }
+ Switch {
+  inputs 2
+  which {{aces_check}}
+  name ACES_check
+  xpos 546
+  ypos 161
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  resize fit
+  black_outside true
+  pbb true
+  name Reformat7
+  label "\[value filter]"
+  xpos 546
+  ypos 217
+ }
+ Transform {
+  translate {-812 76}
+  scale 0.792
+  center {1920 1080}
+  shutteroffset centred
+  name Transform3
+  label "\[value filter]"
+  xpos 546
+  ypos 341
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -155
+  ypos -773
+  addUserKnob {20 User}
+  addUserKnob {6 disable l "node disabled" +STARTLINE}
+  disable {{parent.disable}}
+ }
+ Crop {
+  box {{input.format.x} {input.format.y} {input.format.r} {input.format.t}}
+  reformat true
+  crop false
+  name Crop1_remove_outsidepixels1
+  xpos -155
+  ypos -694
+ }
+ Reformat {
+  type "to box"
+  box_width {{input.width}}
+  box_height {{"input.width / preview_aspect"}}
+  box_fixed true
+  pbb true
+  name Reformat9
+  label "\[value filter]\n\[value preview_aspect]"
+  xpos -155
+  ypos -626
+  addUserKnob {20 User}
+  addUserKnob {7 preview_aspect R 0.8 3}
+  preview_aspect {{parent.preview_aspect}}
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  black_outside true
+  name Reformat10
+  label "\[value filter]"
+  xpos -155
+  ypos -540
+ }
+ Crop {
+  box {{input.format.x} {input.format.y} {input.format.r} {input.format.t}}
+  name Crop1_remove_outsidepixels
+  xpos -155
+  ypos -464
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  black_outside true
+  name Reformat_4k
+  label "\[value filter]"
+  xpos -155
+  ypos -405
+ }
+set N79b0b000 [stack 0]
+ Dot {
+  name Dot1
+  xpos -305
+  ypos -301
+ }
+ Reformat {
+  type "to box"
+  box_width 1000
+  box_height 560
+  box_fixed true
+  scale 0.25
+  filter Lanczos6
+  name Reformat1
+  label "\[value filter]"
+  xpos -339
+  ypos -235
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  resize none
+  center false
+  black_outside true
+  pbb true
+  name Reformat4
+  label "\[value filter]"
+  xpos -339
+  ypos -149
+ }
+ Transform {
+  translate {2568 882}
+  center {960 540}
+  filter Lanczos6
+  shutteroffset centred
+  name Transform2
+  label "\[value filter]"
+  xpos -339
+  ypos -89
+ }
+ FrameHold {
+  firstFrame 1001
+  name FrameHold1
+  xpos -339
+  ypos -40
+ }
+ Dot {
+  name Dot3
+  xpos -305
+  ypos 28
+ }
+push $N79b0b000
+ Remove {
+  name Remove1
+  xpos -155
+  ypos -159
+ }
+ Merge2 {
+  inputs 2
+  name Merge1
+  label "\[value bbox] \n \[value mix]"
+  xpos -155
+  ypos 13
+  disable true
+ }
+ Dot {
+  name Dot2
+  xpos -121
+  ypos 176
+ }
+set N6be95c00 [stack 0]
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge4
+  label "\[value bbox] \n \[value mix]"
+  xpos -155
+  ypos 335
+ }
+set N1d72e000 [stack 0]
+ Dot {
+  name Dot10
+  xpos -121
+  ypos 514
+ }
+set N1d72e400 [stack 0]
+ Dot {
+  name Dot16
+  xpos 24
+  ypos 514
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[lrange \[split \[metadata input/filename]  \"./_\"] end-2 end-2]\n"
+  old_message {{66 69 95 52 49 52 49 95 10}
+    }
+  old_expression_markers {{0 1 3 6 8 7}
+    }
+  box {2326.75 1584 3702 1880.5}
+  transforms {{0 2}
+    }
+  cursor_position 164
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version_preview1
+  xpos -10
+  ypos 557
+  addUserKnob {20 User}
+ }
+ Dot {
+  name Dot15
+  xpos 24
+  ypos 621
+ }
+push $N1d72e400
+ Text2 {
+  font_size_toolbar 70
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[lrange \[split \[lrange \[split \[value root.name] \"./\"] end-1 end-1] \"_\"] 6 6]\n\n"
+  old_message {{76 66 95 49 48 56 48 95 10 10}
+    }
+  old_expression_markers {{0 1 3 6 8 7}
+    }
+  box {2326.75 1584 3702 1880.5}
+  transforms {{0 2}
+    }
+  font_size_values {{0 70 1 70 2 70 3 70 4 70 5 70 6 70 7 70 8 70 9 70 0 90 1 90 2 90 3 90 4 90 5 90 7 90 8 90 9 90}
+    }
+  cursor_position 180
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 70
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_version6
+  xpos -155
+  ypos 570
+  addUserKnob {20 User}
+ }
+ Switch {
+  inputs 2
+  which {{"\[python \\\"preview\\\"\\ in\\ nuke.scriptName()]"}}
+  name Switch4
+  xpos -155
+  ypos 618
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Project:\nVendor:\nFilename:\nDate:\nFramecount:"
+  old_message {{80 114 111 106 101 99 116 58 10 86 101 110 100 111 114 58 10 70 105 108 101 110 97 109 101 58 10 68 97 116 101 58 10 70 114 97 109 101 99 111 117 110 116 58}
+    }
+  box {2327.25 1175 2684.75 1653}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{0 100 1 100 2 100 3 100 4 100 5 100 6 100 7 100 8 100 9 100 10 100 11 100 12 100 13 100 14 100 15 100 16 100 17 100 18 100 19 100 20 100 21 100 22 100 23 100 24 100 25 100 26 100 27 100 28 100 29 100 30 100 31 100 32 100 33 100 34 100 35 100 36 100 37 100 38 100 39 100 40 100 41 100 42 100 43 100}
+    }
+  baseline_values {{0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0 16 0 17 0 18 0 19 0 20 0 21 0 22 0 23 0 24 0 26 0 27 0 28 0 29 0 30 0 31 0 32 0 33 0 34 0 35 0 36 0 37 0 38 0 39 0 40 0 41 0 42 0 43 0 0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0 16 0 17 0 18 0 19 0 20 0 21 0 22 0 23 0 24 0 26 0 27 0 28 0 29 0 30 0 31 0 32 0 33 0 34 0 35 0 36 0 37 0 38 0 39 0 40 0 41 0 42 0 43 0}
+    }
+  cursor_position 44
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.46
+  leading 0.6
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_info_labels
+  xpos -155
+  ypos 709
+  addUserKnob {20 User}
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[value parent.project_name]\n\[value vendor_switch1.input.message]\n\[lindex \[split \[file tail \[knob \[topnode parent.input0].file]] \".\"] 0].mov\n\[date %Y/%m/%d]\n\[expr \{\[value input.last_frame] - \[value input.first_frame] +1 \}]"
+  old_message {{10 67 111 112 101 110 104 97 103 101 110 32 86 105 115 117 97 108 10 91 108 105 110 100 101 120 32 91 115 112 108 105 116 32 91 102 105 108 101 32 116 97 105 108 32 91 107 110 111 98 32 91 116 111 112 110 111 100 101 32 112 97 114 101 110 116 46 105 110 112 117 116 48 93 46 102 105 108 101 93 93 32 34 46 34 93 32 48 93 46 109 111 118 10 50 48 50 51 47 49 49 47 50 49 10 55 50}
+    }
+  old_expression_markers {{0 -1 1 17 94 103 105 106}
+    }
+  box {2757 1170 3603 1653}
+  transforms {{0 2}
+    }
+  font_size_values {{18 100 19 100 20 100 21 100 22 100 23 100 24 100 25 100 26 100 27 100 28 100 29 100 30 100 31 100 32 100 33 100 34 100 35 100 36 100 37 100 38 100 39 100}
+    }
+  cursor_position 221
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.46
+  leading 0.6
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_info
+  xpos -155
+  ypos 791
+  addUserKnob {20 User}
+ }
+ Text2 {
+  font_size_toolbar 50
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Vendors notes:"
+  old_message {{86 101 110 100 111 114 115 32 110 111 116 101 115 58}
+    }
+  box {2330.5 1088.4375 3521 1159.5625}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{0 50 1 50 2 50 3 50 4 50 5 50 6 50 7 50 8 50 9 50 10 50 11 50 12 50 13 50}
+    }
+  cursor_position 7
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 50
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_notes_Label
+  xpos -155
+  ypos 837
+  addUserKnob {20 User}
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  box {2330.5 416 3604 1066}
+  transforms {{0 2}
+    }
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.46
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  name Text_vendor_notes
+  xpos -155
+  ypos 888
+  addUserKnob {20 User}
+ }
+ Dot {
+  inputs 0
+  name Dot8
+  label NONE
+  note_font_size 31
+  xpos -2998
+  ypos 166
+ }
+ Dot {
+  name Dot9
+  xpos -2998
+  ypos 197
+ }
+ Read {
+  inputs 0
+  file_type png
+  file //fs/data/_pipeline/_bin/nuke/graphics/company_logo/HMBVISUAL.png
+  localizationPolicy onDemand
+  format "3488 667 0 0 3488 667 1 "
+  origset true
+  name Read3
+  xpos -2479
+  ypos 12
+ }
+ Read {
+  inputs 0
+  file_type png
+  file //fs/data/_pipeline/_bin/nuke/graphics/company_logo/MLMVISUAL.png
+  localizationPolicy onDemand
+  format "3488 667 0 0 3488 667 1 "
+  origset true
+  name Read4
+  xpos -2794
+  ypos 11
+ }
+ Read {
+  inputs 0
+  file_type png
+  file //fs/data/_pipeline/_bin/nuke/graphics/company_logo/RKVVISUAL.png
+  localizationPolicy onDemand
+  format "3488 667 0 0 3488 667 1 "
+  origset true
+  name Read5
+  xpos -2623
+  ypos 12
+ }
+ Read {
+  inputs 0
+  file_type png
+  file //fs/data/_pipeline/_bin/nuke/graphics/company_logo/CPHVISUAL.png
+  localizationPolicy onDemand
+  format "3488 667 0 0 3488 667 1 "
+  origset true
+  name Read2
+  xpos -2951
+  ypos 17
+ }
+ Switch {
+  inputs 5
+  which {{parent.vendor_pulldown}}
+  name vendor_switch
+  xpos -2713
+  ypos 194
+ }
+ set C8441e400 [stack 0]
+ Keyer {
+  operation "luminance key"
+  name Keyer1
+  xpos -2713
+  ypos 251
+ }
+ Reformat {
+  format "3840 2160 0 0 3840 2160 1 UHD_4K"
+  resize none
+  center false
+  pbb true
+  name Reformat2
+  label "\[value filter]"
+  xpos -2713
+  ypos 320
+ }
+ Transform {
+  translate {571 1614}
+  scale 0.11
+  center {3210 505}
+  shutteroffset centred
+  name Transform1
+  label "\[value filter]"
+  xpos -2713
+  ypos 390
+ }
+ ColorLookup {
+  lut {master {curve C 0 L x0.8765074015 1.001524806}
+    red {}
+    green {}
+    blue {}
+    alpha {}}
+  name ColorLookup1
+  xpos -2713
+  ypos 502
+ }
+ Clamp {
+  minimum_enable false
+  maximum 10
+  MaxClampTo 10
+  MaxClampTo_enable true
+  name Clamp1
+  xpos -2713
+  ypos 602
+ }
+ Dot {
+  name Dot6
+  xpos -2140
+  ypos 611
+ }
+set N8891e000 [stack 0]
+ Dot {
+  name Dot7
+  xpos -2140
+  ypos 756
+ }
+push $N8891e000
+ Transform {
+  translate {6 -3}
+  center {1920 1080}
+  shutteroffset centred
+  name Transform4
+  label "\[value filter]"
+  xpos -2004
+  ypos 602
+ }
+ Blur {
+  channels alpha
+  size 11
+  name Blur1
+  label "\[value size]"
+  xpos -2004
+  ypos 649
+ }
+push $N79b0b000
+ Dot {
+  name Dot4
+  xpos -365
+  ypos -390
+ }
+ Dot {
+  name Dot5
+  xpos -1622
+  ypos -390
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]"
+  old_message {{65 115 115 101 116 115 121 115 116 101 109 50 100 95 48 95 54 95 104 105 103 104 112 114 105 111}
+    }
+  old_expression_markers {{0 16 18 25}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify center
+  transforms {{0 2}
+    }
+  font_size_values {{0 100 1 100 17 100 18 100 19 100 20 100 0 64 1 64 17 64 18 64 19 64 20 64}
+    }
+  cursor_position 101
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.5
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  enable_shadows true
+  shadow_angle 335
+  shadow_distance 6
+  shadow_softness 2.4
+  name Text_seq_shot_name
+  xpos -1656
+  ypos -152
+  disable true
+  addUserKnob {20 User}
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[string tolower \[lrange \[split \[metadata input/filename]  \"./_\"] end-2 end-2]]"
+  old_message {{76 66 95 49 48 56 48 95}
+    }
+  old_expression_markers {{0 1 3 6 8 7}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{2 100 3 100 4 100 5 100 7 100 0 100 1 100}
+    }
+  cursor_position 180
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.6
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  enable_shadows true
+  shadow_opacity 1
+  shadow_angle 335
+  shadow_distance 6
+  shadow_softness 2.4
+  shadow_size 1
+  name Date_sequence_shot_version
+  xpos -1656
+  ypos -86
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[date %Y/%m/%d]"
+  old_message {{50 48 50 51 47 49 49 47 50 49}
+    }
+  old_expression_markers {{0 9}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{8 100 9 100 0 100 1 100 2 100 3 100 4 100 5 100 6 100 7 100}
+    }
+  cursor_position 15
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.6
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1152}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  enable_shadows true
+  shadow_opacity 1
+  shadow_angle 335
+  shadow_distance 6
+  shadow_softness 2.4
+  shadow_size 1
+  name Date
+  xpos -1656
+  ypos -12
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[frame]"
+  old_message {{49 48 52 55}
+    }
+  old_expression_markers {{0 3}
+    }
+  box {60 34 {"input.width - box.x" x1001 3780} {"input.height - box.y" x1001 2064}}
+  xjustify center
+  yjustify bottom
+  transforms {{0 2}
+    }
+  font_size_values {{0 100 1 100 2 100 3 100}
+    }
+  cursor_position 7
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.5
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1152}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  enable_shadows true
+  shadow_opacity 1
+  shadow_angle 335
+  shadow_distance 6
+  shadow_softness 2.4
+  shadow_size 1
+  name Frame1
+  xpos -1656
+  ypos 88
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[value input.first_frame] - \[value input.last_frame]"
+  old_message {{49 48 48 49 32 45 32 49 48 55 50}
+    }
+  old_expression_markers {{0 3 7 10}
+    }
+  box {60 34 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 100 1 100 2 100 3 100 0 65 4 100 5 100 6 100 7 100 8 100 9 100 10 100}
+    }
+  cursor_position 52
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.5
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1152}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  enable_shadows true
+  shadow_opacity 1
+  shadow_angle 335
+  shadow_distance 6
+  shadow_softness 2.4
+  shadow_size 1
+  name Frame_range
+  xpos -1656
+  ypos 149
+ }
+set N6b01a800 [stack 0]
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[value parent.project_name]"
+  old_expression_markers {{0 -1}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  cursor_position 27
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 10
+  name project_name
+  xpos -1651
+  ypos 320
+  disable true
+ }
+ Grade {
+  inputs 1+1
+  white 0.23
+  name Grade2
+  xpos -1651
+  ypos 661
+ }
+ Merge2 {
+  inputs 2
+  name Merge2
+  label "\[value bbox] \n \[value mix]"
+  selected true
+  xpos -1651
+  ypos 741
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[timecode]"
+  old_message {{91 116 105 109 101 99 111 100 101 93}
+    }
+  box {60 37 {"box.x "} {"input.height - box.y - 1"}}
+  transforms {{0 2}
+    }
+  font_size_values {{32 20 32 93 0 100 1 100 2 100 3 100 4 100 5 100 6 100 7 100 8 100 9 100}
+    }
+  cursor_position 10
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.63
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name timecode
+  xpos -1651
+  ypos 813
+  disable true
+ }
+ Dot {
+  name Dot11
+  xpos -1617
+  ypos 991
+ }
+ Switch {
+  inputs 2
+  which {{"frame<(\[topnode].first_frame)?1:0" x1000 1 0}}
+  name Switch1
+  xpos -155
+  ypos 988
+ }
+ Reformat {
+  type "to box"
+  box_width {{Crop1_remove_outsidepixels.width}}
+  box_height {{Crop1_remove_outsidepixels.height}}
+  box_fixed true
+  center false
+  clamp true
+  name Reformat3
+  label "\[value filter]"
+  xpos -155
+  ypos 1137
+ }
+ Output {
+  name Output1
+  xpos -155
+  ypos 1220
+ }
+push $N6be95c00
+ Reformat {
+  format "1920 1080 0 0 1920 1080 1 HD_1080"
+  pbb true
+  name Reformat5
+  label "\[value filter]"
+  xpos -457
+  ypos 161
+ }
+ Expression {
+  expr0 "1-(x / width)"
+  expr1 "1-(x / width)"
+  expr2 "1-(x / width)"
+  expr3 1
+  name Expression1
+  xpos -457
+  ypos 209
+ }
+ Group {
+  name Pixelate
+  xpos -457
+  ypos 267
+  addUserKnob {20 User}
+  addUserKnob {7 size R 0.001 1}
+  size 0.004
+ }
+  Input {
+   inputs 0
+   name Input1
+   xpos 231
+   ypos -311
+  }
+  Reformat {
+   type scale
+   scale {{parent.size}}
+   filter impulse
+   name Reformat6
+   xpos 231
+   ypos -271
+  }
+  ColorCorrect {
+   name break
+   xpos 231
+   ypos -247
+  }
+  Reformat {
+   type scale
+   scale {{1/parent.Reformat6.scale}}
+   filter impulse
+   name Reformat7
+   xpos 231
+   ypos -219
+  }
+  Output {
+   name Output1
+   xpos 231
+   ypos -119
+  }
+ end_group
+ Grade {
+  blackpoint 0.06304931641
+  whitepoint 0.9379882813
+  white_clamp true
+  name Grade1
+  xpos -457
+  ypos 301
+ }
+ Reformat {
+  type "to box"
+  box_width {{Reformat_4k.width}}
+  box_height {{(Reformat_4k.height)/4}}
+  box_fixed true
+  center false
+  filter impulse
+  clamp true
+  name Reformat6
+  label "\[value filter]"
+  xpos -457
+  ypos 383
+ }
+ Crop {
+  box {{"input.width - input.width"} {"input.height - input.height "} {input.width} {input.height}}
+  name Crop2
+  xpos -457
+  ypos 419
+ }
+push $N1d72e000
+ ViewMetaData {
+  metadatafilter filen
+  name ViewMetaData2
+  xpos 109
+  ypos 522
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Hamburg Visual"
+  old_message {{72 97 109 98 117 114 103 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64}
+    }
+  cursor_position 14
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_HMB1
+  xpos -965
+  ypos 624
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Reykjavik Visual"
+  old_message {{82 101 121 107 106 97 118 105 107 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64}
+    }
+  cursor_position 16
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_RKV1
+  xpos -1082
+  ypos 626
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Malmö Visual"
+  old_message {{77 97 108 109 246 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64}
+    }
+  cursor_position 9
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_MLM1
+  xpos -1193
+  ypos 623
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Copenhagen Visual"
+  old_message {{67 111 112 101 110 104 97 103 101 110 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64 16 64}
+    }
+  cursor_position 17
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_CPH1
+  xpos -1312
+  ypos 624
+ }
+ Switch {
+  inputs 4
+  which {{parent.vendor_pulldown}}
+  name vendor_switch1
+  xpos -1131
+  ypos 729
+ }
+ Text2 {
+  inputs 0
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[lrange \[split \[value root.name] \"/\"] end-4 end-4]_\[lrange \[split \[value root.name] \"/\"] end-3 end-3]_\[string tolower \[lrange \[split \[metadata input/filename]  \"./_\"] end-2 end-2]]"
+  old_message {{65 115 115 101 116 115 121 115 116 101 109 50 100 95 48 95 54 95 104 105 103 104 112 114 105 111 95 91 115 116 114 105 110 103 32 116 111 108 111 119 101 114 32 91 108 114 97 110 103 101 32 91 115 112 108 105 116 32 91 109 101 116 97 100 97 116 97 32 105 110 112 117 116 47 102 105 108 101 110 97 109 101 93 32 32 34 46 47 95 34 93 32 101 110 100 45 50 32 101 110 100 45 50 93 93}
+    }
+  old_expression_markers {{0 16 18 25}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify center
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 0 64 1 64 2 64 3 64 4 64 5 64}
+    }
+  cursor_position 110
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  center {960 540}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{194.5 742.5}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 960 540 0 0 1 1 0 0 0 0}
+    }
+  color 10
+  name Text_sequence_shot_version1
+  xpos -1524
+  ypos -18
+  disable true
+  addUserKnob {20 User}
+ }
+ Text2 {
+  inputs 0
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "\[timecode]"
+  old_message {{91 116 105 109 101 99 111 100 101 93}
+    }
+  box {60 37 {"input.width - box.x "} {"input.height - box.y - 1"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{32 20 32 93 0 100 1 100 2 100 3 100 4 100 5 100 6 100 7 100 8 100 9 100}
+    }
+  cursor_position 10
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  global_font_scale 0.63
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name timecode1
+  xpos -2150
+  ypos 835
+  disable true
+ }
+ Text2 {
+  inputs 0
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_None
+  xpos -1807
+  ypos 348
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Hamburg Visual"
+  old_message {{72 97 109 98 117 114 103 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64}
+    }
+  cursor_position 14
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_HMB
+  xpos -1955
+  ypos 350
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Reykjavik Visual"
+  old_message {{82 101 121 107 106 97 118 105 107 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64}
+    }
+  cursor_position 16
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_RKV
+  xpos -2075
+  ypos 358
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Malmö Visual"
+  old_message {{77 97 108 109 246 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64}
+    }
+  cursor_position 9
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_MLM
+  xpos -2186
+  ypos 355
+ }
+push $N6b01a800
+ Text2 {
+  font_size_toolbar 64
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Copenhagen Visual"
+  old_message {{67 111 112 101 110 104 97 103 101 110 32 86 105 115 117 97 108}
+    }
+  box {60 37 {"input.width - box.x"} {"input.height - box.y"}}
+  xjustify right
+  transforms {{0 2}
+    }
+  font_size_values {{0 64 1 64 2 64 3 64 4 64 5 64 6 64 7 64 8 64 9 64 10 64 11 64 12 64 13 64 14 64 15 64 16 64}
+    }
+  cursor_position 17
+  font {{ Arial : Regular : arial.ttf : 0 }}
+  font_size 64
+  scale {1 1}
+  cursor_initialised true
+  autofit_bbox false
+  initial_cursor_position {{0 1133.900024}
+    }
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1024 576 0 0 1 1 0 0 0 0}
+    }
+  color 55
+  name Vendor_CPH
+  xpos -2305
+  ypos 357
+ }
+clone $C8441e400 {
+  inputs 5
+  xpos -2113
+  ypos 424
+  selected false
+ }
+end_group

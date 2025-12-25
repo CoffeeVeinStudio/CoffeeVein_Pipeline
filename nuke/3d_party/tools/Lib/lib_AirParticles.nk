@@ -1,0 +1,1105 @@
+#! C:/Program Files/Nuke10.5v3/nuke-10.5.3.dll -nx
+version 10.5 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-8" y="-8" w="2576" h="1416" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1897" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1354"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="2560" y="0" w="2560" h="1440" maximized="1" screen="1">
+        <splitter orientation="2">
+            <split size="1401"/>
+            <dock id="" activePageId="DAG.1" focus="true">
+                <page id="DAG.1"/>
+                <page id="Curve Editor.1"/>
+                <page id="DopeSheet.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name R:/nuke/ToolSets/Lib/lib_AirParticles.nk
+ frame 20
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config aces_1.0.1
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT "ACES - ACEScg"
+ monitorLut "ACES/sRGB D60 sim."
+ int8Lut "ACES - ACEScc"
+ int16Lut "Utility - Raw"
+ logLut "ACES - ACEScc"
+ floatLut "ACES - ACEScg"
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0x8e388e00
+ label "DPX 2048x1152"
+ note_font_size 42
+ xpos -730
+ ypos -343
+ bdwidth 2520
+ bdheight 182
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode2
+ tile_color 0x8e8e3800
+ label EXR
+ note_font_size 42
+ xpos -727
+ ypos -146
+ bdheight 182
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode3
+ tile_color 0x7171c600
+ label "QuickTIME\n"
+ note_font_size 42
+ xpos -726
+ ypos 47
+ bdwidth 5050
+ bdheight 182
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode4
+ tile_color 0x71c67100
+ label "Quicktime  1920x1080"
+ note_font_size 42
+ xpos -751
+ ypos 314
+ bdwidth 430
+ bdheight 182
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-020-COLOR/AirParticles-020-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read1
+ xpos -720
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-001-COLOR/AirParticles-001-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read4
+ xpos -390
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-002-COLOR/AirParticles-002-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 180
+ origfirst 0
+ origlast 180
+ origset true
+ name Read5
+ xpos -280
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-003-COLOR/AirParticles-003-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 160
+ origfirst 0
+ origlast 160
+ origset true
+ name Read6
+ xpos -170
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-003-COLOR/AirParticles-003-COLOR.mov
+ localizationPolicy off
+ last 161
+ origlast 161
+ origset true
+ colorspace Gamma1.8
+ mov32_codec {{0} "Apple ProRes 4444 (appl - ap4h)"}
+ mov32_pixel_format {{0} "default (RGBA  16-bit (b64a))" "RGBA  8-bit" "RGBA  16-bit (b64a)" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCrA 32-bit 444 Float (r4fl)"}
+ name Read7
+ xpos -60
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-003-COLOR/AirParticles-003-prores.mov
+ localizationPolicy off
+ last 161
+ origlast 161
+ origset true
+ colorspace Gamma1.8
+ mov32_codec {{0} "Apple ProRes 4444 (appl - ap4h)"}
+ mov32_pixel_format {{0} "default (RGBA  16-bit (b64a))" "RGBA  8-bit" "RGBA  16-bit (b64a)" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCrA 32-bit 444 Float (r4fl)"}
+ name Read8
+ xpos 50
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-004-COLOR/AirParticles-004-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 119
+ origfirst 0
+ origlast 119
+ origset true
+ name Read9
+ xpos 160
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-005-COLOR/AirParticles-005-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read10
+ xpos 270
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-006-COLOR/AirParticles-006-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 224
+ origfirst 0
+ origlast 224
+ origset true
+ name Read11
+ xpos 380
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-007-COLOR/AirParticles-007-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 199
+ origfirst 0
+ origlast 199
+ origset true
+ name Read12
+ xpos 490
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-008-COLOR/AirParticles-008-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 189
+ origfirst 0
+ origlast 189
+ origset true
+ name Read13
+ xpos 600
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-009-COLOR/AirParticles-009-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read14
+ xpos 710
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-010-COLOR/AirParticles-010-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read15
+ xpos 820
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-011-COLOR/AirParticles-011-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read16
+ xpos 930
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-012-COLOR/AirParticles-012-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read17
+ xpos 1040
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-013-COLOR/AirParticles-013-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read18
+ xpos 1150
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-014-COLOR/AirParticles-014-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 195
+ origfirst 0
+ origlast 195
+ origset true
+ name Read19
+ xpos 1260
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-016-COLOR/AirParticles-016-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read20
+ xpos 1370
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-017-COLOR/AirParticles-017-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read21
+ xpos 1480
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-018-COLOR/AirParticles-018-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read22
+ xpos 1590
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-019-COLOR/AirParticles-019-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read23
+ xpos 1700
+ ypos -263
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/EXR/AirParticles_Side_Fast.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ last 375
+ origlast 375
+ origset true
+ name Read24
+ xpos -718
+ ypos -66
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-013/AirParticles-013-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read26
+ xpos -716
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-014/AirParticles-014-ALPHA.mov
+ localizationPolicy off
+ last 196
+ origlast 196
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read27
+ xpos -606
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-014/AirParticles-014-COLOR.mov
+ localizationPolicy off
+ last 196
+ origlast 196
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read28
+ xpos -496
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-016/AirParticles-016-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read29
+ xpos -386
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-016/AirParticles-016-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read30
+ xpos -276
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-017/AirParticles-017-ALPHA.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read31
+ xpos -166
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-017/AirParticles-017-COLOR.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read32
+ xpos -56
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-018/AirParticles-018-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read34
+ xpos 54
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-019/AirParticles-019-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read35
+ xpos 164
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-019/AirParticles-019-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read36
+ xpos 274
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-020/AirParticles-020-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read37
+ xpos 384
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-020/AirParticles-020-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read38
+ xpos 494
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-020/png
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read39
+ xpos 604
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-022/AirParticles-022-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read40
+ xpos 714
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-022/AirParticles-022-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read41
+ xpos 824
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-022/Thumbs.db
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read42
+ xpos 934
+ ypos 127
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/PRORES 4444/ALPHA"
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read43
+ xpos 1044
+ ypos 127
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/PRORES 4444/COLOR"
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read44
+ xpos 1154
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-001/AirParticles-001-ALPHA.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read45
+ xpos 1264
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-001/AirParticles-001-COLOR.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read46
+ xpos 1374
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-001/Thumbs.db
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read47
+ xpos 1484
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-002/AirParticles-002-ALPHA.mov
+ localizationPolicy off
+ last 181
+ origlast 181
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read48
+ xpos 1594
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-002/AirParticles-002-COLOR.mov
+ localizationPolicy off
+ last 181
+ origlast 181
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read49
+ xpos 1704
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-003/AirParticles-003-ALPHA.mov
+ localizationPolicy off
+ last 161
+ origlast 161
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read50
+ xpos 1814
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-003/AirParticles-003-COLOR.mov
+ localizationPolicy off
+ last 161
+ origlast 161
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read51
+ xpos 1924
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-004/AirParticles-004-ALPHA.mov
+ localizationPolicy off
+ last 120
+ origlast 120
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read52
+ xpos 2034
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-004/AirParticles-004-COLOR.mov
+ localizationPolicy off
+ last 120
+ origlast 120
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read53
+ xpos 2144
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-005/AirParticles-005-ALPHA.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read54
+ xpos 2254
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-005/AirParticles-005-COLOR.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read55
+ xpos 2364
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-006/AirParticles-006-ALPHA.mov
+ localizationPolicy off
+ last 225
+ origlast 225
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read56
+ xpos 2474
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-006/AirParticles-006-COLOR.mov
+ localizationPolicy off
+ last 225
+ origlast 225
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read57
+ xpos 2584
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-007/AirParticles-007-ALPHA.mov
+ localizationPolicy off
+ last 200
+ origlast 200
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read58
+ xpos 2694
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-007/AirParticles-007-COLOR.mov
+ localizationPolicy off
+ last 200
+ origlast 200
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read59
+ xpos 2804
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-008/AirParticles-008-COLOR.mov
+ localizationPolicy off
+ last 190
+ origlast 190
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read61
+ xpos 2914
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-009/AirParticles-009-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read62
+ xpos 3024
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-009/AirParticles-009-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read63
+ xpos 3134
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-010/AirParticles-010-ALPHA.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read64
+ xpos 3244
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-010/AirParticles-010-COLOR.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read65
+ xpos 3354
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-010/Thumbs.db
+ localizationPolicy off
+ origset true
+ colorspace "ACES - ACES2065-1"
+ name Read66
+ xpos 3464
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-011/AirParticles-011-ALPHA.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read67
+ xpos 3574
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-011/AirParticles-011-COLOR.mov
+ localizationPolicy off
+ last 240
+ origlast 240
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read68
+ xpos 3684
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-012/AirParticles-012-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read69
+ xpos 3794
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-012/AirParticles-012-COLOR.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read70
+ xpos 3904
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-008/AirParticles-008-ALPHA.mov
+ localizationPolicy off
+ last 190
+ origlast 190
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read60
+ xpos 4014
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-018/AirParticles-018-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ name Read33
+ xpos 4124
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/AirParticles-013/AirParticles-013-ALPHA.mov
+ localizationPolicy off
+ last 360
+ origlast 360
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "Apple Photo - JPEG (appl - jpeg)"}
+ mov32_pixel_format {{0} "default (YCbCrA 8-bit 444 Biased (r408))" "RGBA  8-bit" "YCbCrA 8-bit 444 (v408)" "YCbCrA 8-bit 444 Biased (r408)" "YCbCr  8-bit 422 (2vuy)"}
+ xpos 4234
+ ypos 127
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/AirParticles-022-COLOR/AirParticles-022-COLOR.%03d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read2
+ xpos -604
+ ypos -261
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/AirParticles/DPX/2048x1152/png\[001-375]/png%03d.dpx"
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 374
+ origfirst 0
+ origlast 374
+ origset true
+ name Read3
+ xpos -500
+ ypos -259
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/Quicktime/1920x1080/170307_Particles_29_1080p.mp4
+ localizationPolicy off
+ last 431
+ origlast 431
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "H.264-afkoder (appl - avc1)"}
+ mov32_pixel_format {{0} "default (YCbCr  8-bit 422 (2vuy))" "RGBA  8-bit" "YCbCr  8-bit 422 (2vuy)"}
+ name Read71
+ xpos -741
+ ypos 394
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/Quicktime/1920x1080/170307_Particles_09_1080p.mp4
+ localizationPolicy off
+ last 501
+ origlast 501
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "H.264-afkoder (appl - avc1)"}
+ mov32_pixel_format {{0} "default (YCbCr  8-bit 422 (2vuy))" "RGBA  8-bit" "YCbCr  8-bit 422 (2vuy)"}
+ name Read72
+ xpos -631
+ ypos 394
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/Quicktime/1920x1080/170307_Particles_14_1080p.mp4
+ localizationPolicy off
+ last 408
+ origlast 408
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "H.264-afkoder (appl - avc1)"}
+ mov32_pixel_format {{0} "default (YCbCr  8-bit 422 (2vuy))" "RGBA  8-bit" "YCbCr  8-bit 422 (2vuy)"}
+ name Read73
+ xpos -521
+ ypos 394
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/AirParticles/Quicktime/Quicktime/1920x1080/170307_Particles_20_1080p.mp4
+ localizationPolicy off
+ last 664
+ origlast 664
+ origset true
+ colorspace "ACES - ACES2065-1"
+ mov32_codec {{0} "H.264-afkoder (appl - avc1)"}
+ mov32_pixel_format {{0} "default (YCbCr  8-bit 422 (2vuy))" "RGBA  8-bit" "YCbCr  8-bit 422 (2vuy)"}
+ name Read25
+ xpos -411
+ ypos 394
+}

@@ -1,0 +1,564 @@
+#! C:/Program Files/Nuke10.5v3/nuke-10.5.3.dll -nx
+version 10.5 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-8" y="-8" w="2576" h="1416" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1897" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1354"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="2560" y="0" w="2560" h="1440" maximized="1" screen="1">
+        <splitter orientation="2">
+            <split size="1401"/>
+            <dock id="" activePageId="DAG.1" focus="true">
+                <page id="DAG.1"/>
+                <page id="Curve Editor.1"/>
+                <page id="DopeSheet.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name R:/nuke/ToolSets/Lib/lib_atmosphere.nk
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config aces_1.0.1
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT "ACES - ACEScg"
+ monitorLut "ACES/sRGB D60 sim."
+ int8Lut "ACES - ACEScc"
+ int16Lut "Utility - Raw"
+ logLut "ACES - ACEScc"
+ floatLut "ACES - ACEScg"
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0x7171c600
+ label 2048x1556
+ note_font_size 42
+ xpos -825
+ ypos -300
+ bdwidth 1860
+ bdheight 182
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode2
+ tile_color 0x388e8e00
+ label 2048x1152
+ note_font_size 42
+ xpos -834
+ ypos 30
+ bdwidth 1970
+ bdheight 182
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-021/Atmosphere-021-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read1
+ xpos -815
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-021/Atmosphere-021-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read2
+ xpos -705
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-022/Atmosphere-022-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read3
+ xpos -595
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-022/Atmosphere-022-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read4
+ xpos -485
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-023/Atmosphere-023-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 240
+ origfirst 0
+ origlast 240
+ origset true
+ name Read5
+ xpos -375
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-023/Atmosphere-023-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 240
+ origfirst 0
+ origlast 240
+ origset true
+ name Read6
+ xpos -265
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-024/Atmosphere-024-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 360
+ origfirst 0
+ origlast 360
+ origset true
+ name Read7
+ xpos -155
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-024/Atmosphere-024-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 360
+ origfirst 0
+ origlast 360
+ origset true
+ name Read8
+ xpos -45
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-025/Atmosphere-025-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read9
+ xpos 65
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-025/Atmosphere-025-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read10
+ xpos 175
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-026/Atmosphere-026-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 240
+ origfirst 0
+ origlast 240
+ origset true
+ name Read11
+ xpos 285
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-026/Atmosphere-026-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 240
+ origfirst 0
+ origlast 240
+ origset true
+ name Read12
+ xpos 395
+ ypos -220
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/FX Elements - Atmosphere-027/Atmosphere-027.%08d.dpx"
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 97505
+ last 97865
+ origfirst 97505
+ origlast 97865
+ origset true
+ name Read13
+ xpos 505
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-019/Atmosphere-019-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 264
+ origfirst 0
+ origlast 264
+ origset true
+ name Read14
+ xpos 615
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-019/Atmosphere-019-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 264
+ origfirst 0
+ origlast 264
+ origset true
+ name Read15
+ xpos 725
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-020/Atmosphere-020-matte.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read16
+ xpos 835
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1556/Atmosphere-020/Atmosphere-020-RGB.%08d.dpx
+ localizationPolicy off
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ first 0
+ last 288
+ origfirst 0
+ origlast 288
+ origset true
+ name Read17
+ xpos 945
+ ypos -220
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-004/Atmosphere-004-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 199
+ origfirst 0
+ origlast 199
+ origset true
+ name Read18
+ xpos -824
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-005/Atmosphere-005-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 294
+ origfirst 0
+ origlast 294
+ origset true
+ name Read19
+ xpos -714
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-006/Atmosphere-006-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read20
+ xpos -604
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-007/Atmosphere-007-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read21
+ xpos -494
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-008/Atmosphere-008-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read22
+ xpos -384
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-009/Atmosphere-009-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read23
+ xpos -274
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-010/Atmosphere-010-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read24
+ xpos -164
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-011/Atmosphere-011-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 299
+ origfirst 0
+ origlast 299
+ origset true
+ name Read25
+ xpos -54
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-012/Atmosphere-012-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 299
+ origfirst 0
+ origlast 299
+ origset true
+ name Read26
+ xpos 56
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-013/Atmosphere-013-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read27
+ xpos 166
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-014/Atmosphere-014-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read28
+ xpos 276
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-015/Atmosphere-015-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read29
+ xpos 386
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-016/Atmosphere-016-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read30
+ xpos 496
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-017/Atmosphere-017-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read31
+ xpos 606
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-018/Atmosphere-018-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read32
+ xpos 716
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-001/Atmosphere-001-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 239
+ origfirst 0
+ origlast 239
+ origset true
+ name Read33
+ xpos 826
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-002/Atmosphere-002-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 359
+ origfirst 0
+ origlast 359
+ origset true
+ name Read34
+ xpos 936
+ ypos 110
+}
+Read {
+ inputs 0
+ file //10.11.0.184/171000_TGB_Library/Stock/atmosphere/DPX/2048x1152/Atmosphere-003/Atmosphere-003-COLOR.%08d.dpx
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 0
+ last 199
+ origfirst 0
+ origlast 199
+ origset true
+ name Read35
+ xpos 1046
+ ypos 110
+}

@@ -1,0 +1,536 @@
+#! C:/Program Files/Nuke10.5v3/nuke-10.5.3.dll -nx
+version 10.5 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="2560" h="1400" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1881" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1338"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="2560" y="0" w="2560" h="1440" maximized="1" screen="1">
+        <splitter orientation="2">
+            <split size="1401"/>
+            <dock id="" activePageId="DAG.1" focus="true">
+                <page id="DAG.1"/>
+                <page id="Curve Editor.1"/>
+                <page id="DopeSheet.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name R:/nuke/ToolSets/Lib/lib_Snow.nk
+ frame 2
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0x388e8e00
+ label "Fx-Elements - 2048x1080"
+ note_font_size 42
+ xpos -710
+ ypos -528
+ bdwidth 1640
+ bdheight 170
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode2
+ tile_color 0x71c67100
+ label "FX-Elements - 2048x1152"
+ note_font_size 42
+ xpos -703
+ ypos -264
+ bdwidth 1420
+ bdheight 170
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode3
+ tile_color 0x365f36ff
+ label MISC
+ note_font_size 42
+ xpos -720
+ ypos -13
+ bdwidth 320
+ bdheight 170
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode4
+ tile_color 0x388e8e00
+ label ShutterStock
+ note_font_size 42
+ xpos -334
+ ypos -19
+ bdheight 196
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-047/Snow-047.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read1
+ xpos -700
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-048/Snow-048.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read2
+ xpos -590
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-049/Snow-049.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read3
+ xpos -480
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-050/Snow-050.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read4
+ xpos -370
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-051/Snow-051.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read5
+ xpos -260
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-052/Snow-052.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read6
+ xpos -150
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-053/Snow-053.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1221
+ origfirst 1001
+ origlast 1221
+ origset true
+ name Read7
+ xpos -40
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-054/Snow-054.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1249
+ origfirst 1001
+ origlast 1249
+ origset true
+ name Read8
+ xpos 70
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-055/Snow-055.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1345
+ origfirst 1001
+ origlast 1345
+ origset true
+ name Read9
+ xpos 180
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-056/Snow-056.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1251
+ origfirst 1001
+ origlast 1251
+ origset true
+ name Read10
+ xpos 290
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-057/Snow-057.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1294
+ origfirst 1001
+ origlast 1294
+ origset true
+ name Read11
+ xpos 400
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-058/Snow-058.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1251
+ origfirst 1001
+ origlast 1251
+ origset true
+ name Read12
+ xpos 510
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-059/Snow-059.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1260
+ origfirst 1001
+ origlast 1260
+ origset true
+ name Read13
+ xpos 620
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-045/Snow-045.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1241
+ origfirst 1001
+ origlast 1241
+ origset true
+ name Read14
+ xpos 730
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1080/FX-Elements_Pack_4/Snow-046/Snow-046.%04d.exr
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1301
+ origfirst 1001
+ origlast 1301
+ origset true
+ name Read15
+ xpos 840
+ ypos -448
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-005/Snow-005.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1397
+ origfirst 1001
+ origlast 1397
+ origset true
+ name Read16
+ xpos -693
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-006/Snow-006.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1400
+ origfirst 1001
+ origlast 1400
+ origset true
+ name Read17
+ xpos -583
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-007/Snow-007.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1400
+ origfirst 1001
+ origlast 1400
+ origset true
+ name Read18
+ xpos -473
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-008/Snow-008.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1320
+ origfirst 1001
+ origlast 1320
+ origset true
+ name Read19
+ xpos -363
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-009/Snow-009.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1300
+ origfirst 1001
+ origlast 1300
+ origset true
+ name Read20
+ xpos -253
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-010/Snow-010.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1240
+ origfirst 1001
+ origlast 1240
+ origset true
+ name Read21
+ xpos -143
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-011/Snow-011.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1240
+ origfirst 1001
+ origlast 1240
+ origset true
+ name Read22
+ xpos -33
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-012/Snow-012.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1367
+ origfirst 1001
+ origlast 1367
+ origset true
+ name Read23
+ xpos 77
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-013/Snow-013.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1240
+ origfirst 1001
+ origlast 1240
+ origset true
+ name Read24
+ xpos 187
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-001/Snow-001.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1240
+ origfirst 1001
+ origlast 1240
+ origset true
+ name Read25
+ xpos 297
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-002/Snow-002.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1300
+ origfirst 1001
+ origlast 1300
+ origset true
+ name Read26
+ xpos 407
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-003/Snow-003.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1320
+ origfirst 1001
+ origlast 1320
+ origset true
+ name Read27
+ xpos 517
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/FX-Elements/2048x1152/FX-Elements_Pack_1/Snow-004/Snow-004.%04d.exr
+ localizationPolicy off
+ format "2048 1152 0 0 2048 1152 1 "
+ first 1001
+ last 1345
+ origfirst 1001
+ origlast 1345
+ origset true
+ name Read28
+ xpos 627
+ ypos -184
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/Misc/1920x1080/snow-storm-on-black-background_NJA7WQw/snow-storm-on-black-background_NJA7WQw.%04d.dpx
+ localizationPolicy off
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ last 450
+ origlast 450
+ origset true
+ name Read29
+ xpos -710
+ ypos 67
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/Misc/3840x2160/057307430-fast-falling-real-snowflakes-f_prores/057307430-fast-falling-real-snowflakes-f_prores.%04d.dpx
+ localizationPolicy off
+ format "3840 2160 0 0 3840 2160 1 UHD_4K"
+ last 1500
+ origlast 1500
+ origset true
+ name Read31
+ xpos -600
+ ypos 67
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/Misc/3840x2160/059740257-falling-snow-left-right_prores/059740257-falling-snow-left-right_prores.%04d.dpx
+ localizationPolicy off
+ format "3840 2160 0 0 3840 2160 1 UHD_4K"
+ last 1024
+ origlast 1024
+ origset true
+ name Read30
+ xpos -490
+ ypos 67
+}
+Read {
+ inputs 0
+ file Z:/Stock/snow/EXR/Shutterstock/1920x1080/shutterstock_v7926646.%04d.exr
+ localizationPolicy off
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ first 1001
+ last 1900
+ origfirst 1001
+ origlast 1900
+ origset true
+ name Read32
+ xpos -324
+ ypos 61
+}

@@ -1,0 +1,23 @@
+set cut_paste_input [stack 0]
+version 10.0 v1
+push 0
+push $cut_paste_input
+LensDistortion {
+ inputs 2
+ serializeKnob ""
+ serialiseKnob "22 serialization::archive 9 0 0 0 0 0 0 0 0 0 0 0 0"
+ distortion1 -0.01545363385
+ distortion2 0.002920313971
+ distortionCenter {0.02156290412 -0.02093458176}
+ invertDistortion true
+ cardScale {0.987691462 0.987691462 1}
+ a -0.003548207227
+ b 0.01049694698
+ c 0.007763921283
+ alignmentCorrection {1.004208446 0.0006903167232 1.35796904e-006 0.001278904732 1.002468348 -7.882367186e-007 -2.005122185 -1.684739828 1}
+ name CookeS4i_40mm
+ tile_color 0xff00
+ selected true
+ xpos 468
+ ypos -154
+}

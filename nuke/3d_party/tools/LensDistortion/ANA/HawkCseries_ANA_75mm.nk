@@ -1,0 +1,23 @@
+set cut_paste_input [stack 0]
+version 10.0 v1
+push 0
+push $cut_paste_input
+LensDistortion {
+ inputs 2
+ serializeKnob ""
+ serialiseKnob "22 serialization::archive 9 0 0 0 0 0 0 0 0 0 0 0 0"
+ distortion1 -0.01395247132
+ distortion2 -0.0002333683369
+ distortionCenter {-0.01799832843 0.02234648913}
+ invertDistortion true
+ cardScale {0.4930946529 0.4930946529 1}
+ a 1.519805551
+ b 0.1189442873
+ c -1.785404205
+ alignmentCorrection {0.9902096391 -0.001742037712 -5.114040505e-006 0.00676623825 0.9994926453 1.384042179e-007 -12.44636726 0.2427419722 1}
+ name HawkCseries_ANA_75mm
+ tile_color 0xff00
+ selected true
+ xpos 2
+ ypos -335
+}

@@ -1,0 +1,98 @@
+set cut_paste_input [stack 0]
+version 15.0 v2
+push $cut_paste_input
+Gizmo {
+ name DefocusAnalize
+ help "Designed to analyze the focus values of a plate. \n-Tyler Lockard\n\nKnown Caveats:\n    •Results may be inaccurate if mask changes \n    in shape and size throughout shot.\n\n    •FG occluding objects will probably create \n    spikes in the analysis. Delete these \n    keyframes once you bake the curve and let\n    it interpolate this section.\n\n    •Strong motion blur will skew results, \n    requires manual finesse of resulting curve.\n\n\nFirst, run the analysis.\n(It's strongly recommended to mask out the defocusing area.)\n\nScrub through and find the sharpest frame you can, then hit USE CURRENT FRAME under FOCUSED FRAME. \n\nLikewise, find the most defocused frame you can and hit USE CURRENT FRAME under DEFOCUSED FRAME.\n\nMULTIPLY and LIFT are supplied for user control. LIFT should be increased if your plate is never fully in focus. MULTIPLY will scale the overall effect. \n\nHitting BAKE will take the resulting curve and bake it to keyframes. This animation is then applied to a newly created Defocus node. From here, the curve can be tweaked as desired.\n\n\n    (Note: After analysis, this node operates like a \n     normal defocus. Connect me to your element \n     to preview the effect before baking.)\n"
+ tile_color 0xd38353ff
+ selected true
+}
+ Input {
+  inputs 0
+  name Mask
+  xpos 880
+  ypos -707
+  number 1
+ }
+ Invert {
+  name Invert1
+  xpos 880
+  ypos -594
+ }
+ Input {
+  inputs 0
+  name Input1
+  xpos 717
+  ypos -707
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  name Merge1
+  xpos 717
+  ypos -588
+ }
+ Dot {
+  name Dot2
+  xpos 751
+  ypos -397
+ }
+set N16543800 [stack 0]
+ Dot {
+  name Dot1
+  xpos 488
+  ypos -397
+ }
+ EdgeDetectWrapper {
+  name EdgeDetect1
+  xpos 454
+  ypos -344
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  xpos 454
+  ypos -308
+ }
+ CurveTool {
+  ROI {0 0 1920 1072}
+  autocropdata {0 0 1920 1072}
+  name CurveTool1
+  xpos 454
+  ypos -264
+ }
+ NoOp {
+  inputs 0
+  name Controller
+  xpos 586
+  ypos -300
+  addUserKnob {20 User}
+  addUserKnob {3 framelow l "Focused Frame" t "Select the frame where the plate is the most IN FOCUS\n\nIf it's never fully in focus, you may need to use the LIFT CURVE knob to adjust this base."}
+  framelow 1
+  addUserKnob {22 useCurrent1 l "Use Current Frame" -STARTLINE T "current = nuke.Root()\['frame'].value()\nnuke.thisNode()\['framelow'].setValue(current)"}
+  addUserKnob {3 low -STARTLINE}
+  low {{CurveTool1.intensitydata(framelow)}}
+  addUserKnob {3 frameHigh l "Defocused Frame" t "Select the frame where the plate is the most DEFOCUSED"}
+  frameHigh 100
+  addUserKnob {22 useCurrent2 l "Use Current Frame" -STARTLINE T "current = nuke.Root()\['frame'].value()\nnuke.thisNode()\['frameHigh'].setValue(current)"}
+  addUserKnob {3 high -STARTLINE}
+  high {{CurveTool1.intensitydata(frameHigh)}}
+  addUserKnob {7 Multiply l "Multiply Curve" t "Multiply the defocus curve by a value." R 1 50}
+  Multiply 5
+  addUserKnob {7 Lift l "Lift Curve" t "Globally increases the defocused curve by a value." R 0 10}
+ }
+push $N16543800
+ Defocus {
+  defocus {{"((CurveTool1.intensitydata.integrate(frame-2, frame+2)/4-Controller.low)/(Controller.high-Controller.low))*Controller.Multiply+Controller.Lift"}}
+  name Defocus1
+  xpos 717
+  ypos -269
+ }
+ Output {
+  name Output1
+  xpos 717
+  ypos -68
+ }
+end_group

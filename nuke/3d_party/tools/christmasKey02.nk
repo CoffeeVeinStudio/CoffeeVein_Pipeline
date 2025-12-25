@@ -1,0 +1,2036 @@
+set cut_paste_input [stack 0]
+version 14.0 v3
+BackdropNode {
+ inputs 0
+ name BackdropNode2
+ tile_color 0x7171c600
+ label "BG element"
+ note_font_size 92
+ selected true
+ xpos -1167
+ ypos 3984
+ bdwidth 243
+ bdheight 250
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode3
+ tile_color 0x8e8e3800
+ label "Green\nScreen Footage"
+ note_font_size 42
+ selected true
+ xpos -3951
+ ypos 3674
+ bdwidth 304
+ bdheight 254
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode4
+ tile_color 0x8e8e3800
+ label "Edge Matte"
+ note_font_size 72
+ selected true
+ xpos -2765
+ ypos 4444
+ bdwidth 431
+ bdheight 387
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode5
+ tile_color 0x7171c600
+ label "Core Matte"
+ note_font_size 62
+ selected true
+ xpos -3289
+ ypos 4398
+ bdwidth 354
+ bdheight 482
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode6
+ tile_color 0x71c67100
+ note_font_size 42
+ selected true
+ xpos -3847
+ ypos 5856
+ bdwidth 285
+ bdheight 312
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode7
+ tile_color 0x8e8e3800
+ label "Edge Despill"
+ note_font_size 62
+ selected true
+ xpos -3948
+ ypos 4424
+ bdwidth 494
+ bdheight 430
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode8
+ tile_color 0x7171c600
+ label "Core Despill"
+ note_font_size 72
+ selected true
+ xpos -5018
+ ypos 4421
+ bdwidth 609
+ bdheight 583
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode9
+ tile_color 0x3c6d8eff
+ label "BG despill mix"
+ note_font_size 62
+ selected true
+ xpos -4163
+ ypos 6247
+ bdwidth 1039
+ bdheight 366
+}
+push $cut_paste_input
+PostageStamp {
+ name Stamp5
+ help "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021"
+ onCreate "if nuke.GUI:\n    try:\n        import stamps; stamps.wiredOnCreate()\n    except:\n        pass\n"
+ knobChanged "import stamps; stamps.wiredKnobChanged()"
+ autolabel "nuke.thisNode().knob(\"title\").value()"
+ tile_color 0x1000001
+ note_font Verdana
+ note_font_size 20
+ selected true
+ xpos -3851
+ ypos 3777
+ hide_input true
+ postage_stamp true
+ addUserKnob {20 wired_tab l "Wired Stamp"}
+ addUserKnob {26 identifier -STARTLINE +HIDDEN T wired}
+ addUserKnob {3 lockCallbacks l "" +STARTLINE +HIDDEN}
+ addUserKnob {6 toReconnect -STARTLINE +HIDDEN}
+ addUserKnob {1 title l Title: t "Displayed name on the Node Graph for this Stamp and its Anchor.\nIMPORTANT: This is only for display purposes, and is different from the real/internal name of the Stamps."}
+ title "denoise plate01"
+ addUserKnob {26 prev_title l "" +STARTLINE +HIDDEN T "denoise plate01"}
+ addUserKnob {26 tags l Tags: t "Tags of this stamp's Anchor, for information purpose only.\nClick \"show anchor\" to change them." T <i>2D</i>}
+ addUserKnob {26 backdrops l Backdrops: t "Labels of backdrop nodes which contain this stamp's Anchor." T "<i><H1>Denoise plates,Sources</i>"}
+ addUserKnob {26 line1 l "" +STARTLINE}
+ addUserKnob {6 postageStamp_show l "postage stamp" t "Enable the postage stamp thumbnail in this node.\nYou're seeing this because the class of this node includes the postage_stamp knob." +STARTLINE}
+ postageStamp_show true
+ addUserKnob {26 anchor_label l Anchor: T " "}
+ addUserKnob {22 show_anchor l " show anchor " t "Show the properties panel for this Stamp's Anchor." -STARTLINE T stamps.wiredShowAnchor()}
+ addUserKnob {22 zoom_anchor l "zoom anchor" t "Navigate to this Stamp's Anchor on the Node Graph." -STARTLINE T stamps.wiredZoomAnchor()}
+ addUserKnob {26 stamps_label l Stamps: T " "}
+ addUserKnob {22 zoomNext l " zoom next " t "Navigate to this Stamp's next sibling on the Node Graph." -STARTLINE T stamps.wiredZoomNext()}
+ addUserKnob {22 selectSimilar l " select similar " t "Select all similar Stamps to this one on the Node Graph." -STARTLINE T stamps.wiredSelectSimilar()}
+ addUserKnob {26 space_1 l "" +STARTLINE T " "}
+ addUserKnob {26 reconnect_label l Reconnect: t "Reconnect by the stored Anchor name." T " "}
+ addUserKnob {22 reconnect_this l this t "Reconnect this Stamp to its Anchor, by its stored Anchor name." -STARTLINE T "n = nuke.thisNode()\ntry:\n    n.setInput(0,nuke.toNode(n.knob(\"anchor\").value()))\nexcept:\n    nuke.message(\"Unable to reconnect.\")\ntry:\n    import stamps\n    stamps.wiredGetStyle(n)\nexcept:\n    pass\n"}
+ addUserKnob {22 reconnect_similar l similar t "Reconnect this Stamp and similar ones to their Anchor, by their stored anchor name." -STARTLINE T stamps.wiredReconnectSimilar()}
+ addUserKnob {22 reconnect_all l all t "Reconnect all the Stamps to their Anchors, by their stored anchor names." -STARTLINE T stamps.wiredReconnectAll()}
+ addUserKnob {26 space_2 l "" +STARTLINE T " "}
+ addUserKnob {20 advanced_reconnection l "Advanced Reconnection" n 2}
+ addUserKnob {26 reconnect_by_title_label l "<font color=gold>By Title:" t "Reconnect by searching for a matching title." T " "}
+ addUserKnob {22 reconnect_by_title_this l this t "Look for an Anchor that shares this Stamp's title, and connect this Stamp to it.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectByTitle()}
+ addUserKnob {22 reconnect_by_title_similar l similar t "Look for an Anchor that shares this Stamp's title, and connect this Stamp and similar ones to it.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectByTitleSimilar()}
+ addUserKnob {22 reconnect_by_title_selected l selected t "For each Stamp selected, look for an Anchor that shares its title, and connect to it.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectByTitleSelected()}
+ addUserKnob {26 reconnect_by_selection_label l "<font color=orangered>By Selection:" t "Force reconnect to a selected Anchor." T " "}
+ addUserKnob {22 reconnect_by_selection_this l this t "Force reconnect this Stamp to a selected Anchor, whatever its name or title.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectBySelection()}
+ addUserKnob {22 reconnect_by_selection_similar l similar t "Force reconnect this Stamp and similar ones to a selected Anchor, whatever its name or title.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectBySelectionSimilar()}
+ addUserKnob {22 reconnect_by_selection_selected l selected t "Force reconnect all selected Stamps to an also selected Anchor, whatever its name or title.\nIMPORTANT: Use this carefully, and only when the normal reconnection doesn't work." -STARTLINE T stamps.wiredReconnectBySelectionSelected()}
+ addUserKnob {1 anchor l Anchor}
+ anchor Anchor_36d1e11ee3
+ addUserKnob {6 auto_reconnect_by_title l "<font color=#ED9977>&nbsp; auto-reconnect by title" t "When creating this stamp again (like on copy-paste), auto-reconnect it by title instead of doing it by the saved anchor's name, and auto-turn this off immediately.\nIMPORTANT: Should be off by default. Only use this for setting up templates." +STARTLINE}
+ addUserKnob {26 line2 l "" +STARTLINE}
+ addUserKnob {22 buttonHelp l Help -STARTLINE T stamps.showHelp()}
+ addUserKnob {26 version l " " t "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021." -STARTLINE T "<a href=\"http://www.nukepedia.com/gizmos/other/stamps\" style=\"color:#666;text-decoration: none;\"><span style=\"color:#666\"> <big>Stamps v1.1</big></b></a>"}
+}
+Dot {
+ name Dot4
+ label "raw color\nplate"
+ note_font_size 31
+ selected true
+ xpos -3827
+ ypos 3963
+}
+add_layer {GS GS.red GS.green GS.blue GS.alpha}
+Shuffle {
+ black red
+ white green
+ red2 blue
+ green2 alpha
+ out2 GS
+ name Shuffle17
+ label "\[value in]"
+ selected true
+ xpos -3861
+ ypos 4018
+}
+Dot {
+ name Dot5
+ selected true
+ xpos -3827
+ ypos 4134
+}
+set N57476400 [stack 0]
+Dot {
+ name Dot6
+ selected true
+ xpos -3827
+ ypos 4532
+}
+set N57476800 [stack 0]
+Dot {
+ name Dot8
+ selected true
+ xpos -3592
+ ypos 4532
+}
+push $N57476800
+DespillMadness {
+ name DespillMadness3
+ note_font "Bitstream Vera Sans"
+ selected true
+ xpos -3851
+ ypos 4622
+ sourceLuma false
+ maskChannel -rgba.alpha
+}
+Dot {
+ name Dot61
+ selected true
+ xpos -3837
+ ypos 4693
+}
+set Na9c23400 [stack 0]
+Merge2 {
+ inputs 2
+ operation minus
+ name Merge5
+ selected true
+ xpos -3627
+ ypos 4696
+}
+Saturation {
+ saturation 0
+ name Saturation1
+ selected true
+ xpos -3636
+ ypos 4766
+}
+set N57477800 [stack 0]
+push $Na9c23400
+Dot {
+ name Dot9
+ selected true
+ xpos -3837
+ ypos 4769
+}
+set N57477c00 [stack 0]
+Merge2 {
+ inputs 2
+ operation plus
+ name Merge6
+ label "test lunimance match"
+ selected true
+ xpos -3746
+ ypos 4760
+}
+Dot {
+ inputs 0
+ name Dot31
+ selected true
+ xpos -1074
+ ypos 4064
+}
+Read {
+ inputs 0
+ file_type exr
+ file //fs/data/UNTITLED/vfx/sq9999/sh0010/nuke/renders/elements/BG_office_sh010/v001/sq9999_sh0010_BG_office_sh010_v001.####.exr
+ localizationPolicy onDemand
+ first 1001
+ last 1225
+ origfirst 1001
+ origlast 1225
+ origset true
+ version 1
+ colorspace linear
+ name Read7
+ knobChanged "import nodegraph;nodegraph.changed()"
+ tile_color 0xff00ff
+ selected true
+ xpos -1342
+ ypos 3896
+ addUserKnob {20 pipeline}
+ addUserKnob {6 pipeline_enabled l enable -STARTLINE}
+ pipeline_enabled true
+ addUserKnob {1 proj}
+ proj UNTITLED
+ addUserKnob {1 seq}
+ seq sq9999
+ addUserKnob {1 shot}
+ shot sh0010
+ addUserKnob {1 filter}
+ addUserKnob {6 show_sequences -STARTLINE}
+ show_sequences true
+ addUserKnob {6 show_stepped -STARTLINE}
+ addUserKnob {6 show_single -STARTLINE}
+ addUserKnob {6 show_deprecated -STARTLINE}
+ addUserKnob {4 type M {comp slapcomp element plate breakdown gradingmatte}}
+ type element
+ addUserKnob {4 element M {BG_office_sh010 denoise}}
+ addUserKnob {4 ver M {v000 v001 latest}}
+ ver latest
+ addUserKnob {26 depdivider l "" +STARTLINE}
+ addUserKnob {22 deprecate_element l "<font color='tomato'>deprecate_element" -STARTLINE T "print(\"deprecate_element\"), nuke.thisNode().name()"}
+ addUserKnob {22 deprecate l "<font color='tomato'>deprecate" -STARTLINE T "print(\"deprecate\"), nuke.thisNode().name()"}
+ addUserKnob {22 undeprecate l "<font color='grey'>undeprecate" -STARTLINE T "print(\"undeprecate\")"}
+ addUserKnob {22 nonDeletable l "<font color='grey'>nonDeletable" -STARTLINE T "print(\"nondeletable\")"}
+ addUserKnob {22 Deletable l "<font color='tomato'>Deletable" -STARTLINE T "print(\"deletable\")"}
+}
+FrameHold {
+ firstFrame 1001
+ name FrameHold1
+ selected true
+ xpos -1342
+ ypos 3995
+}
+Grade {
+ name Grade4
+ selected true
+ xpos -1342
+ ypos 4132
+}
+Shuffle2 {
+ fromInput1 {{0} B}
+ fromInput2 {{0} B}
+ mappings "4 rgba.red 0 0 rgba.red 0 0 rgba.green 0 1 rgba.green 0 1 rgba.blue 0 2 rgba.blue 0 2 white -1 -1 rgba.alpha 0 3"
+ name Shuffle5
+ selected true
+ xpos -1342
+ ypos 4272
+}
+Transform {
+ translate {-44 -620}
+ rotate 2
+ scale 0.88
+ center {2016 1512}
+ shutteroffset centred
+ name Transform3
+ label "\[value filter]"
+ selected true
+ xpos -1342
+ ypos 4331
+}
+GridWarp3 {
+ toolbar_visibility_src false
+ source_grid_col   {
+    1 7 5 4 1 0
+    {default }
+    {
+      { {2 0 0} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 0} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 0} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 0} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 0} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 0} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {2 3840 0} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -166.4 0} } } 
+      { {2 0 540} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 540} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 540} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 540} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 540} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 540} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {2 3840 540} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -166.4 0} } } 
+      { {2 0 1080} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 1080} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 1080} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 1080} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 1080} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 1080} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {2 3840 1080} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -166.4 0} } } 
+      { {2 0 1620} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 1620} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 1620} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 1620} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 1620} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 1620} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {2 3840 1620} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -166.4 0} } } 
+      { {2 0 2160} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 2160} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 2160} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 2160} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 2160} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 2160} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {2 3840 2160} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -166.4 0} } } 
+    }
+  }
+ destination_grid_col   {
+    1 7 5 4 1 0
+    {default }
+    {
+      { {2 0 0} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 0} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 0} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 0} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 0} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 0} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {1 {curve x1037 4324.799805} {curve x1037 -9.599975586}} { {1 {curve x1037 0} {curve x1037 180}}  {1 {curve x1037 0} {curve x1037 -180}}  {1 {curve x1037 320} {curve x1037 0}}  {1 {curve x1037 -166.4000702} {curve x1037 0}} } } 
+      { {2 0 540} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 540} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 540} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 540} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 540} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 540} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {1 {curve x1037 4324.799805} {curve x1037 530.4000244}} { {1 {curve x1037 0} {curve x1037 180}}  {1 {curve x1037 0} {curve x1037 -180}}  {1 {curve x1037 320} {curve x1037 0}}  {1 {curve x1037 -166.4000702} {curve x1037 0}} } } 
+      { {2 0 1080} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 1080} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 1080} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 1080} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 1080} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 1080} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {1 {curve x1037 4324.799805} {curve x1037 1070.400024}} { {1 {curve x1037 0} {curve x1037 180}}  {1 {curve x1037 0} {curve x1037 -180}}  {1 {curve x1037 320} {curve x1037 0}}  {1 {curve x1037 -166.4000702} {curve x1037 0}} } } 
+      { {2 0 1620} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 1620} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 1620} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 1620} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 1620} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 1620} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {1 {curve x1037 4324.799805} {curve x1037 1610.400024}} { {1 {curve x1037 0} {curve x1037 180}}  {1 {curve x1037 0} {curve x1037 -180}}  {1 {curve x1037 320} {curve x1037 0}}  {1 {curve x1037 -166.4000702} {curve x1037 0}} } } 
+      { {2 0 2160} { {2 0 180}  {2 0 -180}  {2 108.8 0}  {2 -320 0} } } 
+      { {2 326.4 2160} { {2 0 180}  {2 0 -180}  {2 211.2 0}  {2 -108.8 -0} } } 
+      { {2 960 2160} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -211.2 0} } } 
+      { {2 1920 2160} { {2 0 180}  {2 0 -180}  {2 320 0}  {2 -320 0} } } 
+      { {2 2880 2160} { {2 0 180}  {2 0 -180}  {2 153.6 0}  {2 -320 0} } } 
+      { {2 3340.8 2160} { {2 0 180}  {2 0 -180}  {2 166.4 0}  {2 -153.6 -0} } } 
+      { {1 {curve x1037 4324.799805} {curve x1037 2150.399902}} { {1 {curve x1037 0} {curve x1037 180}}  {1 {curve x1037 0} {curve x1037 -180}}  {1 {curve x1037 320} {curve x1037 0}}  {1 {curve x1037 -166.4000702} {curve x1037 0}} } } 
+    }
+  }
+ grids_manually_moved true
+ source_grid_transform_center {1920 1080}
+ destination_grid_transform_center {1920 1080}
+ name GridWarp3_1
+ selected true
+ xpos -1342
+ ypos 4392
+}
+Transform {
+ translate {-230 0}
+ center {2016 1512}
+ shutteroffset centred
+ name Transform4
+ label "\[value filter]"
+ selected true
+ xpos -1342
+ ypos 4446
+}
+CheckerBoard2 {
+ inputs 0
+ name CheckerBoard1
+ selected true
+ xpos -1098
+ ypos 4127
+}
+Merge2 {
+ inputs 2
+ bbox B
+ name Merge17
+ selected true
+ xpos -1126
+ ypos 4453
+}
+Dot {
+ name Dot10
+ label BG
+ note_font_size 71
+ selected true
+ xpos -1074
+ ypos 6373
+}
+set N5750f800 [stack 0]
+Dot {
+ name Dot26
+ note_font_size 31
+ selected true
+ xpos -3017
+ ypos 6373
+}
+set N5750fc00 [stack 0]
+Dot {
+ name Dot125
+ label BG
+ note_font_size 71
+ selected true
+ xpos -3017
+ ypos 6623
+}
+Roto {
+ inputs 0
+ cliptype none
+ curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 512}
+    {t x43f00000 x43870000}
+    {a}
+    {curvegroup Ellipse1 512 bezier
+     {{cc
+       {f 8192}
+       {px
+        {1 x41300000 x41980000 x41c00000}
+        {{{xc2225f21 -}}
+	 {{0 -}}}
+        {{{x43db4000 0 1 xb1cccccd 1}
+	  {x43dbe396 x3ec44d9a 1 x3ec44d9a 1}
+	  {x43e24000 -}
+	  {x43d54000 xc0f9999a 1 0 1}}
+	 {{x43408000 0 1 x3f34a3a8 1}
+	  {x43470e56 x3f0e38e4 1 x3f0e38e4 1}
+	  {x434a8000 -}
+	  {x432c8000 xc1100000 1 0 1}}}
+        {{{x42225f21 -}}
+	 {{0 -}}}
+        {{{0 -}}
+	 {{xc28a123a -}}}
+        {{{x44000000 0 1 xb1cccccd 1}
+	  {x440051cb x3ec44d9a 1 x3ec44d9a 1}
+	  {x44038000 -}
+	  {x43fa0000 xc0f9999a 1 0 1}}
+	 {{x439ec000 0 1 x3f34a3a8 1}
+	  {x43a2072b x3f0e38e4 1 x3f0e38e4 1}
+	  {x43a3c000 -}
+	  {x4394c000 xc1100000 1 0 1}}}
+        {{{0 -}}
+	 {{x428a123a -}}}
+        {{{x42225f21 -}}
+	 {{0 -}}}
+        {{{x43db4000 0 1 xb1cccccd 1}
+	  {x43dbe396 x3ec44d9a 1 x3ec44d9a 1}
+	  {x43e24000 -}
+	  {x43d54000 xc0f9999a 1 0 1}}
+	 {{x43dd4000 0 1 x3f34a3a8 1}
+	  {x43e0872b x3f0e38e4 1 x3f0e38e4 1}
+	  {x43e24000 -}
+	  {x43d34000 xc1100000 1 0 1}}}
+        {{{xc2225f21 -}}
+	 {{0 -}}}
+        {{{0 -}}
+	 {{x428a123a -}}}
+        {{{x43b68000 0 1 xb1cccccd 1}
+	  {x43b72396 x3ec44d9a 1 x3ec44d9a 1}
+	  {x43bd8000 -}
+	  {x43b08000 xc0f9999a 1 0 1}}
+	 {{x439ec000 0 1 x3f34a3a8 1}
+	  {x43a2072b x3f0e38e4 1 x3f0e38e4 1}
+	  {x43a3c000 -}
+	  {x4394c000 xc1100000 1 0 1}}}
+        {{{0 -}}
+	 {{xc28a123a -}}}}}     idem}
+     {t
+      {{x41980000 x43e50000}}
+      {{x41980000 x43a44000}}     0
+      {{x41980000 0}}
+      {{x41980000 0}}     0 0 0
+      {{x41980000 0}}
+      {{x41980000 1}}
+      {{x41980000 1}}     1
+      {{x41980000 0}}}
+     {a spx x43f00000 spy x43870000 sb 1 ltn x41980000 ltm x41980000 tt x40c00000}}}}}}
+ toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 tt 6 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+ toolbar_brush_hardness 0.200000003
+ toolbar_source_transform_scale {1 1}
+ toolbar_source_transform_center {320 240}
+ colorOverlay 0
+ lifetime_type "all frames"
+ lifetime_start 19
+ lifetime_end 19
+ motionblur_shutter_offset_type centred
+ source_translate_round false
+ source_black_outside true
+ name Roto2
+ selected true
+ xpos -4969
+ ypos 4571
+}
+Blur {
+ size 32
+ name Blur3
+ label "\[value size]"
+ selected true
+ xpos -4969
+ ypos 4613
+}
+StickyNote {
+ inputs 0
+ name StickyNote24
+ label "Piping the RGB channels into \nGS RGB Channels so we can QC\nthe final Key with the original Plate"
+ selected true
+ xpos -3737
+ ypos 4031
+}
+StickyNote {
+ inputs 0
+ name StickyNote26
+ label "extra despill control on face"
+ note_font_size 13
+ selected true
+ xpos -5198
+ ypos 4611
+}
+StickyNote {
+ inputs 0
+ name StickyNote14
+ label "This Despill is for the Core of the subject,\nIt will not be mixed with the backGround, \nand must try to keep as much of the original\nplate colors and skin tones as possible, \nand only remove major spill."
+ note_font_size 17
+ selected true
+ xpos -5155
+ ypos 4309
+}
+push $N5750fc00
+Dot {
+ name Dot22
+ label BG
+ note_font_size 71
+ selected true
+ xpos -3285
+ ypos 6358
+}
+Grade {
+ blackpoint 0.012
+ whitepoint 0.055
+ gamma 1.02
+ black_clamp false
+ name Grade3
+ selected true
+ xpos -3309
+ ypos 6459
+}
+Dot {
+ name Dot21
+ selected true
+ xpos -3308
+ ypos 6527
+}
+Roto {
+ inputs 0
+ output alpha
+ cliptype none
+ curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 0}
+    {t x44f00000 x44870000}
+    {a pt1x 0 pt1y 0 pt2x 0 pt2y 0 pt3x 0 pt3y 0 pt4x 0 pt4y 0 ptex00 0 ptex01 0 ptex02 0 ptex03 0 ptex10 0 ptex11 0 ptex12 0 ptex13 0 ptex20 0 ptex21 0 ptex22 0 ptex23 0 ptex30 0 ptex31 0 ptex32 0 ptex33 0 ptof1x 0 ptof1y 0 ptof2x 0 ptof2y 0 ptof3x 0 ptof3y 0 ptof4x 0 ptof4y 0 pterr 0 ptrefset 0 ptmot x40800000 ptref 0}}}}}
+ toolbox {createBezier {
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+ toolbar_brush_hardness 0.200000003
+ toolbar_source_transform_scale {1 1}
+ toolbar_source_transform_center {1920 1080}
+ name Roto3
+ selected true
+ xpos -2446
+ ypos 5333
+}
+Roto {
+ inputs 0
+ output alpha
+ cliptype none
+ curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 2097152}
+    {t x44f00000 x44870000}
+    {a pt1x 0 pt1y 0 pt2x 0 pt2y 0 pt3x 0 pt3y 0 pt4x 0 pt4y 0 ptex00 0 ptex01 0 ptex02 0 ptex03 0 ptex10 0 ptex11 0 ptex12 0 ptex13 0 ptex20 0 ptex21 0 ptex22 0 ptex23 0 ptex30 0 ptex31 0 ptex32 0 ptex33 0 ptof1x 0 ptof1y 0 ptof2x 0 ptof2y 0 ptof3x 0 ptof3y 0 ptof4x 0 ptof4y 0 pterr 0 ptrefset 0 ptmot x40800000 ptref 0}
+    {curvegroup Bezier1 512 bezier
+     {{cc
+       {f 8192}
+       {px x44992000
+        {xc1d80000 x41100000}
+        {x44130000 xc2980000}
+        {x41d80000 xc1100000}
+        {x41800000 xc2d00000}
+        {x43f60000 x447b0000}
+        {xc1800000 x42d00000}
+        {xc1800000 xc2400000}
+        {x43d80000 x44dc8001}
+        {x41800000 x42400000}
+        {xc34d0000 xc1a00000}
+        {x443f4000 x44fb4000}
+        {x434d0000 x41a00000}
+        {xc28c0000 x43160000}
+        {x45453000 x44f82000}
+        {x428c0000 xc3160000}
+        {xc1700000 x42be0000}
+        {x4541c000 x44598000}
+        {x41700000 xc2be0000}
+        {xc1700000 x420c0000}
+        {x4539f000 x42be0000}
+        {x41700000 xc20c0000}
+        {x40a00000 x41a00000}
+        {x45377000 xc31b0000}
+        {xc0a00000 xc1a00000}
+        {0 0}
+        {x43f78000 xc3938000}
+        {0 0}}}     idem}
+     {tx x44992000 x44cf7555 x44480e39}
+     {a osw x41200000 osf 0 str 1 spx x44f00000 spy x44870000 sb 1 ltn x44992000 ltm x44992000 tt x40800000}}}}}}
+ toolbox {selectAll {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 tt 4 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+ toolbar_brush_hardness 0.200000003
+ toolbar_source_transform_scale {1 1}
+ toolbar_source_transform_center {1920 1080}
+ colorOverlay {0 0 0 0}
+ lifetime_type "all frames"
+ lifetime_start 1225
+ lifetime_end 1225
+ motionblur_shutter_offset_type centred
+ source_black_outside true
+ name Roto1
+ selected true
+ xpos -2968
+ ypos 4819
+}
+push $N57476400
+Dot {
+ name Dot18
+ selected true
+ xpos -3151
+ ypos 4134
+}
+NoOp {
+ name DeNoise
+ note_font_size 31
+ selected true
+ xpos -3185
+ ypos 4222
+}
+Dot {
+ name Dot19
+ selected true
+ xpos -3151
+ ypos 4319
+}
+set N575b8c00 [stack 0]
+Dot {
+ name Dot59
+ selected true
+ xpos -3151
+ ypos 4594
+}
+Primatte3 {
+ data { 5
+    14163 28742 21257
+    65552
+    0 5
+    30234 30234 30234 0
+    1 1 1 1 1 1 1 1 1 1 1 1 1 809.509 1616.13 6858.25 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 4226.5 2129.94 178.528 1 1564 1 1 1 1 1 1 1 1 1 1 1 1 1 1274.65 1 1 1041.09 2539.19 659.149 19389 29133.1 6980.04 1 1 1 1 1 757.383
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 15016 8203.53 18280.2 130560 50998.7 130560 55738.1 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10173.1 11003.3 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 10270.1 8372.71 28466.4 117898 29133.1 130560 130560 130560 130560 63207.3 26421.7 8560.12
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 48156.4 10447 23648.7 130560 50998.7 130560 130560 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10750.9 14118.4 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 13281.7 10512.9 28466.4 117898 29133.1 130560 130560 130560 130560 63207.3 26421.7 15959
+    -156 -1.23133e+12 -1.23133e+12 -5.11919e+06 4.10868e+12 4.10868e+12
+    -27904 -3.67853e+11 -4.71994e+11 2.02503e+08 5.03708e+11 1.0702e+12
+    -0.100159 -2.22551e+14 -2.22551e+14 -2308.33 -3.91956e+13 -3.91956e+13
+    -0.100159 -2.22551e+14 -2.22551e+14 -2763.46 -4.7031e+13 -4.7031e+13
+    -0.100037 -2.21985e+12 -2.21985e+12 2763.46 6.97037e+11 6.97037e+11
+    -17.7578 -6.63168e+11 -8.50916e+11 1.20696e+06 -1.09653e+12 -6.42764e+11
+    -0.100037 -2.22551e+14 -2.22551e+14 -2991.43 -5.09557e+13 -5.09557e+13
+    -0.100037 -2.22551e+14 -2.22551e+14 -3446.56 -5.87911e+13 -5.87911e+13
+    -1276 -4.06321e+14 -4.06321e+14 -2.64038e+07 9.75109e+13 9.75109e+13
+    -825344 -1.2404e+13 -1.60468e+13 8.67805e+09 2.38544e+13 1.97096e+13
+    -0.182617 -4.06321e+14 -4.06321e+14 967.94 1.66098e+13 1.66098e+13
+    -0.182678 -1.73465e+14 -4.06322e+14 -4464.36 -5.13529e+13 -7.61767e+13
+    -0.182617 -1.58715e+14 -1.58715e+14 -128.136 1.24209e+14 1.24209e+14
+    -4.75992e+08 -1.30429e+11 -3.27251e+11 -1.50387e+10 1.35385e+11 5.8486e+11
+    -0.182068 -4.06321e+14 -4.06321e+14 -1195.69 -2.04609e+13 -2.04609e+13
+    -0.182617 -3.39498e+14 -3.39498e+14 -6650.91 -1.12379e+14 -1.12379e+14
+    -2.42483e+07 -5.13732e+13 -6.64604e+13 -8.30819e+11 1.0261e+14 1.03094e+14
+    -6.54292e+08 -1.56483e+11 -2.72351e+11 2.4213e+10 3.0021e+11 -4.3556e+10
+    -0.18219 -4.06321e+14 -4.06321e+14 52.3472 8.73233e+11 8.73233e+11
+    -0.182617 -4.06321e+14 -4.06321e+14 128.136 2.39543e+12 2.39543e+12
+    -0.182068 -4.06321e+14 -4.06321e+14 4464.36 7.61767e+13 7.61767e+13
+    -0.182861 -7.6838e+13 -7.6838e+13 -967.94 5.4078e+13 5.4078e+13
+    -0.182617 -4.06321e+14 -4.06321e+14 -5811.1 -9.90331e+13 -9.90331e+13
+    -233 -3.27904e+13 -7.68077e+13 4.81393e+06 -4.48687e+13 -1.49846e+14
+    -3.18177e+07 -4.73686e+14 -4.73686e+14 -1.14579e+12 1.42192e+14 1.42192e+14
+    -161536 -4.57275e+12 -5.91367e+12 -9.03253e+09 5.12581e+12 7.69678e+12
+    -0.235596 -5.24559e+14 -5.24559e+14 3679.25 6.27312e+13 6.27312e+13
+    -0.235596 -2.66619e+14 -2.66619e+14 -1040.7 1.21349e+14 1.21349e+14
+    -0.235596 -5.24559e+14 -5.24559e+14 1040.7 1.77426e+13 1.77426e+13
+    -144640 -1.91498e+12 -1.14496e+13 3.82448e+09 -3.47786e+11 1.58398e+13
+    -0.235596 -5.24559e+14 -5.24559e+14 -3404.84 -5.80504e+13 -5.80504e+13
+    -243200 -9.52884e+12 -3.0559e+13 -1.06686e+10 8.72698e+12 -2.23266e+13
+    -5328 -2.55775e+13 -2.55775e+13 -8.4408e+07 3.73413e+13 3.73413e+13
+    -4.97261e+09 -3.64857e+11 -5.9266e+11 6.6108e+10 1.38958e+11 4.69631e+11
+    -0.182373 -4.06322e+14 -4.06322e+14 -2061.63 -3.53387e+13 -3.53387e+13
+    -0.182861 -4.06321e+14 -4.06321e+14 -5352.99 -9.13241e+13 -9.13241e+13
+    -0.182617 -2.86151e+13 -2.86151e+13 2901.44 3.41603e+13 3.41603e+13
+    -52736 -4.35435e+11 -7.11504e+11 -2.71408e+09 1.2809e+12 1.30377e+12
+    -0.182861 -4.06321e+14 -4.06321e+14 -3813.08 -6.50388e+13 -6.50388e+13
+    -0.183105 -4.06321e+14 -4.06321e+14 -7104.44 -1.21024e+14 -1.21024e+14
+    -0.100159 -2.22551e+14 -2.22551e+14 2236.71 3.79727e+13 3.79727e+13
+    -0.100586 -2.22551e+14 -2.22551e+14 2362.35 4.02673e+13 4.02673e+13
+    -0.100342 -2.22551e+14 -2.22551e+14 1893.85 3.22017e+13 3.22017e+13
+    -0.100159 -8.73347e+12 -2.04571e+13 -1540.48 7.30298e+11 2.0828e+13
+    -0.100098 -2.22551e+14 -2.22551e+14 -1438.72 -2.43662e+13 -2.43662e+13
+    -897024 -4.43348e+11 -4.68529e+11 -3.29401e+10 1.14058e+12 9.80382e+11
+    -0.100037 -2.22551e+14 -2.22551e+14 599.091 1.03115e+13 1.03115e+13
+    -0.100098 -2.22551e+14 -2.22551e+14 -2817.48 -4.81027e+13 -4.81027e+13
+    -3540 -3.66915e+14 -3.66915e+14 -1.3995e+08 1.07988e+14 1.07988e+14
+    -190 -5.67933e+12 -7.34473e+12 -1.26497e+07 2.92865e+13 2.64578e+13
+    -0.182373 -4.06321e+14 -4.06321e+14 3507.63 5.98374e+13 5.98374e+13
+    -0.182617 -2.06522e+14 -2.06522e+14 1137.21 -2.79216e+13 -2.79216e+13
+    -0.182129 -4.06321e+14 -4.06321e+14 1009.07 1.72125e+13 1.72125e+13
+    -147.5 -2.26241e+13 -7.25556e+13 2.03124e+06 -3.78598e+13 -3.91356e+12
+    -0.183105 -4.06321e+14 -4.06321e+14 -2841.48 -4.84349e+13 -4.84349e+13
+    -7.96217e+08 -8.58957e+11 -2.75468e+12 -4.78159e+10 5.39493e+11 3.59287e+12
+    -9.131e+11 -1.47992e+13 -1.91454e+13 1.92318e+12 1.87941e+13 2.3051e+13
+    -1.00699e+09 -1.66267e+11 -3.4382e+11 -1.61542e+10 4.26271e+11 7.3888e+11
+    -0.235596 -5.24559e+14 -5.24559e+14 -785.378 -1.33912e+13 -1.33912e+13
+    -0.235596 -5.24559e+14 -5.24559e+14 -2342.52 -3.99388e+13 -3.99388e+13
+    -0.235352 -5.24559e+14 -5.24559e+14 5505.33 9.3865e+13 9.3865e+13
+    -0.235596 -2.00748e+13 -2.00748e+13 151.923 2.22988e+13 2.22988e+13
+    -0.235596 -5.24559e+14 -5.24559e+14 -7236.02 -1.23372e+14 -1.23372e+14
+    -299.5 -9.91584e+13 -9.91584e+13 -8.75441e+06 -5.49886e+13 -5.49886e+13
+    -5.70526e+10 -1.26953e+12 -1.64236e+12 -1.94493e+11 1.5098e+12 1.65227e+12
+    -1.33759e+08 -1.37984e+11 -2.83099e+11 2.29749e+10 1.87324e+11 3.16271e+11
+    -0.182617 -4.06322e+14 -4.06322e+14 -2552.63 -4.37047e+13 -4.37047e+13
+    -0.182861 -4.06321e+14 -4.06321e+14 -2901.44 -4.95531e+13 -4.95531e+13
+    -0.182373 -1.14626e+14 -1.14626e+14 5352.99 1.52356e+14 1.52356e+14
+    -0.182373 -5.79089e+12 -5.79089e+12 2061.63 1.10634e+13 1.10634e+13
+    -0.183105 -4.06321e+14 -4.06321e+14 -6264.64 -1.0681e+14 -1.0681e+14
+    -0.182373 -4.06321e+14 -4.06321e+14 -6613.44 -1.12658e+14 -1.12658e+14
+    -1270 -4.06321e+14 -4.06321e+14 -5.33535e+07 8.86837e+13 8.86837e+13
+    -121 -4.50287e+13 -4.50287e+13 -6.59138e+06 7.06303e+13 7.06303e+13
+    -0.182617 -4.06321e+14 -4.06321e+14 3937.56 6.7208e+13 6.7208e+13
+    -0.182617 -7.21992e+13 -7.21992e+13 -1009.07 2.64337e+13 2.64337e+13
+    -0.182617 -4.06321e+14 -4.06321e+14 -1137.21 -1.95885e+13 -1.95885e+13
+    -4.73106e+08 -2.97924e+11 -1.78128e+12 7.76765e+09 5.47831e+11 1.00612e+12
+    -0.182129 -4.06321e+14 -4.06321e+14 -678.428 -1.16338e+13 -1.16338e+13
+    -147.5 -3.90464e+13 -1.25222e+14 -5.35192e+06 -1.15443e+12 -3.41781e+13
+    -0.100098 -2.22551e+14 -2.22551e+14 2817.48 4.81028e+13 4.81028e+13
+    -212.938 -1.594e+12 -1.68453e+12 -2.06442e+07 8.96642e+12 8.66683e+12
+    -0.100037 -2.22551e+14 -2.22551e+14 1295.32 2.20716e+13 2.20716e+13
+    -0.100342 -2.22551e+14 -2.22551e+14 1438.72 2.43662e+13 2.43662e+13
+    -0.100037 -2.22551e+14 -2.22551e+14 1540.48 2.62126e+13 2.62126e+13
+    -0.100098 -2.22551e+14 -2.22551e+14 -1893.85 -3.22017e+13 -3.22017e+13
+    -0.0998535 -2.22551e+14 -2.22551e+14 -2362.35 -4.02673e+13 -4.02673e+13
+    -422 -2.42909e+12 -5.68986e+12 1.89837e+07 -7.21161e+12 -1.15751e+13
+    -4.78413e+07 -1.1705e+14 -1.1705e+14 -7.07055e+11 1.70444e+14 1.70444e+14
+    -2.70556e+09 -1.02694e+12 -1.66812e+12 -9.17419e+10 1.71431e+12 1.76163e+12
+    -0.236084 -5.24559e+14 -5.24559e+14 -151.923 -2.59078e+12 -2.59078e+12
+    -0.235352 -5.24559e+14 -5.24559e+14 -5505.33 -9.3865e+13 -9.3865e+13
+    -0.235596 -2.04901e+14 -2.04901e+14 2342.52 -4.50001e+13 -4.50001e+13
+    -288768 -4.37326e+11 -1.0383e+12 7.62927e+09 -6.22377e+11 1.43555e+12
+    -0.235596 -5.24559e+14 -5.24559e+14 -4073.21 -6.94462e+13 -6.94462e+13
+    -0.235596 -4.38289e+14 -4.38289e+14 -9426.62 -1.39693e+14 -1.39693e+14
+    -7.40557e+06 -2.28786e+12 -2.28786e+12 -1.227e+11 3.74354e+12 3.74354e+12
+    -1.15778e+08 -1.96431e+11 -3.16467e+11 -2.00159e+10 2.9858e+11 7.6298e+11
+    -0.163818 -3.63425e+14 -3.63425e+14 -3058.63 -5.22688e+13 -5.22688e+13
+    -0.163818 -3.63425e+14 -3.63425e+14 -4248.96 -7.24522e+13 -7.24522e+13
+    -0.163818 -1.84843e+13 -1.84843e+13 4248.96 1.62563e+13 1.62563e+13
+    -29.125 -1.11752e+12 -1.43389e+12 -1.24974e+06 4.66989e+12 4.21098e+12
+    -0.163818 -3.63425e+14 -3.63425e+14 -4845.18 -8.25617e+13 -8.25617e+13
+    -0.16333 -3.63425e+14 -3.63425e+14 -6035.52 -1.02745e+14 -1.02745e+14
+    -1140 -3.63425e+14 -3.63425e+14 -6.46079e+07 7.38188e+13 7.38188e+13
+    -107.75 -7.92387e+13 -7.92387e+13 1.13943e+06 4.47275e+13 4.47275e+13
+    -0.16333 -3.63425e+14 -3.63425e+14 2750.27 4.69345e+13 4.69345e+13
+    -0.163269 -5.42404e+13 -1.27052e+14 -2552.86 3.4939e+12 1.18352e+14
+    -0.16333 -3.63425e+14 -3.63425e+14 -1559.94 -2.67511e+13 -2.67511e+13
+    -1.1134e+09 -1.8053e+11 -3.55687e+11 4.00089e+10 2.04522e+11 -1.45411e+11
+    -0.163147 -3.63425e+14 -3.63425e+14 154.987 2.56637e+12 2.56637e+12
+    -0.16333 -3.03656e+14 -3.03656e+14 -5165.91 -1.03564e+14 -1.03564e+14
+    -3168 -3.28179e+14 -3.28179e+14 -1.08425e+08 9.71343e+13 9.71343e+13
+    -363520 -7.78733e+11 -1.06429e+12 -2.2625e+10 3.57821e+12 2.7468e+12
+    -0.163025 -3.63425e+14 -3.63425e+14 1928.4 3.28592e+13 3.28592e+13
+    -0.16333 -3.63425e+14 -3.63425e+14 1559.94 2.67511e+13 2.67511e+13
+    -0.163147 -3.63425e+14 -3.63425e+14 2552.86 4.35259e+13 4.35259e+13
+    -0.16333 -1.75943e+14 -1.75943e+14 -2750.27 3.44308e+13 3.44308e+13
+    -0.16333 -3.63425e+14 -3.63425e+14 -3975.57 -6.77107e+13 -6.77107e+13
+    -884736 -2.85177e+12 -6.67994e+12 1.44633e+10 2.55152e+11 -5.35306e+11
+    -1.07308e+12 -1.2205e+14 -1.2205e+14 1.14615e+12 1.39269e+14 1.39269e+14
+    -4.74243e+08 -6.66202e+11 -1.08179e+12 4.9243e+09 8.86788e+11 1.51811e+12
+    -0.272461 -6.05708e+14 -6.05708e+14 1112.75 1.89721e+13 1.89721e+13
+    -0.271973 -6.05708e+14 -6.05708e+14 -3607.2 -6.15017e+13 -6.15017e+13
+    -0.271973 -6.05708e+14 -6.05708e+14 3607.2 6.15017e+13 6.15017e+13
+    -207.5 -3.89082e+12 -7.25382e+12 5.45629e+06 -5.89357e+12 1.03521e+12
+    -0.271729 -6.05708e+14 -6.05708e+14 -5971.35 -1.0181e+14 -1.0181e+14
+    -348 -9.56677e+13 -9.56677e+13 -1.52232e+07 -1.61763e+13 -1.61763e+13
+    -1 -1 -1 -1
+    -1 -1 999999 999999
+    -1 -1 -1 -1
+    0.05 1.732 1.732
+    0.05 1.732 1.732
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+  }
+
+ primEdgedata { 5
+    14163 28742 21257
+    65552
+    0 5
+    30234 30234 30234 0
+    1 1 1 1 1 1 1 1 1 1 1 1 1 809.509 1616.13 6858.25 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 4226.5 2129.94 178.528 1 1564 1 1 1 1 1 1 1 1 1 1 1 1 1 1274.65 1 1 1041.09 2539.19 659.149 19389 45681.9 6980.04 1 1 1 1 1 757.383
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 15016 8203.53 18280.2 130560 50998.7 130560 55738.1 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10173.1 11003.3 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 10270.1 8372.71 28466.4 117898 45681.9 130560 130560 130560 130560 63207.3 26421.7 8560.12
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 48156.4 10447 23648.7 130560 50998.7 130560 130560 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10750.9 14118.4 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 13281.7 10512.9 28466.4 117898 45681.9 130560 130560 130560 130560 63207.3 26421.7 15959
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    -1 -1 -1 -1
+    -1 -1 999999 999999
+    -1 -1 -1 -1
+    0.05 1.732 1.732
+    0.05 1.732 1.732
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+  }
+
+ primBodydata { 5
+    14163 28742 21257
+    65552
+    0 5
+    30234 30234 30234 0
+    1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 15016 8203.53 18280.2 130560 50998.7 130560 55738.1 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10173.1 11003.3 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 10270.1 8372.71 28466.4 117898 19421.8 130560 130560 130560 130560 63207.3 26421.7 8560.12
+    34328.8 130560 130560 130560 25604.4 130560 130560 130560 130560 130560 66360.1 130560 130560 48156.4 10447 23648.7 130560 50998.7 130560 130560 130560 130560 130560 130560 130560 130560 45643.2 130560 130560 130560 130560 130560 130560 12695 10750.9 14118.4 130560 13056.8 130560 36831.8 130560 23538.9 130560 130560 130560 130560 130560 130560 130560 130560 130560 24680 130560 109088 13281.7 10512.9 28466.4 117898 28330.7 130560 130560 130560 130560 63207.3 26421.7 15959
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    0 0 0 0 0 0
+    -1 -1 -1 -1
+    -1 -1 999999 999999
+    -1 -1 -1 -1
+    0.05 1.732 1.732
+    0.05 1.732 1.732
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+    0.05 0.866 0.866
+  }
+
+ crop {0 0 3840 2160}
+ "Adjust Lighting" 0
+ "Hybrid Matte" 0
+ "Fine Tuning" 0
+ name Primatte1
+ selected true
+ xpos -3175
+ ypos 4625
+}
+Merge2 {
+ inputs 2
+ operation mask
+ bbox B
+ name Merge4
+ selected true
+ xpos -3175
+ ypos 4849
+}
+Dot {
+ name Dot20
+ label "Core\nMatte"
+ note_font_size 51
+ selected true
+ xpos -3151
+ ypos 5041
+}
+set N576be400 [stack 0]
+Dot {
+ name Dot23
+ selected true
+ xpos -3151
+ ypos 5233
+}
+push $N576be400
+Grade {
+ channels alpha
+ gamma 0.49
+ name Grade2
+ selected true
+ xpos -3003
+ ypos 5046
+}
+Group {
+ name ExponBlur_v1
+ help "L_ExponBlur_v03 The ExponBlur blurs an image with an exponential falloff based upon an alpha. Most often used with roto shapes. The effect is applied to RGBA only. (For any questions, comments or suggestions please email gizmos@luma-pictures.com)"
+ note_font "Bitstream Vera Sans"
+ selected true
+ xpos -2868
+ ypos 5053
+ mapsize {0.15 0.15}
+ addUserKnob {20 ExponBlur}
+ addUserKnob {26 Description l "" +STARTLINE T ":ExponBlur: by Luma Pictures\n\nExponentially blurs image outward or inward"}
+ addUserKnob {14 size R -40 40}
+ size 9.5
+ addUserKnob {7 Multiplier R 0 10}
+ Multiplier 2.65
+ addUserKnob {6 crop l "crop to format" +STARTLINE}
+ addUserKnob {6 disableCropBB l "disable CropBB" -STARTLINE}
+ addUserKnob {26 ""}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos -372
+  ypos 265
+ }
+set Nd5552000 [stack 0]
+ Invert {
+  name L_ExponBlur_Invert4
+  xpos -372
+  ypos 330
+  disable {{"parent.size>=0 ? 1 : 0" i}}
+ }
+set Nd553a800 [stack 0]
+ Blur {
+  size {{parent.size.w i} {parent.size.h i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur1
+  label "\[value size]"
+  xpos -592
+  ypos 479
+ }
+push $Nd553a800
+ Blur {
+  size {{parent.size.w*parent.Multiplier i} {parent.size.h*parent.Multiplier i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur2
+  label "\[value size]"
+  xpos -482
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge7
+  xpos -537
+  ypos 572
+ }
+push $Nd553a800
+ Blur {
+  size {{parent.size.w*parent.Multiplier*2 i} {parent.size.h*parent.Multiplier*2 i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur3
+  label "\[value size]"
+  xpos -372
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge8
+  xpos -477
+  ypos 637
+ }
+push $Nd553a800
+ Blur {
+  size {{parent.size.w*parent.Multiplier*4 i} {parent.size.h*parent.Multiplier*4 i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur4
+  label "\[value size]"
+  xpos -262
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge9
+  xpos -372
+  ypos 709
+ }
+ Invert {
+  name L_ExponBlur_Invert5
+  xpos -372
+  ypos 774
+  disable {{"parent.size>=0 ? 1 : 0" i}}
+ }
+ Clamp {
+  channels alpha
+  name L_ExponBlur_clampOutput
+  xpos -372
+  ypos 833
+ }
+set Nc007b000 [stack 0]
+ Viewer {
+  input_process false
+  name Viewer1
+  xpos -372
+  ypos 372
+ }
+push $Nc007b000
+ Crop {
+  box {0 0 {input.width i} {input.height i}}
+  reformat true
+  crop false
+  name L_ExponBlur_Crop1
+  xpos -372
+  ypos 901
+  disable {{parent.disableCropBB i x-5 1}}
+ }
+push $Nd5552000
+ Dot {
+  name Dot1
+  xpos -81
+  ypos 270
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  name L_ExponBlur_ChannelsPassThrough
+  xpos -115
+  ypos 901
+ }
+ Output {
+  name Output1
+  xpos -115
+  ypos 993
+ }
+end_group
+push $N575b8c00
+Dot {
+ name Dot24
+ selected true
+ xpos -2608
+ ypos 4319
+}
+Dot {
+ name Dot25
+ selected true
+ xpos -2608
+ ypos 4489
+}
+set N576bf000 [stack 0]
+Dot {
+ name Dot27
+ selected true
+ xpos -2454
+ ypos 4489
+}
+set N576bf400 [stack 0]
+IBKColourV3 {
+ name IBKColourV3_2
+ selected true
+ xpos -2448
+ ypos 4607
+ screen_type green
+ Size 0
+ off {0.005 0 0}
+ multi 1
+}
+IBKColourV3 {
+ name IBKColourV3_3
+ selected true
+ xpos -2448
+ ypos 4656
+ screen_type green
+ Size 36.5
+ off {0.005 0 0}
+ erode 5
+ multi 3.78
+}
+push $N576bf000
+IBKGizmoV3 {
+ inputs 2
+ name IBKGizmoV3_1
+ xpos -2632
+ ypos 4656
+ st C-green
+ red_weight 0.59
+ blue_green_weight 1
+}
+Shuffle {
+ red alpha
+ green alpha
+ blue alpha
+ name Shuffle2
+ label "\[value in]"
+ selected true
+ xpos -2632
+ ypos 4753
+}
+Dot {
+ name Dot28
+ label "Edge\nMatte"
+ note_font_size 51
+ selected true
+ xpos -2608
+ ypos 4941
+}
+Merge2 {
+ inputs 2
+ operation mask
+ name Merge16
+ selected true
+ xpos -2647
+ ypos 5068
+}
+Merge2 {
+ inputs 2
+ operation screen
+ bbox B
+ name Merge7
+ selected true
+ xpos -2632
+ ypos 5236
+}
+Merge2 {
+ inputs 2
+ operation stencil
+ name Merge9
+ selected true
+ xpos -2632
+ ypos 5394
+}
+Dot {
+ name Dot30
+ label "Combined\nMatte"
+ note_font_size 41
+ selected true
+ xpos -2608
+ ypos 5475
+}
+push $N576be400
+Group {
+ name ExponBlur_v02
+ help "L_ExponBlur_v03 The ExponBlur blurs an image with an exponential falloff based upon an alpha. Most often used with roto shapes. The effect is applied to RGBA only. (For any questions, comments or suggestions please email gizmos@luma-pictures.com)"
+ note_font "Bitstream Vera Sans"
+ selected true
+ xpos -3432
+ ypos 5045
+ mapsize {0.15 0.15}
+ addUserKnob {20 ExponBlur}
+ addUserKnob {26 Description l "" +STARTLINE T ":ExponBlur: by Luma Pictures\n\nExponentially blurs image outward or inward"}
+ addUserKnob {14 size R -40 40}
+ size -6.4
+ addUserKnob {7 Multiplier R 0 10}
+ Multiplier 2.65
+ addUserKnob {6 crop l "crop to format" +STARTLINE}
+ addUserKnob {6 disableCropBB l "disable CropBB" -STARTLINE}
+ addUserKnob {26 ""}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos -372
+  ypos 265
+ }
+set N57b38800 [stack 0]
+ Invert {
+  name L_ExponBlur_Invert4
+  xpos -372
+  ypos 330
+  disable {{"parent.size>=0 ? 1 : 0" i}}
+ }
+set N57b38c00 [stack 0]
+ Blur {
+  size {{parent.size.w i} {parent.size.h i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur1
+  label "\[value size]"
+  xpos -592
+  ypos 479
+ }
+push $N57b38c00
+ Blur {
+  size {{parent.size.w*parent.Multiplier i} {parent.size.h*parent.Multiplier i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur2
+  label "\[value size]"
+  xpos -482
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge7
+  xpos -537
+  ypos 572
+ }
+push $N57b38c00
+ Blur {
+  size {{parent.size.w*parent.Multiplier*2 i} {parent.size.h*parent.Multiplier*2 i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur3
+  label "\[value size]"
+  xpos -372
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge8
+  xpos -477
+  ypos 637
+ }
+push $N57b38c00
+ Blur {
+  size {{parent.size.w*parent.Multiplier*4 i} {parent.size.h*parent.Multiplier*4 i}}
+  crop {{parent.crop i}}
+  name L_ExponBlur_Blur4
+  label "\[value size]"
+  xpos -262
+  ypos 479
+ }
+ Merge2 {
+  inputs 2
+  name L_ExponBlur_Merge9
+  xpos -372
+  ypos 709
+ }
+ Invert {
+  name L_ExponBlur_Invert5
+  xpos -372
+  ypos 774
+  disable {{"parent.size>=0 ? 1 : 0" i}}
+ }
+ Clamp {
+  channels alpha
+  name L_ExponBlur_clampOutput
+  xpos -372
+  ypos 833
+ }
+set N57b79000 [stack 0]
+ Viewer {
+  input_process false
+  name Viewer1
+  xpos -372
+  ypos 372
+ }
+push $N57b79000
+ Crop {
+  box {0 0 {input.width i} {input.height i}}
+  reformat true
+  crop false
+  name L_ExponBlur_Crop1
+  xpos -372
+  ypos 901
+  disable {{parent.disableCropBB i x-5 1}}
+ }
+push $N57b38800
+ Dot {
+  name Dot1
+  xpos -81
+  ypos 270
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  name L_ExponBlur_ChannelsPassThrough
+  xpos -115
+  ypos 901
+ }
+ Output {
+  name Output1
+  xpos -115
+  ypos 993
+ }
+end_group
+push $N57476400
+Dot {
+ name Dot32
+ selected true
+ xpos -4775
+ ypos 4134
+}
+Dot {
+ name Dot33
+ selected true
+ xpos -4775
+ ypos 4508
+}
+set N57bfac00 [stack 0]
+Dot {
+ name Dot34
+ selected true
+ xpos -4566
+ ypos 4508
+}
+push $N57bfac00
+DespillMadness {
+ name DespillMadness2
+ note_font "Bitstream Vera Sans"
+ selected true
+ xpos -4799
+ ypos 4625
+ sourceLuma false
+ maskChannel -rgba.alpha
+}
+Dot {
+ name Dot60
+ selected true
+ xpos -4796
+ ypos 4682
+}
+set N40183c00 [stack 0]
+Merge2 {
+ inputs 2
+ operation minus
+ name Merge10
+ selected true
+ xpos -4600
+ ypos 4678
+}
+Saturation {
+ saturation 0
+ name Saturation2
+ selected true
+ xpos -4600
+ ypos 4759
+}
+push $N40183c00
+Merge2 {
+ inputs 2
+ operation plus
+ name Merge12
+ selected true
+ xpos -4820
+ ypos 4759
+}
+Dot {
+ name Dot36
+ selected true
+ xpos -4775
+ ypos 5047
+}
+push $N57477800
+Dot {
+ name Dot37
+ label "despill\nMatte"
+ note_font_size 41
+ selected true
+ xpos -3592
+ ypos 4898
+}
+push $N57477c00
+add_layer {despill despill.red}
+Copy {
+ inputs 2
+ from0 rgba.red
+ to0 despill.red
+ name Copy4
+ selected true
+ xpos -3861
+ ypos 4889
+}
+Keymix {
+ inputs 3
+ name Keymix2
+ selected true
+ xpos -3861
+ ypos 5038
+}
+Copy {
+ inputs 2
+ from0 rgba.alpha
+ to0 rgba.alpha
+ name Copy5
+ selected true
+ xpos -3861
+ ypos 5466
+}
+Dot {
+ name Dot63
+ selected true
+ xpos -3837
+ ypos 5936
+}
+Grade {
+ white {0.6964921951 0.6242098212 0.5360832214 1}
+ name Grade5
+ selected true
+ xpos -3851
+ ypos 6012
+}
+Dot {
+ name Dot38
+ selected true
+ xpos -3827
+ ypos 6399
+}
+set N57c95400 [stack 0]
+Shuffle {
+ in despill
+ name Shuffle3
+ label "\[value in]"
+ selected true
+ xpos -3694
+ ypos 6390
+}
+Merge2 {
+ inputs 2
+ operation multiply
+ name Merge13
+ selected true
+ xpos -3694
+ ypos 6514
+}
+push $N57c95400
+Merge2 {
+ inputs 2
+ operation plus
+ bbox B
+ name Merge14
+ selected true
+ xpos -3861
+ ypos 6514
+}
+Premult {
+ name Premult2
+ selected true
+ xpos -3861
+ ypos 6671
+}
+Dot {
+ name Dot53
+ selected true
+ xpos -3827
+ ypos 7060
+}
+Dot {
+ name Dot55
+ selected true
+ xpos -1508
+ ypos 7060
+}
+set N57f77400 [stack 0]
+Shuffle {
+ in GS
+ name Shuffle4
+ label "\[value in]"
+ selected true
+ xpos -1542
+ ypos 7257
+}
+Dot {
+ name Dot58
+ label "Key\nQC "
+ note_font_size 31
+ selected true
+ xpos -1508
+ ypos 7368
+}
+StickyNote {
+ inputs 0
+ name StickyNote38
+ label "This will be the original GS plate\nwith all the transformations and format\nchanges applied.  Use this to Wipe between\nyour Comp and the original GS plate to \nQuallity check your key.\n\nYou are looking for how well the edges blend, \nholes in the mattes, if the colors changed too much\nas a result of the despill, if you eroded in too far, or\nthe edges do not line up."
+ selected true
+ xpos -1772
+ ypos 7304
+}
+StickyNote {
+ inputs 0
+ name StickyNote40
+ label "Keying Template "
+ note_font_size 241
+ selected true
+ xpos -4553
+ ypos 3260
+}
+push $N576bf000
+OFXuk.co.thefoundry.keylight.keylight_v201 {
+ show "Final Result"
+ unPreMultiply false
+ screenColour {0.03638825193 0.158648029 0.08416579664}
+ screenGain 1
+ screenBalance 0.5
+ alphaBias {0.5 0.5 0.5}
+ despillBias {0.5 0.5 0.5}
+ gangBiases true
+ preBlur 0
+ "Screen Matte" 0
+ screenClipMin 0
+ screenClipMax 1
+ screenClipRollback 0
+ screenGrowShrink 0
+ screenSoftness 0
+ screenDespotBlack 0
+ screenDespotWhite 0
+ screenReplaceMethod "Soft Colour"
+ screenReplaceColour {0.5 0.5 0.5}
+ Tuning 0
+ midPoint 0.5
+ lowGain 1
+ midGain 1
+ highGain 1
+ "Inside Mask" 0
+ sourceAlphaHandling Ignore
+ insideReplaceMethod "Soft Colour"
+ insideReplaceColour {0.5 0.5 0.5}
+ Crops 0
+ SourceXMethod Colour
+ SourceYMethod Colour
+ SourceEdgeColour 0
+ SourceCropL 0
+ SourceCropR 1
+ SourceCropB 0
+ SourceCropT 1
+ balanceSet false
+ insideComponent None
+ outsideComponent None
+ cacheBreaker true
+ name Keylight4
+ selected true
+ xpos -2724
+ ypos 4583
+}
+push $N576bf400
+IBKColourV3 {
+ name IBKColourV3_1
+ selected true
+ xpos -2487
+ ypos 4539
+ screen_type green
+ Size 0
+ mult {0 0 0}
+}
+push $N57bfac00
+OFXuk.co.thefoundry.keylight.keylight_v201 {
+ show "Final Result"
+ unPreMultiply false
+ screenColour {0 1 0}
+ screenGain 0.71
+ screenBalance 0.375
+ alphaBias {0.5 0.5 0.5}
+ despillBias {0.5299999714 0.4600000083 0.6200000048}
+ gangBiases false
+ preBlur 0
+ "Screen Matte" 0
+ screenClipMin 0
+ screenClipMax 1
+ screenClipRollback 0
+ screenGrowShrink 0
+ screenSoftness 0
+ screenDespotBlack 0
+ screenDespotWhite 0
+ screenReplaceMethod "Soft Colour"
+ screenReplaceColour {0.5 0.5 0.5}
+ Tuning 0
+ midPoint 0.5
+ lowGain 1
+ midGain 1
+ highGain 1
+ "Inside Mask" 0
+ sourceAlphaHandling Ignore
+ insideReplaceMethod "Soft Colour"
+ insideReplaceColour {0.5 0.5 0.5}
+ Crops 0
+ SourceXMethod Colour
+ SourceYMethod Colour
+ SourceEdgeColour 0
+ SourceCropL 0
+ SourceCropR 1
+ SourceCropB 0
+ SourceCropT 1
+ balanceSet true
+ insideComponent None
+ outsideComponent None
+ cacheBreaker true
+ name Keylight2
+ selected true
+ xpos -4741
+ ypos 4574
+}
+push $N57476800
+OFXuk.co.thefoundry.keylight.keylight_v201 {
+ show "Final Result"
+ unPreMultiply false
+ screenColour {0 1 0}
+ screenGain 1
+ screenBalance 0.5
+ alphaBias {0.5 0.5 0.5}
+ despillBias {0.5 0.5 0.5}
+ gangBiases true
+ preBlur 0
+ "Screen Matte" 0
+ screenClipMin 0
+ screenClipMax 1
+ screenClipRollback 0
+ screenGrowShrink 0
+ screenSoftness 0
+ screenDespotBlack 0
+ screenDespotWhite 0
+ screenReplaceMethod "Soft Colour"
+ screenReplaceColour {0.5 0.5 0.5}
+ Tuning 0
+ midPoint 0.5
+ lowGain 1
+ midGain 1
+ highGain 1
+ "Inside Mask" 0
+ sourceAlphaHandling Ignore
+ insideReplaceMethod "Soft Colour"
+ insideReplaceColour {0.5 0.5 0.5}
+ Crops 0
+ SourceXMethod Colour
+ SourceYMethod Colour
+ SourceEdgeColour 0
+ SourceCropL 0
+ SourceCropR 1
+ SourceCropB 0
+ SourceCropT 1
+ balanceSet false
+ insideComponent None
+ outsideComponent None
+ cacheBreaker true
+ name Keylight7
+ selected true
+ xpos -3937
+ ypos 4535
+ disable true
+}
+StickyNote {
+ inputs 0
+ name StickyNote21
+ label "Merge over  or addmix"
+ selected true
+ xpos -891
+ ypos 7112
+}
+push $N57f77400
+push $N5750f800
+Dot {
+ name Dot56
+ selected true
+ xpos -1074
+ ypos 6959
+}
+Merge2 {
+ inputs 2
+ bbox B
+ name Merge15
+ selected true
+ xpos -1098
+ ypos 7063
+}
+set N57f77c00 [stack 0]
+Dot {
+ name Dot57
+ selected true
+ xpos -1074
+ ypos 7557
+}
+push $N57f77c00
+Viewer {
+ frame 1030
+ frame_range 1001-1001
+ fps 25
+ colour_sample_bbox {0.1208333299 0.4270833433 0.1213541701 0.4276041687}
+ viewerProcess LogC-LCC709
+ monitorOutOutputTransform rec709
+ name Viewer2
+ selected true
+ xpos -3625
+ ypos 3979
+}

@@ -1,0 +1,74 @@
+set cut_paste_input [stack 0]
+version 14.0 v3
+push $cut_paste_input
+Kronos {
+ useGPUIfAvailable {{Kronos2_useGPUIfAvailable x1160 0}}
+ input.first {{Kronos2_input.first}}
+ input.last {{Kronos2_input.last}}
+ retimedChannels all
+ interpolation {{KroNoNukeX.method}}
+ timing2 {{KroNoNukeX.timing_1}}
+ timingOutputSpeed {{Kronos2_timingOutputSpeed}}
+ timingInputSpeed {{Kronos2_timingInputSpeed}}
+ timingFrame2 {{Kronos2_timingFrame2}}
+ motionEstimation Regularized
+ smoothnessLocal {{Kronos2_smoothnessLocal}}
+ vectorDetailReg {{Kronos2_vectorDetailReg}}
+ strengthReg {{Kronos2_strengthReg}}
+ resampleType {{KroNoNukeX.resampling}}
+ Shutter 1
+ shutterSamples {{Kronos2_shutterSamples}}
+ shutterTime {{Kronos2_shutterTime}}
+ autoShutterTime {{Kronos2_autoShutterTime}}
+ Advanced 1
+ flickerCompensation {{Kronos2_flickerCompensation}}
+ Tolerances 1
+ weightRed {{Kronos2_weightRed}}
+ weightGreen {{Kronos2_weightGreen}}
+ weightBlue {{Kronos2_weightBlue}}
+ showVectors {{Kronos2_showVectors}}
+ name KroNoNukeX
+ selected true
+ xpos -6248
+ ypos -331
+ addUserKnob {20 User l Overrides}
+ addUserKnob {4 method l Method M {Frame Blend Motion}}
+ method Motion
+ addUserKnob {4 timing_1 l Timing M {"Output Speed" "Input Speed" Frame}}
+ addUserKnob {3 Kronos2_input.first l "Input Range"}
+ Kronos2_input.first 1001
+ addUserKnob {3 Kronos2_input.last l "" -STARTLINE R 0 100}
+ Kronos2_input.last 1100
+ addUserKnob {22 reset_framerange_input l reset t "Sets first and last input frame" -STARTLINE T "this = nuke.thisNode()\ninput_node = this.input(0)\n\nthis.knob(\"Kronos2_input.first\").setValue(input_node.frameRange().first())\nthis.knob(\"Kronos2_input.last\").setValue(input_node.frameRange().last())"}
+ addUserKnob {26 ""}
+ addUserKnob {8 Kronos2_timingOutputSpeed l "Output Speed" R 0 5}
+ Kronos2_timingOutputSpeed 2
+ addUserKnob {8 Kronos2_timingInputSpeed l "Input Speed" R 0 5}
+ Kronos2_timingInputSpeed 0.5
+ addUserKnob {8 Kronos2_timingFrame2 l Frame R 0 1000}
+ Kronos2_timingFrame2 {{frame}}
+ addUserKnob {26 ""}
+ addUserKnob {8 Kronos2_vectorDetailReg l "Vector Detail" R 0.01 1}
+ Kronos2_vectorDetailReg 0.3
+ addUserKnob {8 Kronos2_strengthReg l Strength R 0 1.5}
+ Kronos2_strengthReg 1.5
+ addUserKnob {4 resampling l Resampling M {Bilinear Lanczos4 Lanczos6}}
+ addUserKnob {26 ""}
+ addUserKnob {3 Kronos2_shutterSamples l "Shutter Samples" R 0 20}
+ Kronos2_shutterSamples 1
+ addUserKnob {8 Kronos2_shutterTime l "Shutter Time" R 0 10}
+ addUserKnob {6 Kronos2_autoShutterTime l "Automatic Shutter Time" -STARTLINE}
+ addUserKnob {6 Kronos2_flickerCompensation l "Flicker Compensation" -STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {8 Kronos2_weightRed l "Weight Red"}
+ Kronos2_weightRed 0.3
+ addUserKnob {8 Kronos2_weightGreen l "Weight Green"}
+ Kronos2_weightGreen 0.6
+ addUserKnob {8 Kronos2_weightBlue l "Weight Blue"}
+ Kronos2_weightBlue 0.1
+ addUserKnob {6 Kronos2_showVectors l "Overlay Vectors" -STARTLINE}
+ addUserKnob {6 Kronos2_useGPUIfAvailable l "Use GPU if available" -STARTLINE}
+ Kronos2_useGPUIfAvailable true
+ addUserKnob {8 Kronos2_smoothnessLocal l Smoothness R 0.01 1}
+ Kronos2_smoothnessLocal 0.5
+}

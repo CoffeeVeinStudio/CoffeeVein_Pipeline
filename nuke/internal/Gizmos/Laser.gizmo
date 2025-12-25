@@ -1,0 +1,285 @@
+set cut_paste_input [stack 0]
+version 15.0 v2
+push $cut_paste_input
+Gizmo {
+ name Laser
+ selected true
+ Grade7_blackpoint {0 0 0 0}
+ Grade7_whitepoint 0.22
+ Grade7_black {0 0 0 0}
+ Grade7_white {0.14666684 2.706666946 0.1466668397 1}
+ Grade7_multiply 4
+ Grade7_add {0 0 0 0}
+ Grade7_gamma 0.2
+ Grade7_mix 0.125
+ Noise1_translate {{curve x1 0} {curve x1 0 l x170 15}}
+ noise1xy 1
+ noise1z {{curve x1 0 l x170 0.76}}
+ noise1gamma 0.245
+ Noise2_translate {{curve x1 0} {curve x1 0 x112 15}}
+ noise2xy 90
+ noise2z {{curve x1 0 l x112 0.76}}
+ noise2gamma 0.32
+}
+ Noise {
+  inputs 0
+  size {{parent.noise1xy}}
+  zoffset {{curve x1 0 l x170 0.76}}
+  gain 1
+  gamma {{parent.noise1gamma}}
+  translate {{curve x1 0} {curve x1 0 l x170 15}}
+  center {960 540}
+  name Original_Noise_1
+  xpos 94
+  ypos 487
+  disable true
+ }
+ Input {
+  inputs 0
+  name mask
+  xpos -448
+  ypos 1042
+  number 1
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  name Constant1
+  xpos -409
+  ypos 842
+ }
+ Noise {
+  inputs 0
+  size {{parent.noise2xy}}
+  zoffset {{parent.noise2z x1 0 l x112 0.76}}
+  gain 1
+  gamma {{parent.noise2gamma}}
+  translate {{parent.Noise2_translate} {parent.Noise2_translate}}
+  center {960 540}
+  name Noise2
+  xpos 410
+  ypos 640
+  disable {{parent.Noise2disable}}
+ }
+set N93599c00 [stack 0]
+ Grade {
+  channels rgba
+  whitepoint 0.26
+  white 2.25
+  gamma 5
+  black_clamp false
+  name Grade4
+  xpos 410
+  ypos 673
+ }
+ Clamp {
+  name Clamp3
+  xpos 410
+  ypos 697
+ }
+ Blur {
+  size 1
+  name Blur6
+  label "\[value size]"
+  xpos 410
+  ypos 733
+ }
+ Noise {
+  inputs 0
+  size {{parent.noise1xy i}}
+  zoffset {{parent.noise1z i x1 0 l x170 0.76}}
+  gain 1
+  gamma {{parent.noise1gamma i}}
+  translate {{parent.Noise1_translate} {parent.Noise1_translate}}
+  center {960 540}
+  name Noise1
+  xpos 209
+  ypos 486
+  disable {{parent.Noise1Disable i}}
+ }
+set N936e0c00 [stack 0]
+ Grade {
+  channels rgba
+  whitepoint 0.15
+  white 4
+  gamma 4.6
+  black_clamp false
+  name Grade6
+  xpos 209
+  ypos 526
+ }
+ Clamp {
+  name Clamp4
+  xpos 209
+  ypos 550
+ }
+ Blur {
+  size 1
+  name Blur7
+  label "\[value size]"
+  xpos 209
+  ypos 586
+ }
+ Input {
+  inputs 0
+  name LaserShape
+  label "Laser Shape"
+  xpos -183
+  ypos 349
+ }
+ NoOp {
+  name NoOp2
+  label "Replace With Shape"
+  xpos -183
+  ypos 385
+ }
+ EdgeBlur {
+  size 1
+  name EdgeBlur1
+  xpos -183
+  ypos 421
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  name Merge6
+  xpos -183
+  ypos 598
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  mix 0.97
+  name Merge7
+  xpos -183
+  ypos 745
+ }
+set N93732c00 [stack 0]
+ Blur {
+  size 1.5
+  name Blur8
+  label "\[value size]"
+  xpos -183
+  ypos 802
+ }
+set N93733000 [stack 0]
+ Grade {
+  blackpoint {{parent.Grade7_blackpoint.r} {parent.Grade7_blackpoint.g} {parent.Grade7_blackpoint.b} {parent.Grade7_blackpoint.a}}
+  whitepoint {{parent.Grade7_whitepoint.r} {parent.Grade7_whitepoint.g} {parent.Grade7_whitepoint.b} {parent.Grade7_whitepoint.a}}
+  black {{parent.Grade7_black.r} {parent.Grade7_black.g} {parent.Grade7_black.b} {parent.Grade7_black.a}}
+  white {4 0.2234667838 0.1466668099 1}
+  multiply {{parent.Grade7_multiply.r} {parent.Grade7_multiply.g} {parent.Grade7_multiply.b} {parent.Grade7_multiply.a}}
+  add {{parent.Grade7_add.r} {parent.Grade7_add.g} {parent.Grade7_add.b} {parent.Grade7_add.a}}
+  gamma {{parent.Grade7_gamma.r} {parent.Grade7_gamma.g} {parent.Grade7_gamma.b} {parent.Grade7_gamma.a}}
+  reverse {{parent.Grade7_reverse}}
+  black_clamp {{parent.Grade7_black_clamp}}
+  white_clamp {{parent.Grade7_white_clamp}}
+  inject {{parent.Grade7_inject}}
+  invert_mask {{parent.Grade7_invert_mask}}
+  fringe {{parent.Grade7_fringe}}
+  invert_unpremult {{parent.Grade7_invert_unpremult}}
+  mix {{parent.Grade7_mix}}
+  name Grade7
+  xpos -267
+  ypos 860
+ }
+push $N93733000
+ Grade {
+  blackpoint {{parent.Grade7_blackpoint.r} {parent.Grade7_blackpoint.g} {parent.Grade7_blackpoint.b} {parent.Grade7_blackpoint.a}}
+  whitepoint {{parent.Grade7_whitepoint.r} {parent.Grade7_whitepoint.g} {parent.Grade7_whitepoint.b} {parent.Grade7_whitepoint.a}}
+  black {{parent.Grade7_black.r} {parent.Grade7_black.g} {parent.Grade7_black.b} {parent.Grade7_black.a}}
+  white {{parent.Grade7_white.r} {parent.Grade7_white.g} {parent.Grade7_white.b} {parent.Grade7_white.a}}
+  multiply {{parent.Grade7_multiply.r} {parent.Grade7_multiply.g} {parent.Grade7_multiply.b} {parent.Grade7_multiply.a}}
+  add {{parent.Grade7_add.r} {parent.Grade7_add.g} {parent.Grade7_add.b} {parent.Grade7_add.a}}
+  gamma {{parent.Grade7_gamma.r} {parent.Grade7_gamma.g} {parent.Grade7_gamma.b} {parent.Grade7_gamma.a}}
+  reverse {{parent.Grade7_reverse}}
+  black_clamp {{parent.Grade7_black_clamp}}
+  white_clamp {{parent.Grade7_white_clamp}}
+  inject {{parent.Grade7_inject}}
+  invert_mask {{parent.Grade7_invert_mask}}
+  fringe {{parent.Grade7_fringe}}
+  invert_unpremult {{parent.Grade7_invert_unpremult}}
+  mix {{parent.Grade7_mix}}
+  name Grade1
+  xpos -106
+  ypos 860
+ }
+ Switch {
+  inputs 2
+  which 1
+  name Switch1
+  xpos -183
+  ypos 894
+  disable {{parent.GreenLaser}}
+ }
+ Glow2 {
+  size 9.5
+  mix 0.53
+  name Glow2
+  xpos -183
+  ypos 946
+ }
+ TimeBlur {
+  divisions 12
+  shutter 0.35
+  shutteroffset centred
+  shuttercustomoffset 0
+  name TimeBlur2
+  xpos -183
+  ypos 970
+ }
+ Keymix {
+  inputs 3
+  name Keymix1
+  xpos -183
+  ypos 1036
+ }
+set N93778800 [stack 0]
+push $N93732c00
+ Viewer {
+  inputs 2
+  frame 10
+  input_number 1
+  input_process false
+  name Viewer1
+  xpos 183
+  ypos 1033
+ }
+push $N93778800
+push $N936e0c00
+ Switch {
+  inputs 2
+  which 1
+  name switchn1
+  xpos -183
+  ypos 1143
+  disable {{parent.Viewnoise1}}
+ }
+push $N93599c00
+ Switch {
+  inputs 2
+  which 1
+  name switchn2
+  xpos -183
+  ypos 1192
+  disable {{parent.Viewnoise2}}
+ }
+ Output {
+  name Output1
+  xpos -183
+  ypos 1250
+ }
+ Noise {
+  inputs 0
+  size 90
+  zoffset {{curve x1 0 l x112 0.76}}
+  gain 1
+  gamma 0.32
+  translate {{curve x1 0} {curve x1 0 x112 15}}
+  center {960 540}
+  name Noise3
+  xpos 305
+  ypos 641
+  disable true
+ }
+end_group

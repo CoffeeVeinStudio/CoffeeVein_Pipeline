@@ -1,0 +1,70 @@
+set cut_paste_input [stack 0]
+version 13.0 v2
+BackdropNode {
+inputs 0
+name Backdrop_to_Mattepaint18
+tile_color 0x555947ff
+label "to Mattepaint"
+note_font_size 40
+selected true
+xpos 393
+ypos 1039
+bdwidth 767
+bdheight 563
+z_order 3
+}
+push $cut_paste_input
+Dot {
+name Dot22
+label input
+selected true
+xpos 610
+ypos 1151
+}
+FrameHold {
+firstFrame 1001
+name FrameHold19
+label "Choose frame"
+selected true
+xpos 576
+ypos 1207
+disable {{parent.Dot_writer20.disable}}
+}
+Remove {
+operation keep
+channels rgba
+name Keep18
+label rgba
+selected true
+xpos 576
+ypos 1274
+disable true
+}
+Dot {
+name Dot23
+label Undistortion
+selected true
+xpos 610
+ypos 1339
+}
+Dot {
+name Dot_writer20
+tile_color 0xfff810ff
+label to_mattepaint
+selected true
+xpos 610
+ypos 1405
+addUserKnob {20 User}
+addUserKnob {22 labelWriteElement l "Create label element writenode" t "Create screenclean element" T "#Get info from input\ntopnode_name = nuke.tcl(\"full_name \[topnode %s]\" % nuke.thisNode().name())\ntopnode = nuke.toNode(topnode_name)\nprint(topnode.name(),nuke.filename(topnode))\n\n#Topnode is a pipeline readnode, base on path.\ntry:\n    proj = topnode.knob(\"proj\").getValue()\n    seq = topnode.knob(\"seq\").getValue()\n    shot = topnode.knob(\"shot\").getValue()\n    \n    print (\"pipeline: \", proj,seq,shot)\nexcept:\n    filename = nuke.filename(topnode)\n    if not \"Z\" in filename\[:1]:\n    \n        namelist = (filename.split(\"/\"))\n        proj = namelist\[4]\n        seq = namelist\[6]\n        shot = namelist\[7]\n        print (\"filepath: \", proj,seq,shot)\n    \n    else:\n        nuke.message(\"Z is not allowed, use '//fs/data' instead\")\n\n\n\nfor nodes in nuke.allNodes():\n    nodes.setSelected(False)\ndotname = nuke.thisNode()\[\"label\"].getValue().split(\"/n\")\[0]\nnuke.thisNode().setSelected(True)    \n\nnewWrite = nodegraph.create_custom_writenode()\nnewWrite\[\"type\"].setValue(\"element\")\nnewWrite\[\"new_el\"].setValue(dotname)\n\n\n# Set channels if any in this nodes knob\nchannels_value = nuke.thisNode().knob(\"channels\").getValue()\nif not channels_value == \"\":\n    newWrite\[\"channels\"].setValue(channels_value)\nelse:\n    newWrite\[\"channels\"].setValue(\"all\")\n\n# Colorspace according to ocio settings\nocio_config = nuke.Root()\[\"OCIO_config\"].value()\n\nif \"aces\" in ocio_config:\n    newWrite\[\"colorspace\"].setValue(\"Input - ARRI - V3 LogC (EI800) - Wide Gamut\")\nelse:\n    newWrite\[\"colorspace\"].setValue(\"AlexaV3LogC\")\n\nnewWrite\[\"file_type\"].setValue(\"tiff\")\nnewWrite\[\"datatype\"].setValue(\"16 bit\")\nnewWrite\[\"compression\"].setValue(\"none\")\n\noldext = newWrite\[\"file\"].getValue()\nnewWrite\[\"file\"].setValue(oldext.replace(\".exr\",\".tiff\"))\n\nif not nuke.thisNode().knob(\"disable\").getValue():\n    newWrite\[\"packetsize\"].setValue(1)\n    newWrite\[\"use_limit\"].setValue(True)\n    newWrite\[\"first\"].setValue(nuke.thisNode().knob(\"frame\").getValue())\n    newWrite\[\"last\"].setValue(nuke.thisNode().knob(\"frame\").getValue())\n\nnewWrite.setInput(0, nuke.thisNode())" +STARTLINE}
+addUserKnob {3 frame l "Single frame" t "if rendering single frame, set it here"}
+frame {{parent.FrameHold19.firstFrame}}
+addUserKnob {41 setToCurrentFrame l "Set to Current Frame" -STARTLINE T FrameHold19.setToCurrentFrame}
+addUserKnob {6 disable -STARTLINE}
+addUserKnob {1 channels t "Typically \"rgb\", \"rgba\" or \"all\""}
+channels rgba
+addUserKnob {26 ""}
+addUserKnob {20 info n 1}
+info 0
+addUserKnob {26 text l "" +STARTLINE T "This is a custom dotWriter for delivering to our mattepainter. \n\nRemember to update the single frame you want to export. as a standard it's set to 1001.\n\nChange name in \"label\" of this node if you want to name it something else.\n\nSince it's only one frame, you could just render it locally. \n"}
+addUserKnob {20 endGroup n -1}
+}

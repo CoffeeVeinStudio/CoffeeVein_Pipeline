@@ -1,0 +1,211 @@
+#! C:/Program Files/Nuke10.5v3/nuke-10.5.3.dll -nx
+version 10.5 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="2560" h="1400" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1881" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1338"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1" focus="true">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="2560" y="0" w="2560" h="1440" maximized="1" screen="1">
+        <splitter orientation="2">
+            <split size="1401"/>
+            <dock id="" activePageId="DAG.1">
+                <page id="DAG.1"/>
+                <page id="Curve Editor.1"/>
+                <page id="DopeSheet.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/Users/sbb/Desktop/lib_DustWaves.nk
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0xaaaaaa00
+ label DustWaves
+ note_font_size 70
+ selected true
+ xpos -1258
+ ypos -96
+ bdwidth 1136
+ bdheight 347
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_1_0241/DustWave_1/DustWave_1_0241.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1715
+ origfirst 1001
+ origlast 1715
+ origset true
+ name Read8
+ selected true
+ xpos -1226
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_2_0242/DustWave_2/DustWave_2_0242.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1723
+ origfirst 1001
+ origlast 1723
+ origset true
+ name Read9
+ selected true
+ xpos -1116
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_3_0243/DustWave_3/DustWave_3_0243.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1432
+ origfirst 1001
+ origlast 1432
+ origset true
+ name Read11
+ selected true
+ xpos -1006
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_4_0244/DustWave_4/DustWave_4_0244.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1719
+ origfirst 1001
+ origlast 1719
+ origset true
+ name Read12
+ selected true
+ xpos -896
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_5_0245/DustWave_5/DustWave_5_0245.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1664
+ origfirst 1001
+ origlast 1664
+ origset true
+ name Read16
+ selected true
+ xpos -786
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_9_0249/DustWave_9/DustWave_9_0249.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1540
+ origfirst 1001
+ origlast 1540
+ origset true
+ name Read20
+ selected true
+ xpos -346
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_10_0250/DustWave_10/DustWave_10_0250.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1601
+ origfirst 1001
+ origlast 1601
+ origset true
+ name Read21
+ selected true
+ xpos -236
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_8_0248/DustWave_8/DustWave_8_0248.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1606
+ origfirst 1001
+ origlast 1606
+ origset true
+ name Read19
+ selected true
+ xpos -456
+ ypos 51
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_7_0247/DustWave_7/DustWave_7_0247.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1659
+ origfirst 1001
+ origlast 1659
+ origset true
+ name Read18
+ selected true
+ xpos -567
+ ypos 50
+}
+Read {
+ inputs 0
+ file "//10.11.0.184/171000_TGB_Library/Stock/Dust Waves/DPX/2048x1080/DustWave_6_0246/DustWave_6/DustWave_6_0246.%04d.dpx"
+ localizationPolicy off
+ format "2048 1080 0 0 2048 1080 1 2K_DCP"
+ first 1001
+ last 1604
+ origfirst 1001
+ origlast 1604
+ origset true
+ name Read17
+ selected true
+ xpos -676
+ ypos 50
+}

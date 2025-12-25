@@ -1,0 +1,255 @@
+set cut_paste_input [stack 0]
+version 12.0 v4
+push $cut_paste_input
+Group {
+name Grade_AOV
+label "\[value in]"
+selected true
+xpos 13697
+ypos 9266
+addUserKnob {20 User}
+addUserKnob {41 disable_1 l isolate_selected T isolate_selected.disable}
+addUserKnob {41 in l AOV T global_AOV.in}
+addUserKnob {26 ""}
+addUserKnob {20 gaov l "Grade AOV" n 1}
+addUserKnob {41 blackpoint T grade_AOV.blackpoint}
+addUserKnob {41 whitepoint T grade_AOV.whitepoint}
+addUserKnob {41 black l lift T grade_AOV.black}
+addUserKnob {41 white l gain T grade_AOV.white}
+addUserKnob {41 multiply T grade_AOV.multiply}
+addUserKnob {41 add l offset T grade_AOV.add}
+addUserKnob {41 gamma T grade_AOV.gamma}
+addUserKnob {41 black_clamp l "black clamp" T grade_AOV.black_clamp}
+addUserKnob {41 white_clamp l "white clamp" T grade_AOV.white_clamp}
+addUserKnob {41 mix T grade_AOV.mix}
+addUserKnob {20 endGroup n -1}
+addUserKnob {20 expaov l "Exposure AOV" n 1}
+addUserKnob {41 exposure l "Exposure +" T EXP.exposure}
+addUserKnob {20 endGroup_2 l endGroup n -1}
+addUserKnob {20 ccaov l "CC AOV" n 1}
+addUserKnob {41 saturation T cc_AOV.saturation}
+addUserKnob {41 contrast T cc_AOV.contrast}
+addUserKnob {20 endGroup_1 l endGroup n -1}
+addUserKnob {6 lut l Lut -STARTLINE}
+addUserKnob {6 gizmo l Gizmo -STARTLINE}
+}
+Input {
+inputs 0
+name mask
+xpos -1392
+ypos -699
+number 1
+}
+Dot {
+name Dot8
+label MASK
+xpos -1358
+ypos -659
+}
+Dot {
+name Dot9
+xpos -1358
+ypos -409
+}
+set Nf5d26400 [stack 0]
+Dot {
+name Dot4
+xpos -1358
+ypos -330
+}
+set Ndb0ad400 [stack 0]
+Dot {
+name Dot3
+xpos -1358
+ypos -250
+}
+push $Ndb0ad400
+push $Nf5d26400
+Input {
+inputs 0
+name Input1
+xpos -1044
+ypos -692
+}
+Dot {
+name Dot10
+label INPUT
+xpos -1010
+ypos -656
+}
+Unpremult {
+channels all
+name Unpremult11
+xpos -1044
+ypos -545
+}
+set N80b00000 [stack 0]
+Shuffle {
+in none
+name global_AOV
+label "\[value in]"
+xpos -1266
+ypos -545
+}
+set Nbb2ac400 [stack 0]
+Grade {
+inputs 1+1
+channels all
+name grade_AOV
+xpos -1266
+ypos -419
+}
+Multiply {
+inputs 1+1
+value {{"pow (2, EXP.exposure)"}}
+name Multiply1
+xpos -1266
+ypos -340
+}
+ColorCorrect {
+inputs 1+1
+channels all
+name cc_AOV
+xpos -1266
+ypos -260
+}
+Shuffle {
+in {{{AOV_to_RGB.in}}}
+alpha black
+name AOV_to_RGB2
+label "\[value in]"
+xpos -1156
+ypos -260
+}
+set Nf73b6400 [stack 0]
+push $Nbb2ac400
+Shuffle {
+in {{{global_AOV.in}}}
+alpha black
+name AOV_to_RGB
+label "\[value in]"
+xpos -1158
+ypos -467
+}
+set Nf73b6000 [stack 0]
+push $N80b00000
+Remove {
+operation keep
+channels rgb
+name keep_rgb
+xpos -1044
+ypos -478
+}
+Merge2 {
+inputs 2
+operation from
+Achannels rgb
+Bchannels rgb
+also_merge all
+name Merge16
+xpos -1044
+ypos -373
+}
+Merge2 {
+inputs 2
+operation plus
+Achannels rgb
+also_merge all
+name Merge17
+xpos -1042
+ypos -254
+}
+set N2098400 [stack 0]
+push $Nf73b6400
+Shuffle {
+out {{{global_AOV.in}}}
+name tweaked_outputchannel
+label "\[value in]"
+xpos -1156
+ypos -19
+}
+push $N80b00000
+Dot {
+name Dot12
+xpos -770
+ypos -535
+}
+Remove {
+channels rgb
+name remove_rgb
+xpos -804
+ypos -480
+}
+Dot {
+name Dot7
+xpos -770
+ypos -75
+}
+push $N2098400
+push $Nf73b6000
+Dot {
+name Dot2
+xpos -871
+ypos -457
+}
+Dot {
+name Dot1
+xpos -871
+ypos -132
+}
+Switch {
+inputs 2
+which 1
+name isolate_selected
+xpos -1042
+ypos -136
+}
+Copy {
+inputs 2
+from0 rgba.alpha
+to0 rgba.alpha
+channels all
+name Copy1
+xpos -1042
+ypos -92
+}
+ShuffleCopy {
+inputs 2
+red red
+green green
+blue blue
+out {{{global_AOV.in}}}
+name inject_tweaked_channel
+xpos -1042
+ypos -13
+}
+Premult {
+channels all
+name Premult5
+xpos -1042
+ypos 24
+}
+Output {
+name Output1
+xpos -1042
+ypos 114
+}
+add_layer {light02 light02.red light02.green light02.blue}
+Viewer {
+inputs 2
+frame_range 1001-1082
+fps 25
+channels light02
+name Viewer1
+xpos -1651
+ypos -312
+}
+NoOp {
+inputs 0
+name EXP
+xpos -1467
+ypos -333
+addUserKnob {20 User}
+addUserKnob {7 exposure l "Exposure +" R -4 4}
+}
+end_group

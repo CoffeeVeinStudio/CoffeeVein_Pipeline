@@ -1,0 +1,342 @@
+#! C:/Program Files/Nuke15.0v2/nuke-15.0.2.dll -nx
+version 15.0 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-1" y="-8" w="5120" h="1377" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1250"/>
+            <splitter orientation="2">
+                <split size="963"/>
+                <dock id="" activePageId="uk.co.thefoundry.scripteditor.1">
+                    <page id="uk.co.thefoundry.scripteditor.1"/>
+                    <page id="Error Console.1"/>
+                </dock>
+                <split size="372"/>
+                <splitter orientation="1">
+                    <split size="465"/>
+                    <dock id="" activePageId="uk.co.thefoundry.waveformscope.1">
+                        <page id="uk.co.thefoundry.waveformscope.1"/>
+                        <page id="Pixel Analyzer.1"/>
+                    </dock>
+                    <split size="472"/>
+                    <dock id="" activePageId="uk.co.thefoundry.histogram.1">
+                        <page id="uk.co.thefoundry.histogram.1"/>
+                    </dock>
+                    <split size="305"/>
+                    <dock id="" activePageId="uk.co.thefoundry.vectorscope.1">
+                        <page id="uk.co.thefoundry.vectorscope.1"/>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="2507" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1339"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="1311"/>
+            <splitter orientation="2">
+                <split size="668"/>
+                <dock id="" activePageId="Properties.1">
+                    <page id="Properties.1"/>
+                    <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+                </dock>
+                <split size="667"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/Users/chris/.nuke/Cinegrace/_tools/studio/ScriptSetup/ingest.nk
+ project_directory "\[python \{nuke.script_directory()\}]"
+ fps 25
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ monitorOutLUT sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+ onScriptSave Cinegracepipe.relativepath()
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode32
+ tile_color 0x15472bff
+ label Ingest
+ note_font_size 42
+ selected true
+ xpos 0
+ appearance Border
+ border_width 8.35
+ bookmark false
+ bdwidth 2337
+ bdheight 773
+ z_order -1
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode44
+ tile_color 0xaaaaaa00
+ label <H1>Plates
+ note_font_size 42
+ selected true
+ xpos 831
+ ypos 81
+ bdwidth 1404
+ bdheight 613
+ addUserKnob {20 User}
+ addUserKnob {22 loadinfo l "Load info" +INVISIBLE +STARTLINE}
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode48
+ tile_color 0x655f67ff
+ label <H1>Offline
+ note_font_size 42
+ selected true
+ xpos 210
+ ypos 76
+ bookmark false
+ bdwidth 403
+ bdheight 604
+ z_order 1
+}
+Dot {
+ inputs 0
+ name Dot37
+ tile_color 0xff5f00ff
+ label plate
+ selected true
+ xpos 1005
+ ypos 367
+}
+TimeClip {
+ time ""
+ first {{input.first_frame}}
+ last {{input.last_frame}}
+ origfirst {{input.first_frame}}
+ origlast {{input.last_frame}}
+ origset true
+ mask_metadata true
+ name TimeClip1
+ label "Black before / after"
+ selected true
+ xpos 971
+ ypos 434
+}
+NoOp {
+ name Anchor_3ce4bb652c3
+ help "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021"
+ onCreate "if nuke.GUI:\n    try:\n        import stamps; stamps.anchorOnCreate()\n    except:\n        pass"
+ knobChanged stamps.anchorKnobChanged()
+ autolabel "nuke.thisNode().knob(\"title\").value()"
+ tile_color 0xffffff01
+ note_font_size 20
+ selected true
+ xpos 971
+ ypos 612
+ addUserKnob {20 anchor_tab l "Anchor Stamp"}
+ addUserKnob {26 identifier -STARTLINE +HIDDEN T anchor}
+ addUserKnob {1 title l Title: t "Displayed name on the Node Graph for this Stamp and its Anchor.\nIMPORTANT: This is only for display purposes, and is different from the real/internal name of the Stamps."}
+ title Plate01
+ addUserKnob {26 prev_title l "" +STARTLINE +HIDDEN T Plate01}
+ addUserKnob {26 prev_name l "" +STARTLINE +HIDDEN T Anchor_3ce4bb652c3}
+ addUserKnob {3 showing l "" +STARTLINE +HIDDEN}
+ addUserKnob {1 tags l Tags t "Comma-separated tags you can define for each Anchor, that will help you find it when invoking the Stamp Selector by pressing the Stamps shortkey with nothing selected."}
+ tags plate
+ addUserKnob {26 line1 l "" +STARTLINE}
+ addUserKnob {26 stamps_label l Stamps: T " "}
+ addUserKnob {22 createStamp l new t "Create a new Stamp for this Anchor." -STARTLINE T stamps.stampCreateWired(nuke.thisNode())}
+ addUserKnob {22 selectStamps l select t "Reconnect all of this Anchor's Stamps." -STARTLINE T stamps.wiredSelectSimilar(nuke.thisNode().name())}
+ addUserKnob {22 reconnectStamps l reconnect -STARTLINE T stamps.anchorReconnectWired()}
+ addUserKnob {22 zoomNext l "zoom next" t "Navigate to this Anchor's next Stamp on the Node Graph." -STARTLINE T stamps.wiredZoomNext(nuke.thisNode().name())}
+ addUserKnob {26 line2 l "" +STARTLINE}
+ addUserKnob {22 buttonHelp l Help -STARTLINE T stamps.showHelp()}
+ addUserKnob {26 version l " " t "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021." -STARTLINE T "<a href=\"http://www.nukepedia.com/gizmos/other/stamps\" style=\"color:#666;text-decoration: none;\"><span style=\"color:#666\"> <big>Stamps v1.1</big></b></a>"}
+}
+Dot {
+ inputs 0
+ name Dot40
+ tile_color 0xdfff00ff
+ label offline
+ selected true
+ xpos 405
+ ypos 408
+ addUserKnob {20 User +INVISIBLE}
+ addUserKnob {1 script_connection_audio l "connection audio"}
+ script_connection_audio offline
+}
+Group {
+ name TimecodeCalc_TimeOffset
+ tile_color 0xc9b281ff
+ label "Sync offline and plate"
+ selected true
+ xpos 371
+ ypos 426
+ addUserKnob {20 User}
+ addUserKnob {41 calcOffset l "calc offset" T TimeOffset8.calcOffset}
+ addUserKnob {41 framerate T TimeOffset8.framerate}
+ addUserKnob {41 startframe l "start frame" -STARTLINE T TimeOffset8.startframe}
+ addUserKnob {41 offset -STARTLINE T TimeOffset8.offset}
+ addUserKnob {41 framerate_float l framerate -STARTLINE +INVISIBLE T TimeOffset8.framerate_float}
+ addUserKnob {41 goalTimecode l "Goal timecode" T TimeOffset8.goalTimecode}
+ addUserKnob {41 setCurrentTimecode l "Set Current input" -STARTLINE T TimeOffset8.setCurrentTimecode}
+ addUserKnob {41 startTimecode l "Start timecode" T TimeOffset8.startTimecode}
+ addUserKnob {41 inputframe l "input startframe" -STARTLINE T TimeOffset8.inputframe}
+ addUserKnob {41 importmetadata l "Import from metadata" -STARTLINE T TimeOffset8.importmetadata}
+ addUserKnob {26 ""}
+ addUserKnob {6 view_node_boolean l "Goal timecode through timeoffset" +STARTLINE}
+ addUserKnob {22 expression_active l "expression on / off" t "The expression keept getting called, which slows down our script. \n\nI've added this option if we wanted to generate multiple timeoffset." -STARTLINE T "view_node_boolean_knob = nuke.thisNode().knob(\"view_node_boolean\")\nif view_node_boolean_knob.hasExpression():\n    view_node_boolean_knob.clearAnimated()\nelse:\n    view_node_boolean_knob.setExpression(\"\[python nuke.activeViewer().node().input(0) == nuke.thisNode()]\")\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 gen_timeoffset l "Generate timeoffset" +INVISIBLE T "#nuke.nodes.TimeOffset(time_offset = nuke.thisNode().knob(\"int_timeoffset\"))\n\nnuke.createNode(\"TimeOffset\")" +STARTLINE}
+ addUserKnob {3 int_timeoffset l "" -STARTLINE +INVISIBLE}
+ int_timeoffset {{"((offset - startframe) * -1) -inputframe"}}
+}
+ Input {
+  inputs 0
+  name InputReference
+  xpos -221
+  ypos -295
+ }
+ Dot {
+  name Dot1
+  xpos -187
+  ypos -201
+ }
+set Na58ebc00 [stack 0]
+ TimeOffset {
+  time_offset {{"((offset - startframe) * -1) -inputframe"}}
+  time ""
+  name TimeOffset8
+  onCreate "seq = paths.get_sequence()\nshot = paths.get_shot()\n\n\ntry: \n    if nuke.thisNode()\[\"autoupdate\"].value() == True:\n        if not nuke.thisNode()\[\"sequence\"] == seq:\n            if not nuke.thisNode()\[\"shot\"] == shot:\n                nukeAsk = nuke.ask(\"Would you like to update to current shot?\")\n                if nukeAsk:\n                    nuke.thisNode()\[\"getshot\"].execute()\nexcept:\n    pass"
+  selected true
+  xpos -221
+  ypos -133
+  addUserKnob {20 User}
+  addUserKnob {22 calcOffset l "calc offset" T "this = nuke.thisNode()\n\n\nframerate = this\[\"framerate_float\"].getValue()\n\n\nif int(framerate) != int(nuke.root().fps()):\n    ask = nuke.ask(\"Framerates don't match, Current: \" + str(framerate) + \". Script:\" + str(int(nuke.root().fps())) + \", would you like to match it to the scripts settings?\")\n    if ask:\n        nuke.thisNode()\[\"framerate_float\"].setValue(nuke.root().fps())\n        framerate = this\[\"framerate_float\"].getValue()\n\ndef timecode_to_frames(timecode):\n    return sum(f * int(t) for f,t in zip((3600*framerate, 60*framerate, framerate, 1), timecode.split(':')))\n\nthis\[\"offset\"].setValue( timecode_to_frames(this\[\"goalTimecode\"].getValue()) - timecode_to_frames(this\[\"startTimecode\"].getValue()))" +STARTLINE}
+  addUserKnob {3 offset -STARTLINE}
+  addUserKnob {3 startframe l "start frame"}
+  startframe 1001
+  addUserKnob {3 framerate -STARTLINE}
+  framerate 24
+  addUserKnob {7 framerate_float l framerate -STARTLINE}
+  framerate_float 24
+  addUserKnob {4 sequence l Sequence +INVISIBLE M {- TRL_sc019 TRL_sc031 TRL_sc037 TRL_sc051 TRL_sc081 TRL_sc096 TRL_sc135 TRL_sc150 "" "" "" "" ""}}
+  sequence TRL_sc081
+  addUserKnob {4 shot l Shot +INVISIBLE M {- sh0940 sh0960 sh0980 sh1000 sh1020 sh1040 sh1080 sh1090 sh1100 sh1110 sh1120 sh1140 sh1160 sh1180 sh1220 sh1240 sh1260 sh1280 "" "" "" "" "" "" "" ""}}
+  shot sh1120
+  addUserKnob {22 getshot l "Get shot" +INVISIBLE T "nuke.thisNode()\[\"sequence\"].setValue(paths.get_sequence())\nnuke.thisNode()\[\"shot\"].setValue(paths.get_shot())" +STARTLINE}
+  addUserKnob {6 autoupdate l "auto Update" -STARTLINE +INVISIBLE}
+  addUserKnob {26 ""}
+  addUserKnob {2 filename +INVISIBLE}
+  addUserKnob {1 goalTimecode l "Goal timecode"}
+  addUserKnob {22 setCurrentTimecode l "Set Current input" -STARTLINE T "current = nuke.toNode(\"ViewMetaDataCurrent\").metadata(\"input/timecode\")\n\nnuke.thisNode()\[\"goalTimecode\"].setValue(current)\n\nask = nuke.ask(\"Update timeoffset?\")\nif ask:\n    nuke.thisNode()\[\"calcOffset\"].execute()"}
+  addUserKnob {1 startTimecode l "Start timecode"}
+  addUserKnob {3 inputframe l "input startframe" -STARTLINE}
+  inputframe 1
+  addUserKnob {22 importmetadata l "Import from metadata" -STARTLINE T "start = nuke.toNode(\"ViewMetaData_first\").metadata(\"input/timecode\")\n\nnuke.thisNode()\[\"startTimecode\"].setValue(start)\n\nfirstframe = nuke.toNode(\"FrameHold_first\")\[\"firstFrame\"].getValue()\n\nnuke.thisNode()\[\"inputframe\"].setValue(firstframe)\n\n"}
+  addUserKnob {22 timecode l "Timecode calc link" +INVISIBLE T "nukescripts.openurl.start(\"http://www.michaelcinquin.com/tools/timecode_keykode\")" +STARTLINE}
+ }
+set Nad7b2b00 [stack 0]
+ Output {
+  name Output1
+  xpos -221
+  ypos -11
+ }
+push $Na58ebc00
+ Dot {
+  name Dot3
+  xpos -342
+  ypos -201
+ }
+set Na9b3e400 [stack 0]
+ Dot {
+  name Dot2
+  xpos -491
+  ypos -201
+ }
+ FrameHold {
+  firstFrame {{"input.frame - input.frame + 1"}}
+  name FrameHold_first
+  xpos -525
+  ypos -150
+ }
+ ViewMetaData {
+  name ViewMetaData_first
+  xpos -525
+  ypos -52
+ }
+push $Nad7b2b00
+push $Na9b3e400
+ Switch {
+  inputs 2
+  which {{parent.view_node_boolean}}
+  name Switch_currentFrame
+  label "Looking through timeOffset or input?"
+  xpos -376
+  ypos -139
+ }
+ ViewMetaData {
+  name ViewMetaDataCurrent
+  xpos -376
+  ypos -53
+ }
+end_group
+Dot {
+ name Dot_generateAudio2
+ tile_color 0x5bffedff
+ label preview_audio
+ selected true
+ xpos 405
+ ypos 546
+ addUserKnob {20 User +INVISIBLE}
+ addUserKnob {1 script_connection_audio l "connection audio"}
+ script_connection_audio offline
+}
+NoOp {
+ name Anchor_21e9c73a6e3
+ help "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021"
+ onCreate "if nuke.GUI:\n    try:\n        import stamps; stamps.anchorOnCreate()\n    except:\n        pass"
+ knobChanged stamps.anchorKnobChanged()
+ autolabel "nuke.thisNode().knob(\"title\").value()"
+ tile_color 0xffffff01
+ note_font_size 20
+ selected true
+ xpos 371
+ ypos 599
+ addUserKnob {20 anchor_tab l "Anchor Stamp"}
+ addUserKnob {26 identifier -STARTLINE +HIDDEN T anchor}
+ addUserKnob {1 title l Title: t "Displayed name on the Node Graph for this Stamp and its Anchor.\nIMPORTANT: This is only for display purposes, and is different from the real/internal name of the Stamps."}
+ title Offline
+ addUserKnob {26 prev_title l "" +STARTLINE +HIDDEN T Offline}
+ addUserKnob {26 prev_name l "" +STARTLINE +HIDDEN T Anchor_21e9c73a6e3}
+ addUserKnob {3 showing l "" +STARTLINE +HIDDEN}
+ addUserKnob {1 tags l Tags t "Comma-separated tags you can define for each Anchor, that will help you find it when invoking the Stamp Selector by pressing the Stamps shortkey with nothing selected."}
+ tags 2D,
+ addUserKnob {26 line1 l "" +STARTLINE}
+ addUserKnob {26 stamps_label l Stamps: T " "}
+ addUserKnob {22 createStamp l new t "Create a new Stamp for this Anchor." -STARTLINE T stamps.stampCreateWired(nuke.thisNode())}
+ addUserKnob {22 selectStamps l select t "Reconnect all of this Anchor's Stamps." -STARTLINE T stamps.wiredSelectSimilar(nuke.thisNode().name())}
+ addUserKnob {22 reconnectStamps l reconnect -STARTLINE T stamps.anchorReconnectWired()}
+ addUserKnob {22 zoomNext l "zoom next" t "Navigate to this Anchor's next Stamp on the Node Graph." -STARTLINE T stamps.wiredZoomNext(nuke.thisNode().name())}
+ addUserKnob {26 line2 l "" +STARTLINE}
+ addUserKnob {22 buttonHelp l Help -STARTLINE T stamps.showHelp()}
+ addUserKnob {26 version l " " t "Stamps by Adrian Pueyo and Alexey Kuchinski.\nUpdated May 18 2021." -STARTLINE T "<a href=\"http://www.nukepedia.com/gizmos/other/stamps\" style=\"color:#666;text-decoration: none;\"><span style=\"color:#666\"> <big>Stamps v1.1</big></b></a>"}
+}
