@@ -1,0 +1,130 @@
+#! C:/Program Files/Nuke10.0v3/nuke-10.0.3.dll -nx
+version 10.0 v3
+Gizmo {
+ inputs 2
+ addUserKnob {20 User}
+ addUserKnob {41 normal l "normal vectors" T ReLight1.normal}
+ addUserKnob {41 position l "point positions" T ReLight1.position}
+ addUserKnob {26 ""}
+ addUserKnob {41 gamma l Fall-out T Grade1.gamma}
+ addUserKnob {41 blackpoint T Grade1.blackpoint}
+ addUserKnob {41 whitepoint T Grade1.whitepoint}
+ addUserKnob {41 black_clamp l "black clamp" T Grade1.black_clamp}
+ addUserKnob {41 white_clamp l "white clamp" T Grade1.white_clamp}
+}
+ Input {
+  inputs 0
+  name SrcColor
+  label Color
+  xpos -389
+  ypos -451
+ }
+ Dot {
+  name Dot3
+  xpos -355
+  ypos -349
+ }
+ Dot {
+  name Dot1
+  xpos -355
+  ypos -204
+ }
+set N4415800 [stack 0]
+ Phong {
+  inputs 0
+  color 0.8
+  diffuse 1
+  specular 0
+  name Phong1
+  xpos -523
+  ypos -306
+ }
+ Input {
+  inputs 0
+  name SrcCamera
+  label Camera
+  xpos -730
+  ypos -463
+  number 1
+ }
+ Camera2 {
+  name Camera1
+  xpos -720
+  ypos -413
+ }
+ Dot {
+  name Dot2
+  xpos -696
+  ypos -335
+ }
+set N4453000 [stack 0]
+push $N4453000
+ Light {
+  depthmap_slope_bias 0.01
+  name Point1
+  xpos -721
+  ypos -237
+ }
+push $N4415800
+ ReLight {
+  inputs 4
+  use_alpha true
+  name ReLight1
+  selected true
+  xpos -523
+  ypos -208
+ }
+ Invert {
+  name Invert1
+  xpos -523
+  ypos -131
+ }
+set N4452400 [stack 0]
+ EdgeDetectWrapper {
+  threshold 1
+  name EdgeDetect1
+  xpos -667
+  ypos -46
+ }
+push $N4452400
+ Blur {
+  inputs 1+1
+  size 3
+  name Blur2
+  xpos -528
+  ypos -46
+ }
+ Grade {
+  gamma 0.5
+  name Grade1
+  xpos -528
+  ypos 25
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos -389
+  ypos 19
+ }
+ Premult {
+  name Premult1
+  xpos -389
+  ypos 102
+ }
+set N471bd400 [stack 0]
+ Output {
+  name Output1
+  xpos -389
+  ypos 202
+ }
+push $N471bd400
+ Viewer {
+  frame 30
+  frame_range 1-100
+  name Viewer1
+  xpos -770
+  ypos 23
+ }
+end_group

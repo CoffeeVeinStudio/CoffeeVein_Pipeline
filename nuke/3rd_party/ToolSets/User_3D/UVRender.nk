@@ -1,0 +1,230 @@
+Group {
+ name UVRender
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\n#######################################\n\nif ('texture' in k.name()):\n    if (int(n\['texture'].getValue()) == 0):\n        #PROJECTION FROM CAM\n        if (n.knob('disable_framehold_cam').value() == True):\n            n\['framehold_cam'].setVisible(True)\n        else:\n            n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(True)\n        n\['project_on'].setVisible(True)\n        n\['crop'].setVisible(True)\n        n\['occlusion_mode'].setVisible(True)\n        n\['PARAMETERS'].setVisible(True)\n        n\['line'].setVisible(True)\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n        n\['dimension_uv_map'].setVisible(False)\n        n\['adjust_BBox'].setVisible(False)\n        n\['alpha_uv_map'].setVisible(False)\n    elif (int(n\['texture'].getValue()) == 1):\n        #WIREFRAME\n        n\['dimension_uv_map'].setVisible(False)\n        n\['adjust_BBox'].setVisible(False)\n        n\['alpha_uv_map'].setVisible(False)\n        n\['operation'].setVisible(True)\n        n\['line_width'].setVisible(True)\n        n\['line_color'].setVisible(True)\n        n\['PARAMETERS'].setVisible(True)\n        n\['line'].setVisible(True)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n    elif (int(n\['texture'].getValue()) == 2):\n        #UV MAP\n        n\['dimension_uv_map'].setVisible(True)\n        n\['adjust_BBox'].setVisible(True)\n        n\['alpha_uv_map'].setVisible(True)\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n        n\['PARAMETERS'].setVisible(True)\n        n\['line'].setVisible(True)\n    elif (int(n\['texture'].getValue()) == 3):\n        #IMG\n        n\['dimension_uv_map'].setVisible(False)\n        n\['adjust_BBox'].setVisible(False)\n        n\['alpha_uv_map'].setVisible(False)\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n        n\['PARAMETERS'].setVisible(False)\n        n\['line'].setVisible(False)\n        \n        \n\n#######################################\nif ('disable_framehold_output' in k.name()):\n    if (n.knob('disable_framehold_output').value() == True):\n        n\['framehold_output'].setVisible(True)\n    else:\n        n\['framehold_output'].setVisible(False)\n    \n#######################################\nif ('disable_framehold_cam' in k.name()):\n    if (n.knob('disable_framehold_cam').value() == True):\n        n\['framehold_cam'].setVisible(True)\n    else:\n        n\['framehold_cam'].setVisible(False)"
+ autolabel "nuke.thisNode().name() + \"\\n\" + '(' + nuke.thisNode()\['texture'].value() + ')' "
+ tile_color 0x9c000000
+ selected true
+ xpos -5
+ ypos -89
+ addUserKnob {20 UV}
+ addUserKnob {20 output l Output n 1}
+ addUserKnob {41 box_width l "Dimension pixel" t "Output will be automatically a square.\nSet here the Output resolution of your UV" T Reformat3.box_width}
+ addUserKnob {4 texture l Texture t "Select the operation you wanna do on the UV:\n\n- Projection from Cam: connect camera and img and project the image from the camera to the geo\n\n- Wireframe: check the wireframe of the geo\n\n- UV map: red gradient from right to left and green gradient from top to bottom\n\n- img: use the image in input as a Texture. In theory should match already the geo's UV" M {"projection from cam" wireframe "UV map" img "" "" "" "" "" ""}}
+ addUserKnob {6 disable_framehold_output l "Framehold Output" t "Enable the FrameHold on the Output" +STARTLINE}
+ addUserKnob {3 framehold_output l "at frame" -STARTLINE +HIDDEN}
+ framehold_output 1001
+ addUserKnob {20 endGroup_1 l endGroup n -1}
+ addUserKnob {26 line l "" +STARTLINE}
+ addUserKnob {26 PARAMETERS l "<font color=\"#DC143C\"><b>PARAMETERS</b></font>"}
+ addUserKnob {6 disable_framehold_cam l "Framehold Camera" t "Enable FramHold on the Camera input" +STARTLINE}
+ disable_framehold_cam true
+ addUserKnob {3 framehold_cam l "at frame" t "Select the frame for the Cam" -STARTLINE}
+ framehold_cam 1001
+ addUserKnob {3 dimension_uv_map l "Dimension UV Map" +HIDDEN}
+ dimension_uv_map 1000
+ addUserKnob {7 adjust_BBox l "Adjust BBox" +HIDDEN R 0 30}
+ addUserKnob {6 alpha_uv_map l "Alpha 1" +HIDDEN +STARTLINE}
+ alpha_uv_map true
+ addUserKnob {4 operation t "Select the operation for the Wireframe" +HIDDEN M {opaque "see through" over multiply modulate "" ""}}
+ addUserKnob {7 line_width l "line width" +HIDDEN R 0.1 10}
+ line_width 1
+ addUserKnob {19 line_color l "line color" +HIDDEN}
+ line_color 1
+ addUserKnob {6 line_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgba_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgba_panelDropped_1 l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {4 project_on l "project on" t "Operation for the Project3D" M {both front back "" ""}}
+ addUserKnob {6 crop -STARTLINE}
+ addUserKnob {4 occlusion_mode l "occlusion mode" M {none self world "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {20 UVTile n 1}
+ addUserKnob {41 udim t "Select the Tile" T UVTile1.udim}
+ addUserKnob {41 udim_enable l enable -STARTLINE T UVTile1.udim_enable}
+ addUserKnob {41 tile_u l u T UVTile1.tile_u}
+ addUserKnob {41 tile_v l v T UVTile1.tile_v}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 ScanlineRender}
+ addUserKnob {41 filter_1 l filter T ScanlineRender5.filter}
+ addUserKnob {41 antialiasing_1 l antialiasing T ScanlineRender5.antialiasing}
+ addUserKnob {41 overscan_1 l overscan T ScanlineRender5.overscan}
+ addUserKnob {26 ""}
+ addUserKnob {41 samples_1 l samples T ScanlineRender5.samples}
+ addUserKnob {41 shutter_1 l shutter T ScanlineRender5.shutter}
+ addUserKnob {41 shutteroffset_1 l "shutter offset" T ScanlineRender5.shutteroffset}
+ addUserKnob {20 email l @}
+ addUserKnob {22 button_www l Tutorials T "import webbrowser\nwebbrowser.open('http://www.andreageremia.it/tutorial_uvrender.html')" +STARTLINE}
+ addUserKnob {26 createdBy l "" -STARTLINE T "Gizmo created by Andrea Geremia\n"}
+ addUserKnob {26 ""}
+ addUserKnob {26 mail l "" +STARTLINE T "andrea.geremia89@gmail.com\nwww.andreageremia.it"}
+}
+ Input {
+  inputs 0
+  name img
+  xpos 509
+  ypos 375
+ }
+ Dot {
+  name Dot20
+  xpos 543
+  ypos 511
+ }
+set N1db155d0 [stack 0]
+ Dot {
+  name Dot2
+  xpos 762
+  ypos 511
+ }
+ Dot {
+  name Dot1
+  xpos 762
+  ypos 598
+ }
+ Reformat {
+  inputs 0
+  type "to box"
+  box_width {{parent.dimension_uv_map}}
+  box_height {{box_width}}
+  box_fixed true
+  name Reformat1
+  xpos 622
+  ypos 530
+ }
+ Expression {
+  expr0 (x+0.5)/width
+  expr1 (y+0.5)/height
+  name UV_map
+  xpos 622
+  ypos 557
+ }
+ Shuffle {
+  alpha white
+  name Shuffle_alpha
+  label "\[value in]"
+  xpos 622
+  ypos 581
+  disable {{!parent.alpha_uv_map}}
+ }
+ AdjBBox {
+  numpixels {{parent.adjust_BBox}}
+  name AdjBBox1
+  xpos 622
+  ypos 616
+ }
+push $N1db155d0
+ Wireframe {
+  operation {{parent.operation}}
+  line_width {{parent.line_width}}
+  line_color {{parent.line_color}}
+  name Wireframe1
+  xpos 509
+  ypos 596
+ }
+ Input {
+  inputs 0
+  name cam
+  xpos 267
+  ypos 454
+  number 1
+ }
+ Dot {
+  name Dot21
+  xpos 301
+  ypos 512
+ }
+ FrameHold {
+  first_frame {{parent.framehold_cam}}
+  name FrameHold6
+  xpos 267
+  ypos 590
+  disable {{!parent.disable_framehold_cam}}
+ }
+push $N1db155d0
+ Project3D2 {
+  inputs 2
+  project_on {{parent.project_on}}
+  crop {{parent.crop}}
+  occlusion_mode {{parent.occlusion_mode}}
+  name Project3D2
+  xpos 392
+  ypos 596
+ }
+ Switch {
+  inputs 4
+  which {{parent.texture}}
+  name Switch1
+  label "\[value which]"
+  xpos 509
+  ypos 690
+ }
+set N1db46d20 [stack 0]
+ UVTile2 {
+  name UVTile1
+  xpos 509
+  ypos 749
+ }
+ Input {
+  inputs 0
+  name geo
+  xpos 673
+  ypos 794
+  number 2
+ }
+ ApplyMaterial {
+  inputs 2
+  name ApplyMaterial4
+  xpos 509
+  ypos 794
+ }
+ FrameHold {
+  first_frame {{parent.framehold_output}}
+  name FrameHold1
+  xpos 509
+  ypos 899
+  disable {{!parent.disable_framehold_output}}
+ }
+ Reformat {
+  inputs 0
+  type "to box"
+  format "4096 4096 0 0 4096 4096 1 square_4K"
+  box_width 2000
+  box_height {{box_width}}
+  box_fixed true
+  name Reformat3
+  xpos 694
+  ypos 1023
+ }
+ ScanlineRender {
+  inputs 2
+  conservative_shader_sampling false
+  projection_mode uv
+  shutteroffset centred
+  motion_vectors_type distance
+  name ScanlineRender5
+  xpos 509
+  ypos 1023
+ }
+ Output {
+  name Output1
+  xpos 509
+  ypos 1123
+ }
+ Constant {
+  inputs 0
+  color 1
+  name Constant1
+  xpos 817
+  ypos 584
+ }
+push $N1db46d20
+ Viewer {
+  frame_range 1-100
+  name Viewer1
+  selected true
+  xpos 1390
+  ypos -9
+  hide_input true
+ }
+end_group

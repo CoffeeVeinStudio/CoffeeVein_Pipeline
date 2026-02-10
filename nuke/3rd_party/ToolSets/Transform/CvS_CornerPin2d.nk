@@ -1,0 +1,62 @@
+#! C:/Program Files/Nuke14.0v3/nuke-14.0.3.dll -nx
+version 14.0 v3
+Group {
+ name CvS_CornerPin2d1
+ tile_color 0xffab00ff
+ addUserKnob {20 CornerPin2D}
+ addUserKnob {41 to1 T CornerPin2D1.to1}
+ addUserKnob {41 to2 T CornerPin2D1.to2}
+ addUserKnob {41 to3 T CornerPin2D1.to3}
+ addUserKnob {41 to4 T CornerPin2D1.to4}
+ addUserKnob {41 copy_from l "Copy 'from'" T CornerPin2D1.copy_from}
+ addUserKnob {41 copyFrom l "Copy 'From' No Animation" -STARTLINE T CornerPin2D1.copyFrom}
+ addUserKnob {20 "extra matrix" n 1}
+ "extra matrix" 0
+ addUserKnob {41 transform_matrix l "" -STARTLINE T CornerPin2D1.transform_matrix}
+ addUserKnob {20 "" n -1}
+ addUserKnob {41 invert T CornerPin2D1.invert}
+ addUserKnob {41 filter T CornerPin2D1.filter}
+ addUserKnob {41 clamp -STARTLINE T CornerPin2D1.clamp}
+ addUserKnob {41 black_outside l "black outside" -STARTLINE T CornerPin2D1.black_outside}
+ addUserKnob {41 motionblur T CornerPin2D1.motionblur}
+ addUserKnob {41 shutter l Shutter T CornerPin2D1.shutter}
+ addUserKnob {41 shutteroffset l "Shutter Offset" T CornerPin2D1.shutteroffset}
+ addUserKnob {41 shuttercustomoffset l "" -STARTLINE T CornerPin2D1.shuttercustomoffset}
+ addUserKnob {20 tab}
+ addUserKnob {41 from1 T CornerPin2D1.from1}
+ addUserKnob {41 from2 T CornerPin2D1.from2}
+ addUserKnob {41 from3 T CornerPin2D1.from3}
+ addUserKnob {41 from4 T CornerPin2D1.from4}
+ addUserKnob {41 set_to_input l "Set to input" T CornerPin2D1.set_to_input}
+ addUserKnob {41 copy_to l "Copy 'to'" -STARTLINE T CornerPin2D1.copy_to}
+ addUserKnob {41 copyTo l "Copy 'To' No Animation" -STARTLINE T CornerPin2D1.copyTo}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 0
+ }
+ CornerPin2D {
+  to1 {0 0}
+  to2 {2048 0}
+  to3 {2048 1556}
+  to4 {0 1556}
+  invert false
+  from1 {100 0}
+  from2 {2048 0}
+  from3 {2048 1556}
+  from4 {0 1556}
+  name CornerPin2D1
+  selected true
+  xpos 0
+  ypos 128
+  addUserKnob {20 NoAnimationCopy l "No Animation Copy"}
+  addUserKnob {22 copyTo l "Copy 'To' No Animation" T "nuke.thisNode()\['from1'].setValue(nuke.thisNode()\['to1'].getValue())\nnuke.thisNode()\['from2'].setValue(nuke.thisNode()\['to2'].getValue())\nnuke.thisNode()\['from3'].setValue(nuke.thisNode()\['to3'].getValue())\nnuke.thisNode()\['from4'].setValue(nuke.thisNode()\['to4'].getValue())" +STARTLINE}
+  addUserKnob {22 copyFrom l "Copy 'From' No Animation" T "nuke.thisNode()\['to1'].setValue(nuke.thisNode()\['from1'].getValue())\nnuke.thisNode()\['to2'].setValue(nuke.thisNode()\['from2'].getValue())\nnuke.thisNode()\['to3'].setValue(nuke.thisNode()\['from3'].getValue())\nnuke.thisNode()\['to4'].setValue(nuke.thisNode()\['from4'].getValue())" +STARTLINE}
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 300
+ }
+end_group

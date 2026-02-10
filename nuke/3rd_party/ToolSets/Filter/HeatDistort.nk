@@ -1,0 +1,90 @@
+#! C:/Program Files/Nuke12.2v2/nuke-12.2.2.dll -nx
+version 12.2 v2
+Gizmo {
+ inputs 2
+ addUserKnob {20 HeatDistort}
+ addUserKnob {14 NoiceSize l "Noice Size" R 0 100}
+ NoiceSize 10
+ addUserKnob {7 NoiceAnimation l "Noice Animation" R 0 5}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {7 UVoffset l "UV offset"}
+ UVoffset 0.5
+ addUserKnob {14 UVscale l "UV scale" R 0 100}
+ UVscale 1
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {14 BlurSize l "Blur Size" R 0 100}
+ BlurSize 1
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode10
+  tile_color 0xaaaaaa00
+  label "Heat distortion\nfront plain"
+  note_font_size 32.5
+  xpos -202
+  ypos -26
+  bdwidth 383
+  bdheight 432
+  z_order 1
+ }
+ Input {
+  inputs 0
+  name Mask
+  xpos 350
+  ypos 330
+ }
+ Noise {
+  inputs 0
+  size {{HeatDistort_CP.NoiceSize}}
+  zoffset {{HeatDistort_CP.NoiceAnimation x1067 2.24}}
+  center {1920 1080}
+  name Noise5
+  selected true
+  xpos -126
+  ypos 126
+ }
+ Input {
+  inputs 0
+  name Img
+  xpos 18
+  ypos -105
+  number 1
+ }
+ Shuffle2 {
+  inputs 2
+  fromInput1 {{0} B A}
+  fromInput2 {{1} B A}
+  in2 alpha
+  out2 forward
+  mappings "6 rgba.red 0 0 rgba.red 0 0 rgba.green 0 1 rgba.green 0 1 rgba.blue 0 2 rgba.blue 0 2 white -1 -1 rgba.alpha 0 3 rgba.alpha 1 0 forward.u 1 0 rgba.alpha 1 0 forward.v 1 1"
+  name Shuffle10
+  xpos 18
+  ypos 126
+ }
+ IDistort {
+  uv forward
+  uv_offset {{HeatDistort_CP.UVoffset}}
+  uv_scale {{HeatDistort_CP.UVscale}}
+  name IDistort1
+  xpos 18
+  ypos 194
+ }
+ Blur {
+  size {{HeatDistort_CP.BlurSize}}
+  name Blur2
+  xpos 18
+  ypos 260
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge1
+  xpos 18
+  ypos 330
+ }
+ Output {
+  name Output1
+  xpos 18
+  ypos 468
+ }
+end_group

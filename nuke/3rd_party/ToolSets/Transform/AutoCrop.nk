@@ -1,0 +1,14 @@
+set cut_paste_input [stack 0]
+version 12.2 v2
+push $cut_paste_input
+CurveTool {
+ operation "Auto Crop"
+ channels rgba
+ ROI {0 0 {input.width} {input.height}}
+ autocropdata {{curve} {curve} {curve} {curve}}
+ name CurveTool1
+ label "Processing Crop..."
+ selected true
+ xpos -183
+ ypos -71
+}

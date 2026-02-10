@@ -1,0 +1,652 @@
+#! /Applications/Nuke10.5v2/Nuke10.5v2.app/Contents/MacOS/libnuke-10.5.2.dylib -nx
+version 10.5 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="23" w="1440" h="838" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="777" stretch="1"/>
+            <splitter orientation="2">
+                <split size="477"/>
+                <dock id="" activePageId="Viewer.1" focus="true">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="335"/>
+                <dock id="" activePageId="DAG.1">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.scripteditor.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /Users/gere/Desktop/UVRender/example_UVRender.nk
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+Camera2 {
+ inputs 0
+ translate {-19.2066803 4.58805847 30.75139809}
+ rotate {-6.678004018 -31.40000178 0}
+ name Camera2
+ xpos -55
+ ypos 8
+}
+set N24998c50 [stack 0]
+Dot {
+ name Dot2
+ xpos -31
+ ypos 259
+}
+ReadGeo2 {
+ inputs 0
+ file ~/.nuke/3D_Object/TestGeometry/teapot.obj
+ name TEAPOT
+ label "from RenderMan\n"
+ xpos 215
+ ypos 20
+}
+set N21578520 [stack 0]
+push $N24998c50
+ColorWheel {
+ inputs 0
+ gamma 0.45
+ name ColorWheel1
+ xpos 71
+ ypos -112
+}
+Group {
+ inputs 3
+ name UVRender
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\n#######################################\n\nif ('texture' in k.name()):\n    if (int(n\['texture'].getValue()) == 0):\n        #PROJECTION FROM CAM\n        if (n.knob('disable_framehold_cam').value() == True):\n            n\['framehold_cam'].setVisible(True)\n        else:\n            n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(True)\n        n\['project_on'].setVisible(True)\n        n\['crop'].setVisible(True)\n        n\['occlusion_mode'].setVisible(True)\n        n\['PARAMETERS'].setVisible(True)\n        n\['line'].setVisible(True)\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n    elif (int(n\['texture'].getValue()) == 1):\n        #WIREFRAME\n        n\['operation'].setVisible(True)\n        n\['line_width'].setVisible(True)\n        n\['line_color'].setVisible(True)\n        n\['PARAMETERS'].setVisible(True)\n        n\['line'].setVisible(True)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n    elif (int(n\['texture'].getValue()) == 2):\n        #UV MAP\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n        n\['PARAMETERS'].setVisible(False)\n        n\['line'].setVisible(False)\n    elif (int(n\['texture'].getValue()) == 2):\n        #IMG\n        n\['operation'].setVisible(False)\n        n\['line_width'].setVisible(False)\n        n\['line_color'].setVisible(False)\n        n\['framehold_cam'].setVisible(False)\n        n\['disable_framehold_cam'].setVisible(False)\n        n\['project_on'].setVisible(False)\n        n\['crop'].setVisible(False)\n        n\['occlusion_mode'].setVisible(False)\n        n\['PARAMETERS'].setVisible(False)\n        n\['line'].setVisible(False)\n        \n        \n\n#######################################\nif ('disable_framehold_output' in k.name()):\n    if (n.knob('disable_framehold_output').value() == True):\n        n\['framehold_output'].setVisible(True)\n    else:\n        n\['framehold_output'].setVisible(False)\n    \n#######################################\nif ('disable_framehold_cam' in k.name()):\n    if (n.knob('disable_framehold_cam').value() == True):\n        n\['framehold_cam'].setVisible(True)\n    else:\n        n\['framehold_cam'].setVisible(False)"
+ autolabel "nuke.thisNode().name() + \"\\n\" + '(' + nuke.thisNode()\['texture'].value() + ')' "
+ tile_color 0x9c000000
+ xpos 71
+ ypos 25
+ addUserKnob {20 UV}
+ addUserKnob {20 output l Output n 1}
+ addUserKnob {41 box_width l "Dimension pixel" t "Output will be automatically a square.\nSet here the Output resolution of your UV" T Reformat3.box_width}
+ addUserKnob {4 texture l Texture t "Select the operation you wanna do on the UV:\n\n- Projection from Cam: connect camera and img and project the image from the camera to the geo\n\n- Wireframe: check the wireframe of the geo\n\n- UV map: red gradient from right to left and green gradient from top to bottom\n\n- img: use the image in input as a Texture. In theory should match already the geo's UV" M {"projection from cam" wireframe "UV map" img "" "" "" "" "" ""}}
+ addUserKnob {6 disable_framehold_output l "Framehold Output" t "Enable the FrameHold on the Output" +STARTLINE}
+ addUserKnob {3 framehold_output l "at frame" -STARTLINE +HIDDEN}
+ framehold_output 1001
+ addUserKnob {20 endGroup_1 l endGroup n -1}
+ addUserKnob {26 line l "" +STARTLINE}
+ addUserKnob {26 PARAMETERS l "<font color=\"#DC143C\"><b>PARAMETERS</b></font>"}
+ addUserKnob {6 disable_framehold_cam l "Framehold Camera" t "Enable FramHold on the Camera input" +STARTLINE}
+ disable_framehold_cam true
+ addUserKnob {3 framehold_cam l "at frame" t "Select the frame for the Cam" -STARTLINE}
+ framehold_cam 1001
+ addUserKnob {4 operation t "Select the operation for the Wireframe" +HIDDEN M {opaque "see through" over multiply modulate "" ""}}
+ addUserKnob {7 line_width l "line width" +HIDDEN R 0.1 10}
+ line_width 1
+ addUserKnob {19 line_color l "line color" +HIDDEN}
+ line_color 1
+ addUserKnob {6 line_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 line_color_panelDropped_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgba_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgba_panelDropped_1 l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {4 project_on l "project on" t "Operation for the Project3D" M {both front back "" ""}}
+ addUserKnob {6 crop -STARTLINE}
+ addUserKnob {4 occlusion_mode l "occlusion mode" M {none self world "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {20 UVTile n 1}
+ addUserKnob {41 udim t "Select the Tile" T UVTile1.udim}
+ addUserKnob {41 udim_enable l enable -STARTLINE T UVTile1.udim_enable}
+ addUserKnob {41 tile_u l u T UVTile1.tile_u}
+ addUserKnob {41 tile_v l v T UVTile1.tile_v}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 ScanlineRender}
+ addUserKnob {41 filter_1 l filter T ScanlineRender5.filter}
+ addUserKnob {41 antialiasing_1 l antialiasing T ScanlineRender5.antialiasing}
+ addUserKnob {41 overscan_1 l overscan T ScanlineRender5.overscan}
+ addUserKnob {26 ""}
+ addUserKnob {41 samples_1 l samples T ScanlineRender5.samples}
+ addUserKnob {41 shutter_1 l shutter T ScanlineRender5.shutter}
+ addUserKnob {41 shutteroffset_1 l "shutter offset" T ScanlineRender5.shutteroffset}
+ addUserKnob {20 email l @}
+ addUserKnob {22 button_www l Tutorials T "import webbrowser\nwebbrowser.open('http://www.andreageremia.it/tutorial.html')" +STARTLINE}
+ addUserKnob {26 createdBy l "" -STARTLINE T "Gizmo created by Andrea Geremia\n"}
+ addUserKnob {26 ""}
+ addUserKnob {26 mail l "" +STARTLINE T "andrea.geremia89@gmail.com\nwww.andreageremia.it"}
+}
+ Input {
+  inputs 0
+  name img
+  xpos 509
+  ypos 375
+ }
+ Dot {
+  name Dot20
+  xpos 543
+  ypos 511
+ }
+set N24d40800 [stack 0]
+ Dot {
+  name Dot1
+  xpos 762
+  ypos 598
+ }
+ Expression {
+  inputs 0
+  expr0 (x+0.5)/width
+  expr1 (y+0.5)/height
+  name UV_map
+  xpos 619
+  ypos 596
+ }
+set N24d49000 [stack 0]
+push $N24d40800
+ Wireframe {
+  operation {{parent.operation}}
+  line_width {{parent.line_width}}
+  line_color {{parent.line_color}}
+  name Wireframe1
+  xpos 509
+  ypos 596
+ }
+ Input {
+  inputs 0
+  name cam
+  xpos 267
+  ypos 454
+  number 1
+ }
+ Dot {
+  name Dot21
+  xpos 301
+  ypos 512
+ }
+ FrameHold {
+  first_frame {{parent.framehold_cam}}
+  name FrameHold6
+  xpos 267
+  ypos 590
+  disable {{!parent.disable_framehold_cam}}
+ }
+push $N24d40800
+ Project3D2 {
+  inputs 2
+  project_on {{parent.project_on}}
+  crop {{parent.crop}}
+  occlusion_mode {{parent.occlusion_mode}}
+  name Project3D2
+  xpos 392
+  ypos 596
+ }
+ Switch {
+  inputs 4
+  which {{parent.texture}}
+  name Switch1
+  label "\[value which]"
+  xpos 509
+  ypos 690
+ }
+ UVTile2 {
+  name UVTile1
+  xpos 509
+  ypos 749
+ }
+ Input {
+  inputs 0
+  name geo
+  xpos 673
+  ypos 794
+  number 2
+ }
+ ApplyMaterial {
+  inputs 2
+  name ApplyMaterial4
+  xpos 509
+  ypos 794
+ }
+ FrameHold {
+  first_frame {{parent.framehold_output}}
+  name FrameHold1
+  xpos 509
+  ypos 899
+  disable {{!parent.disable_framehold_output}}
+ }
+ Reformat {
+  inputs 0
+  type "to box"
+  format "4096 4096 0 0 4096 4096 1 square_4K"
+  box_width 2000
+  box_height {{box_width}}
+  box_fixed true
+  name Reformat3
+  xpos 694
+  ypos 1023
+ }
+ ScanlineRender {
+  inputs 2
+  conservative_shader_sampling false
+  projection_mode uv
+  shutteroffset centred
+  motion_vectors_type distance
+  name ScanlineRender5
+  xpos 509
+  ypos 1023
+ }
+ Output {
+  name Output1
+  xpos 509
+  ypos 1123
+ }
+ Constant {
+  inputs 0
+  color 1
+  name Constant1
+  xpos 817
+  ypos 584
+ }
+push $N24d49000
+ Viewer {
+  frame_range 1-100
+  name Viewer1
+  xpos 1390
+  ypos -9
+  hide_input true
+ }
+end_group
+RotoPaint {
+ curves {{{v x3f99999a}
+  {f 0}
+  {n
+   {layer Root
+    {f 2097152}
+    {t x44700000 x44070000}
+    {a pt1x 0 pt1y 0 pt2x 0 pt2y 0 pt3x 0 pt3y 0 pt4x 0 pt4y 0 ptex00 0 ptex01 0 ptex02 0 ptex03 0 ptex10 0 ptex11 0 ptex12 0 ptex13 0 ptex20 0 ptex21 0 ptex22 0 ptex23 0 ptex30 0 ptex31 0 ptex32 0 ptex33 0 ptof1x 0 ptof1y 0 ptof2x 0 ptof2y 0 ptof3x 0 ptof3y 0 ptof4x 0 ptof4y 0 pterr 0 ptrefset 0 ptmot x40800000 ptref 0}
+    {cubiccurve Brush2 512 catmullrom
+     {cc
+      {f 2080}
+      {px 1
+       {x43b80000 x44650000 x3ec2c2c3}
+       {x43b80000 x44660000 x3ef6f6f7}
+       {x43b80000 x44670000 x3f0f8f90}
+       {x43ba0000 x44670000 x3f189899}
+       {x43bc0000 x44680000 x3f1f9fa0}
+       {x43be0000 x44690000 x3f25a5a6}
+       {x43c00000 x446b0000 x3f2babac}
+       {x43c40000 x446c0000 x3f31b1b2}
+       {x43c60000 x446e0000 x3f35b5b6}
+       {x43ca0000 x44700000 x3f38b8b9}
+       {x43ce0000 x44720000 x3f3bbbbc}
+       {x43d20000 x44740000 x3f3ebebf}
+       {x43d40000 x44770000 x3f41c1c2}
+       {x43d80000 x44790000 x3f43c3c4}
+       {x43dc0000 x447b0000 x3f44c4c5}
+       {x43e00000 x447e0000 x3f44c4c5}
+       {x43e20000 x44800000 x3f45c5c6}
+       {x43e40000 x44810000 x3f46c6c7}
+       {x43e80000 x44820000 x3f47c7c8}
+       {x43ea0000 x44830000 x3f48c8c9}
+       {x43ea0000 x44840000 x3f49c9ca}
+       {x43ec0000 x44850000 x3f4acacb}
+       {x43ee0000 x44858000 x3f4bcbcc}
+       {x43f00000 x44868000 x3f4ccccd}
+       {x43f20000 x44870000 x3f4ececf}
+       {x43f40000 x44878000 x3f4fcfd0}
+       {x43f60000 x44880000 x3f50d0d1}
+       {x43f80000 x44888000 x3f50d0d1}
+       {x43fa0000 x44890000 x3f50d0d1}
+       {x43fa0000 x44898000 x3f50d0d1}
+       {x43fc0000 x448a0000 x3f51d1d2}
+       {x43fe0000 x448a8000 x3f51d1d2}
+       {x43fe0000 x448b0000 x3f51d1d2}
+       {x44000000 x448b0000 x3f51d1d2}
+       {x44000000 x448b8000 x3f51d1d2}
+       {x44010000 x448c0000 x3f51d1d2}
+       {x44020000 x448c0000 x3f51d1d2}
+       {x44020000 x448c8000 x3f51d1d2}
+       {x44030000 x448d0000 x3f51d1d2}
+       {x44040000 x448d8000 x3f51d1d2}
+       {x44040000 x448e0000 x3f51d1d2}
+       {x44050000 x448e8000 x3f51d1d2}
+       {x44060000 x448e8000 x3f51d1d2}
+       {x44060000 x448f0000 x3f52d2d3}
+       {x44070000 x448f8000 x3f52d2d3}
+       {x44070000 x44900000 x3f52d2d3}
+       {x44080000 x44908000 x3f52d2d3}
+       {x44090000 x44908000 x3f52d2d3}
+       {x44090000 x44910000 x3f52d2d3}
+       {x44080000 x44908000 x3f57d7d8}
+       {x44080000 x44900000 x3f57d7d8}
+       {x44070000 x448f8000 x3f58d8d9}
+       {x44060000 x448f0000 x3f58d8d9}
+       {x44050000 x448e8000 x3f58d8d9}
+       {x44040000 x448e0000 x3f58d8d9}
+       {x44030000 x448d0000 x3f58d8d9}
+       {x44020000 x448c8000 x3f58d8d9}
+       {x44010000 x448b8000 x3f58d8d9}
+       {x43fe0000 x448b0000 x3f58d8d9}
+       {x43fc0000 x448a0000 x3f58d8d9}
+       {x43f80000 x44890000 x3f59d9da}
+       {x43f60000 x44880000 x3f59d9da}
+       {x43f20000 x44870000 x3f59d9da}
+       {x43f00000 x44860000 x3f59d9da}
+       {x43ee0000 x44850000 x3f59d9da}
+       {x43ea0000 x44838000 x3f59d9da}
+       {x43e80000 x44828000 x3f59d9da}
+       {x43e60000 x44818000 x3f59d9da}
+       {x43e40000 x44810000 x3f59d9da}
+       {x43e20000 x44800000 x3f59d9da}
+       {x43e00000 x447e0000 x3f59d9da}
+       {x43dc0000 x447d0000 x3f59d9da}
+       {x43da0000 x447c0000 x3f59d9da}
+       {x43d80000 x447a0000 x3f59d9da}
+       {x43d60000 x44790000 x3f59d9da}
+       {x43d40000 x44780000 x3f59d9da}
+       {x43d20000 x44770000 x3f59d9da}
+       {x43d00000 x44760000 x3f59d9da}
+       {x43ce0000 x44750000 x3f59d9da}
+       {x43cc0000 x44740000 x3f59d9da}
+       {x43ca0000 x44730000 x3f59d9da}
+       {x43ca0000 x44720000 x3f59d9da}
+       {x43c80000 x44710000 x3f59d9da}
+       {x43c60000 x44700000 x3f59d9da}
+       {x43c60000 x446f0000 x3f59d9da}
+       {x43c40000 x446e0000 x3f59d9da}
+       {x43c20000 x446d0000 x3f59d9da}
+       {x43c00000 x446c0000 x3f59d9da}
+       {x43c00000 x446b0000 x3f59d9da}
+       {x43be0000 x446a0000 x3f59d9da}
+       {x43bc0000 x44680000 x3f59d9da}
+       {x43ba0000 x44670000 x3f59d9da}
+       {x43ba0000 x44660000 x3f59d9da}
+       {x43b80000 x44640000 x3f59d9da}
+       {x43b80000 x44630000 x3f59d9da}
+       {x43b60000 x44620000 x3f59d9da}
+       {x43b60000 x44610000 x3f59d9da}
+       {x43b40000 x44600000 x3f59d9da}
+       {x43b40000 x445f0000 x3f59d9da}
+       {x43b40000 x44600000 x3f57d7d8}
+       {x43b60000 x44610000 x3f57d7d8}
+       {x43b60000 x44620000 x3f57d7d8}
+       {x43b80000 x44630000 x3f57d7d8}
+       {x43ba0000 x44640000 x3f57d7d8}
+       {x43bc0000 x44660000 x3f57d7d8}
+       {x43be0000 x44680000 x3f57d7d8}
+       {x43c20000 x446a0000 x3f57d7d8}
+       {x43c40000 x446c0000 x3f58d8d9}
+       {x43c80000 x446f0000 x3f58d8d9}
+       {x43cc0000 x44720000 x3f58d8d9}
+       {x43ce0000 x44750000 x3f58d8d9}
+       {x43d20000 x44770000 x3f59d9da}
+       {x43d60000 x447a0000 x3f59d9da}
+       {x43d80000 x447d0000 x3f59d9da}
+       {x43dc0000 x447f0000 x3f59d9da}
+       {x43e00000 x44808000 x3f5adadb}
+       {x43e20000 x44818000 x3f5adadb}
+       {x43e60000 x44828000 x3f5adadb}
+       {x43e80000 x44838000 x3f5adadb}
+       {x43ea0000 x44848000 x3f5adadb}
+       {x43ee0000 x44858000 x3f5adadb}
+       {x43f00000 x44860000 x3f5bdbdc}
+       {x43f20000 x44870000 x3f5bdbdc}
+       {x43f40000 x44880000 x3f5bdbdc}
+       {x43f60000 x44888000 x3f5cdcdd}
+       {x43f60000 x44898000 x3f5cdcdd}
+       {x43f80000 x448a0000 x3f5dddde}
+       {x43fa0000 x448a8000 x3f5ededf}
+       {x43fc0000 x448b0000 x3f5ededf}
+       {x43fe0000 x448b8000 x3f5ededf}
+       {x44000000 x448b8000 x3f5fdfe0}
+       {x44010000 x448c0000 x3f5fdfe0}
+       {x44020000 x448c8000 x3f5fdfe0}
+       {x44020000 x448d0000 x3f60e0e1}
+       {x44030000 x448d8000 x3f60e0e1}
+       {x44040000 x448e0000 x3f60e0e1}
+       {x44050000 x448e8000 x3f60e0e1}
+       {x44060000 x448f0000 x3f60e0e1}
+       {x44060000 x448f8000 x3f60e0e1}
+       {x44070000 x44900000 x3f60e0e1}
+       {x44070000 x44908000 x3f61e1e2}
+       {x44080000 x44910000 x3f61e1e2}
+       {x44080000 x44918000 x3f61e1e2}
+       {x44090000 x44918000 x3f61e1e2}
+       {x44090000 x44920000 x3f61e1e2}
+       {x44080000 x44918000 x3f65e5e6}
+       {x44080000 x44910000 x3f65e5e6}
+       {x44070000 x44910000 x3f65e5e6}
+       {x44070000 x44908000 x3f65e5e6}
+       {x44060000 x44900000 x3f65e5e6}
+       {x44060000 x448f0000 x3f65e5e6}
+       {x44050000 x448e8000 x3f65e5e6}
+       {x44040000 x448e0000 x3f65e5e6}
+       {x44030000 x448d0000 x3f65e5e6}
+       {x44010000 x448c0000 x3f65e5e6}
+       {x44000000 x448b0000 x3f65e5e6}
+       {x43fc0000 x448a0000 x3f65e5e6}
+       {x43fa0000 x44890000 x3f65e5e6}
+       {x43f60000 x44880000 x3f65e5e6}
+       {x43f20000 x44868000 x3f65e5e6}
+       {x43ee0000 x44858000 x3f65e5e6}
+       {x43ec0000 x44848000 x3f65e5e6}
+       {x43e80000 x44830000 x3f65e5e6}
+       {x43e60000 x44820000 x3f65e5e6}
+       {x43e20000 x44808000 x3f65e5e6}
+       {x43e00000 x447f0000 x3f65e5e6}
+       {x43de0000 x447d0000 x3f65e5e6}
+       {x43dc0000 x447b0000 x3f65e5e6}
+       {x43da0000 x447a0000 x3f65e5e6}
+       {x43d80000 x44780000 x3f65e5e6}
+       {x43d60000 x44770000 x3f65e5e6}
+       {x43d20000 x44750000 x3f65e5e6}
+       {x43d20000 x44740000 x3f65e5e6}
+       {x43ce0000 x44730000 x3f65e5e6}
+       {x43cc0000 x44720000 x3f65e5e6}
+       {x43ca0000 x44710000 x3f65e5e6}
+       {x43c80000 x44700000 x3f65e5e6}
+       {x43c60000 x446f0000 x3f65e5e6}
+       {x43c40000 x446e0000 x3f65e5e6}
+       {x43c20000 x446d0000 x3f65e5e6}
+       {x43c00000 x446b0000 x3f64e4e5}
+       {x43be0000 x446a0000 x3f64e4e5}
+       {x43bc0000 x44690000 x3f63e3e4}
+       {x43ba0000 x44680000 x3f62e2e3}
+       {x43b80000 x44650000 x3f61e1e2}
+       {x43b60000 x44640000 x3f5adadb}}}
+     {tx 1 x43e53c8f x4481f70e}
+     {a g 0 b 0 ro 0 go 0 bo 0 ao 0 bs x42f60000 bu 1 str 1 spx x44700000 spy x44070000 sb 1 ltt x40000000 tt x41880000}}
+    {cubiccurve Brush1 512 catmullrom
+     {cc
+      {f 2080}
+      {px 1
+       {x43b00000 x448e8000 x3e68e8e9}
+       {x43b00000 x448e0000 x3f19999a}
+       {x43b20000 x448d8000 x3f2eaeaf}
+       {x43b40000 x448d8000 x3f36b6b7}
+       {x43b60000 x448d0000 x3f3ababb}
+       {x43b80000 x448d0000 x3f3dbdbe}
+       {x43ba0000 x448d0000 x3f44c4c5}
+       {x43bc0000 x448c8000 x3f46c6c7}
+       {x43be0000 x448c0000 x3f4ccccd}
+       {x43c00000 x448b8000 x3f4fcfd0}
+       {x43c20000 x448b8000 x3f50d0d1}
+       {x43c40000 x448b0000 x3f51d1d2}
+       {x43c40000 x448a8000 x3f52d2d3}
+       {x43c60000 x448a8000 x3f53d3d4}
+       {x43ca0000 x448a0000 x3f53d3d4}
+       {x43cc0000 x44898000 x3f54d4d5}
+       {x43ce0000 x44890000 x3f54d4d5}
+       {x43d00000 x44888000 x3f55d5d6}
+       {x43d40000 x44878000 x3f55d5d6}
+       {x43d60000 x44870000 x3f55d5d6}
+       {x43d80000 x44868000 x3f56d6d7}
+       {x43dc0000 x44860000 x3f56d6d7}
+       {x43de0000 x44858000 x3f56d6d7}
+       {x43e00000 x44848000 x3f57d7d8}
+       {x43e40000 x44840000 x3f57d7d8}
+       {x43e80000 x44838000 x3f57d7d8}
+       {x43ea0000 x44828000 x3f57d7d8}
+       {x43ee0000 x44820000 x3f58d8d9}
+       {x43f00000 x44810000 x3f58d8d9}
+       {x43f40000 x44808000 x3f58d8d9}
+       {x43f80000 x447f0000 x3f58d8d9}
+       {x43fc0000 x447d0000 x3f58d8d9}
+       {x43fe0000 x447c0000 x3f59d9da}
+       {x44010000 x447a0000 x3f59d9da}
+       {x44030000 x44790000 x3f59d9da}
+       {x44040000 x44770000 x3f59d9da}
+       {x44060000 x44760000 x3f59d9da}
+       {x44070000 x44740000 x3f59d9da}
+       {x44090000 x44730000 x3f59d9da}
+       {x440a0000 x44710000 x3f59d9da}
+       {x440b0000 x44700000 x3f59d9da}
+       {x440d0000 x446e0000 x3f59d9da}
+       {x440e0000 x446d0000 x3f59d9da}
+       {x440f0000 x446b0000 x3f59d9da}
+       {x44100000 x446a0000 x3f59d9da}
+       {x44110000 x44690000 x3f59d9da}
+       {x44120000 x44680000 x3f59d9da}
+       {x44130000 x44670000 x3f59d9da}
+       {x44130000 x44660000 x3f59d9da}
+       {x44140000 x44660000 x3f59d9da}
+       {x44140000 x44650000 x3f59d9da}
+       {x44150000 x44650000 x3f59d9da}
+       {x44150000 x44660000 x3f56d6d7}
+       {x44130000 x44680000 x3f56d6d7}
+       {x44120000 x44690000 x3f56d6d7}
+       {x44110000 x446a0000 x3f56d6d7}
+       {x44100000 x446c0000 x3f56d6d7}
+       {x440f0000 x446d0000 x3f55d5d6}
+       {x440e0000 x446e0000 x3f55d5d6}
+       {x440c0000 x44700000 x3f55d5d6}
+       {x440b0000 x44710000 x3f55d5d6}
+       {x44090000 x44730000 x3f55d5d6}
+       {x44070000 x44740000 x3f55d5d6}
+       {x44050000 x44760000 x3f55d5d6}
+       {x44040000 x44770000 x3f55d5d6}
+       {x44020000 x44780000 x3f55d5d6}
+       {x44010000 x44790000 x3f55d5d6}
+       {x43fe0000 x447a0000 x3f55d5d6}
+       {x43fc0000 x447b0000 x3f55d5d6}
+       {x43fa0000 x447c0000 x3f55d5d6}
+       {x43f80000 x447d0000 x3f55d5d6}
+       {x43f40000 x447e0000 x3f55d5d6}
+       {x43f20000 x447f0000 x3f55d5d6}
+       {x43f00000 x44800000 x3f55d5d6}
+       {x43ee0000 x44808000 x3f55d5d6}
+       {x43ec0000 x44810000 x3f55d5d6}
+       {x43e80000 x44818000 x3f55d5d6}
+       {x43e60000 x44820000 x3f56d6d7}
+       {x43e40000 x44828000 x3f56d6d7}
+       {x43e20000 x44830000 x3f55d5d6}
+       {x43e00000 x44840000 x3f55d5d6}
+       {x43de0000 x44848000 x3f55d5d6}
+       {x43de0000 x44850000 x3f55d5d6}
+       {x43dc0000 x44850000 x3f55d5d6}
+       {x43da0000 x44858000 x3f55d5d6}
+       {x43d80000 x44860000 x3f55d5d6}
+       {x43d60000 x44860000 x3f55d5d6}
+       {x43d40000 x44868000 x3f55d5d6}
+       {x43d20000 x44870000 x3f55d5d6}
+       {x43d00000 x44878000 x3f55d5d6}
+       {x43ce0000 x44878000 x3f55d5d6}
+       {x43cc0000 x44880000 x3f55d5d6}
+       {x43ca0000 x44888000 x3f55d5d6}
+       {x43c80000 x44890000 x3f55d5d6}
+       {x43c60000 x44898000 x3f55d5d6}
+       {x43c40000 x448a0000 x3f55d5d6}
+       {x43c20000 x448a8000 x3f55d5d6}
+       {x43c00000 x448b0000 x3f55d5d6}
+       {x43be0000 x448b8000 x3f55d5d6}
+       {x43bc0000 x448c0000 x3f55d5d6}
+       {x43bc0000 x448c8000 x3f55d5d6}
+       {x43ba0000 x448d0000 x3f55d5d6}
+       {x43b80000 x448d8000 x3f55d5d6}
+       {x43b80000 x448e0000 x3f55d5d6}
+       {x43b60000 x448e0000 x3f55d5d6}
+       {x43b60000 x448e8000 x3f55d5d6}
+       {x43b60000 x448e0000 x3f048485}}}
+     {tx 1 x43e98d29 x4481fece}
+     {a g 0 b 0 ro 0 go 0 bo 0 ao 0 bs x42f60000 bu 1 str 1 spx x44700000 spy x44070000 sb 1 ltt x40000000 tt x41880000}}}}}}
+ toolbox {brush {
+  { selectAll str 1 ssx 1 ssy 1 sf 1 }
+  { createBezier str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBezierCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createBSpline str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createEllipse str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangle str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { createRectangleCusped str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { brush g 0 b 0 bs 123 str 1 ssx 1 ssy 1 sf 1 sb 1 tt 17 }
+  { eraser src 2 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { clone opc 0.1 src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 tt 19 }
+  { reveal src 3 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { dodge src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { burn src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { blur src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 ep1 5 }
+  { sharpen src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+  { smear opc 0.5 src 1 str 1 ssx 1 ssy 1 sf 1 sb 1 }
+} }
+ toolbar_paint_color {1 0 0 1}
+ toolbar_brush_size 123
+ toolbar_brush_hardness 0.200000003
+ toolbar_lifetime_type single
+ toolbar_source_transform_scale {1 1}
+ toolbar_source_transform_center {960 540}
+ color {1 0 0 1}
+ colorOverlay {0 0 0 0}
+ motionblur_on true
+ brush_size 123
+ brush_spacing 0.05000000075
+ brush_hardness 0.200000003
+ source_black_outside true
+ name RotoPaint1
+ xpos 71
+ ypos 97
+ disable true
+}
+push $N21578520
+Dot {
+ name Dot1
+ xpos 249
+ ypos 176
+}
+ApplyMaterial {
+ inputs 2
+ name ApplyMaterial1
+ xpos 71
+ ypos 173
+}
+push 0
+ScanlineRender {
+ inputs 3
+ conservative_shader_sampling false
+ motion_vectors_type distance
+ name ScanlineRender2
+ xpos 71
+ ypos 256
+}
+Viewer {
+ frame 1
+ frame_range 1-100
+ gl_lighting true
+ name Viewer1
+ xpos 71
+ ypos 343
+ hide_input true
+}

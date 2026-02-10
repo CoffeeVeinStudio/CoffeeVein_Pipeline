@@ -1,0 +1,20 @@
+{
+  "bookmarks": {
+    "bookmarkedProjects": [],
+    "recentProjects": []
+  },
+  "resume": {
+    "user": "Generic",
+    "project": null,
+    "subproject": null,
+    "task": null,
+    "category": null,
+    "work": null,
+    "version": null
+  },
+  "settings": {
+    "work_naming": {
+      "use_task_prefix": true
+    }
+  }
+}

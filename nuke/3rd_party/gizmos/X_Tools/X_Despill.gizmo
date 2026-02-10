@@ -1,0 +1,134 @@
+#! C:/Program Files/Nuke8.0v5/nuke-8.0.v5.dll -nx
+version 8.0 v5
+Gizmo {
+ lock_connections true
+ addUserKnob {20 Despill}
+ addUserKnob {41 affect l "affect core" T Controls.affect}
+ addUserKnob {41 strength l threshold t "How many pixels will be affected by the despill." T Controls.strength}
+ addUserKnob {41 edge l "edge strength" T Controls.edge}
+ addUserKnob {41 color l "color balance" t "How will the r and b channels be mixed in order to do the despill." T Controls.color}
+ addUserKnob {41 mix t "Dissolve between the original image at 0 and the full effect at 1." T Controls.mix}
+ addUserKnob {41 alpha l "premult by" T Premult1.alpha}
+}
+ Input {
+  inputs 0
+  name Source
+  xpos 462
+  ypos -224
+ }
+set N27f4c280 [stack 0]
+ Expression {
+  temp_name0 m
+  temp_expr0 parent.Controls.edge
+  channel0 alpha
+  expr0 m/a-m
+  channel1 none
+  channel2 none
+  name Alfa_correct
+  xpos 592
+  ypos -224
+  disable {{parent.Controls.affect}}
+ }
+set N3b69d450 [stack 0]
+push $N3b69d450
+ Clamp {
+  channels alpha
+  name Clamp1
+  xpos 693
+  ypos -230
+  disable {{parent.Controls.affect}}
+ }
+ EdgeDetectWrapper {
+  edgedetector prewitt
+  channels alpha
+  name EdgeDetect1
+  xpos 788
+  ypos -230
+  disable {{parent.Controls.affect}}
+ }
+ Dilate {
+  channels alpha
+  size {{parent.Controls.edge*30}}
+  name Dilate1
+  xpos 788
+  ypos -168
+  disable {{parent.Controls.affect}}
+ }
+ Blur {
+  size {{parent.Controls.edge*30}}
+  name Blur1
+  xpos 694
+  ypos -168
+  disable {{parent.Controls.affect}}
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels alpha
+  Bchannels alpha
+  output alpha
+  name Merge1
+  xpos 592
+  ypos -168
+  disable {{parent.Controls.affect}}
+ }
+ Constant {
+  inputs 0
+  channels alpha
+  color 1
+  name Constant1
+  xpos 693
+  ypos -109
+  postage_stamp false
+ }
+ Switch {
+  inputs 2
+  which 1
+  name Switch1
+  xpos 592
+  ypos -103
+  disable {{parent.Controls.affect}}
+ }
+push $N27f4c280
+ Expression {
+  inputs 1+1
+  temp_name0 l
+  temp_expr0 (parent.Controls.color+1)/2
+  temp_name1 j
+  temp_expr1 1/parent.Controls.strength
+  temp_name2 k
+  temp_expr2 parent.Controls.mix
+  expr1 "g >((r+b)/2)*j ? (r*l+b*(1-l))*k+g*(1-k) : g"
+  name Despill
+  xpos 462
+  ypos -103
+ }
+ Premult {
+  alpha -rgba.alpha
+  name Premult1
+  xpos 462
+  ypos -46
+ }
+ Output {
+  name Output1
+  xpos 462
+  ypos 5
+ }
+ NoOp {
+  inputs 0
+  name Controls
+  selected true
+  xpos 788
+  ypos -103
+  addUserKnob {20 Controls}
+  addUserKnob {6 affect l "affect inside matte" +STARTLINE}
+  addUserKnob {7 edge l "edge strength" R 0 10}
+  edge 1
+  addUserKnob {7 strength R 0 10}
+  strength 1
+  addUserKnob {7 color l "color balance" R -1 1}
+  addUserKnob {7 mix}
+  mix 1
+  addUserKnob {6 Color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+end_group

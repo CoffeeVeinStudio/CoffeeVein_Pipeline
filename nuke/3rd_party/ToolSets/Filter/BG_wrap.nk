@@ -1,0 +1,138 @@
+#! C:/Program Files/Nuke12.2v3/nuke-12.2.3.dll -nx
+version 12.2 v3
+Group {
+ inputs 2
+ addUserKnob {20 alpha_blur l Blur}
+ addUserKnob {41 size T Blur3.size}
+ addUserKnob {41 filter T Blur3.filter}
+ addUserKnob {20 BG_Grade l Grade}
+ addUserKnob {41 blackpoint T Grade4.blackpoint}
+ addUserKnob {41 whitepoint T Grade4.whitepoint}
+ addUserKnob {41 black l lift T Grade4.black}
+ addUserKnob {41 white l gain T Grade4.white}
+ addUserKnob {41 multiply T Grade4.multiply}
+ addUserKnob {41 add l offset T Grade4.add}
+ addUserKnob {41 gamma T Grade4.gamma}
+ addUserKnob {41 reverse T Grade4.reverse}
+ addUserKnob {41 black_clamp l "black clamp" -STARTLINE T Grade4.black_clamp}
+ addUserKnob {41 white_clamp l "white clamp" -STARTLINE T Grade4.white_clamp}
+ addUserKnob {20 LightWrap l Lightwrap}
+ addUserKnob {6 BGMerge l "Merge BG with FG" +STARTLINE}
+}
+ Input {
+  inputs 0
+  name FG
+ }
+ Dot {
+  name Dot11
+  xpos -33
+  ypos 349
+ }
+set N3f400 [stack 0]
+ Blur {
+  size 78
+  name Blur3
+  xpos -67
+  ypos 404
+ }
+ Invert {
+  name Invert1
+  xpos -66
+  ypos 469
+ }
+push $N3f400
+ Dot {
+  name Dot12
+  xpos -167
+  ypos 349
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name Merge8
+  xpos -201
+  ypos 475
+ }
+ Dot {
+  name Dot1
+  xpos -167
+  ypos 587
+ }
+ Input {
+  inputs 0
+  name BG
+  xpos 444
+  ypos 219
+  number 1
+ }
+ Dot {
+  name Dot2
+  xpos 478
+  ypos 397
+ }
+set N3d800 [stack 0]
+ Grade {
+  name Grade4
+  xpos 444
+  ypos 499
+ }
+ Shuffle2 {
+  inputs 2
+  fromInput1 {{0} B A}
+  fromInput2 {{1} B A}
+  in2 alpha
+  mappings "4 rgba.red 0 0 rgba.red 0 0 rgba.green 0 1 rgba.green 0 1 rgba.blue 0 2 rgba.blue 0 2 rgba.alpha 1 0 rgba.alpha 0 3"
+  name Shuffle1
+  xpos 444
+  ypos 584
+ }
+ Premult {
+  name Premult1
+  xpos 444
+  ypos 650
+ }
+set N3cc00 [stack 0]
+push $N3cc00
+push $N3f400
+ Dot {
+  name Dot4
+  xpos 238
+  ypos 349
+ }
+ Merge2 {
+  inputs 2
+  name Merge2
+  xpos 204
+  ypos 650
+ }
+push $N3d800
+ Dot {
+  name Dot3
+  xpos 110
+  ypos 397
+ }
+ Dot {
+  name Dot5
+  xpos 110
+  ypos 721
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  xpos 204
+  ypos 718
+ }
+ Switch {
+  inputs 2
+  which {{"parent.BGMerge == 0 ? 1 : 0"}}
+  name Switch1
+  selected true
+  xpos 444
+  ypos 718
+ }
+ Output {
+  name Output1
+  xpos 444
+  ypos 808
+ }
+end_group

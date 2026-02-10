@@ -1,0 +1,95 @@
+#! C:/Program Files/Nuke13.0v5/nuke-13.0.5.dll -nx
+version 13.0 v5
+Group {
+ name LightWrap
+ inputs 2
+ addUserKnob {20 User}
+ addUserKnob {41 size_BG l "BG Blur" T Blur1.size}
+ addUserKnob {7 double}
+}
+ Input {
+  inputs 0
+  name FG
+  xpos 372
+  ypos 4
+ }
+ Dot {
+  name Dot3
+  xpos 406
+  ypos 130
+ }
+set N91abc400 [stack 0]
+ Dot {
+  name Dot2
+  xpos 524
+  ypos 130
+ }
+set N91a53c00 [stack 0]
+ Dot {
+  name Dot6
+  xpos 524
+  ypos 323
+ }
+push $N91a53c00
+ Dot {
+  name Dot1
+  xpos 634
+  ypos 130
+ }
+ Invert {
+  name Invert1
+  xpos 600
+  ypos 165
+ }
+ Blur {
+  size 5.8
+  name Blur1
+  selected true
+  xpos 600
+  ypos 229
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name Multiply
+  xpos 600
+  ypos 319
+ }
+ Input {
+  inputs 0
+  name BG
+  xpos 1026
+  ypos 250
+  number 1
+ }
+ Dot {
+  name Dot4
+  xpos 1060
+  ypos 408
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge3
+  xpos 600
+  ypos 404
+ }
+ Dot {
+  name Dot5
+  xpos 634
+  ypos 497
+ }
+push $N91abc400
+ Merge2 {
+  inputs 2
+  operation screen
+  name Merge2
+  xpos 372
+  ypos 493
+ }
+ Output {
+  name Output1
+  xpos 372
+  ypos 555
+ }
+end_group

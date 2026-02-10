@@ -1,27 +1,56 @@
 import nuke
-import os
+import sys
+from pathlib import Path
 
-print('='*30)
-print('Calling Coffee Vein Studio init -> ', os.path.dirname(__file__))
+print('=' * 50)
+print('Coffee Vein Studio - Pipeline Init')
+print('=' * 50)
 
-plugins_to_load = { 
-    '3d_party': 
-        ('w_hotbox',),
-    'internal':
-        ('CoffeeBoard',)}
+NUKE_ROOT = Path(__file__).resolve().parent
 
-for base_folder, sub_folders in plugins_to_load.items():
-    for sub_folder in sub_folders:
+def add_to_paths(path_obj):
+    """Lägger till mappen i både Nuke och Python path."""
+    if path_obj.exists():
+        p_str = path_obj.as_posix()
+        nuke.pluginAddPath(p_str)
+        if p_str not in sys.path:
+            sys.path.insert(0, p_str)
+        return True
+    return False
+
+# 1. Rotmappar
+add_to_paths(NUKE_ROOT)
+add_to_paths(NUKE_ROOT / "icons")
+
+# === 2. SKANNA INTERNAL OCH 3RD PARTY (MED HIERARKI) ===
+for category in ["internal", "3rd_party"]:
+    cat_path = NUKE_ROOT / category
+    if not cat_path.exists():
+        continue
         
-        # Exempel 1: os.path.join('3d_party', 'w_hotbox') -> '3d_party\w_hotbox'
-        # Exempel 2: os.path.join('internal', 'CoffeeBoard') -> 'internal\CoffeeBoard'
-        path_to_add = os.path.join(base_folder, sub_folder)
+    print(f"\n[{category.replace('_', ' ').title()}]")
+    
+    # Lista alla mappar i första nivån (t.ex. w_hotbox, gizmos)
+    for plugin_dir in sorted(cat_path.iterdir()):
+        if not plugin_dir.is_dir() or plugin_dir.name.startswith('.'):
+            continue
+            
+        add_to_paths(plugin_dir)
+        print(f"    + {plugin_dir.name}")
         
-        print(f"\tLägger till {sub_folder}")
-        print('\t\t' + path_to_add)
-        nuke.pluginAddPath(path_to_add)
+        # Om det är gizmo-mappen, skanna en nivå till för kategorierna
+        if plugin_dir.name.lower() == "gizmos":
+            for sub_dir in sorted(plugin_dir.iterdir()):
+                if sub_dir.is_dir() and not sub_dir.name.startswith('.'):
+                    add_to_paths(sub_dir)
+                    print(f"        + {sub_dir.name}")
+        
+        # För övriga paket, kolla bara efter standardmappar (python, icons etc)
+        else:
+            for sub_dir in plugin_dir.iterdir():
+                if sub_dir.is_dir() and sub_dir.name.lower() in ["icons", "python", "gizmos"]:
+                    add_to_paths(sub_dir)
 
-
-
-print('='*30)
-print('\n')
+print('\n' + '=' * 50)
+print('Pipeline Init Complete')
+print('=' * 50)

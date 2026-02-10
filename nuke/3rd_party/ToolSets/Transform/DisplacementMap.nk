@@ -1,0 +1,94 @@
+set cut_paste_input [stack 0]
+version 12.1 v1
+push $cut_paste_input
+Group {
+name displacementMap1
+selected true
+xpos 194
+ypos -308
+addUserKnob {20 User}
+addUserKnob {7 multSlope l multiply R 1 300}
+multSlope 300
+}
+Input {
+inputs 0
+name input
+xpos 544
+ypos 97
+}
+set Nccdefc00 [stack 0]
+Matrix {
+channels {rgba.red -rgba.green -rgba.blue none}
+matrix {
+    {0 1 0}
+    {0 -1 0}
+    {0 0 0}
+  }
+name Matrix3
+xpos 665
+ypos 359
+}
+push $Nccdefc00
+Matrix {
+channels {rgba.red -rgba.green -rgba.blue none}
+matrix {
+    {0 0 0}
+    {0 -1 1}
+    {0 0 0}
+  }
+name Matrix4
+xpos 708
+ypos 283
+}
+set N64691400 [stack 0]
+push $Nccdefc00
+Shuffle {
+red black
+green black
+blue black
+alpha black
+name Shuffle1
+xpos 830
+ypos 204
+}
+Copy {
+inputs 2
+from0 rgba.red
+to0 rgba.red
+name Copy9
+xpos 830
+ypos 283
+}
+Copy {
+inputs 2
+from0 rgba.red
+to0 rgba.green
+name Copy10
+xpos 830
+ypos 359
+}
+Grade {
+channels {rgba.red rgba.green -rgba.blue none}
+white {{clamp(parent.multSlope*1,1,1000) i}}
+black_clamp false
+name Grade6
+xpos 830
+ypos 475
+}
+set Ncc826400 [stack 0]
+Output {
+name Output1
+xpos 830
+ypos 618
+}
+push $N64691400
+push $Ncc826400
+Viewer {
+inputs 2
+input_process false
+name Viewer1
+selected true
+xpos 984
+ypos 607
+}
+end_group

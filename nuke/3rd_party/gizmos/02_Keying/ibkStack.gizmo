@@ -1,0 +1,287 @@
+#! C:/Program Files/Nuke15.0v2/nuke-15.0.2.dll -nx
+version 15.0 v2
+Group {
+ tile_color 0xaa00ff
+ addUserKnob {20 User}
+ addUserKnob {4 view M {Result Colour}}
+ addUserKnob {4 ScreenType l "screen type" M {Green Blue ""}}
+ addUserKnob {26 ""}
+ addUserKnob {41 Size l size T IBKColourPrime.Size}
+ addUserKnob {41 off l darks T IBKColourPrime.off}
+ addUserKnob {41 mult l lights T IBKColourPrime.mult}
+ addUserKnob {41 erode T IBKColourPrime.erode}
+ addUserKnob {26 ""}
+ addUserKnob {41 red_weight l "red weight" T IBKGizmoV3_2.red_weight}
+ addUserKnob {41 blue_green_weight l "blue/green weight" T IBKGizmoV3_2.blue_green_weight}
+ addUserKnob {26 ""}
+ addUserKnob {7 clipBlack l "clip black"}
+ addUserKnob {7 clipWhite l "clip white"}
+ clipWhite 1
+}
+ Input {
+  inputs 0
+  name source
+  xpos 847
+  ypos 362
+ }
+set Nb02b9c00 [stack 0]
+ Dot {
+  name Dot5
+  xpos 881
+  ypos 417
+ }
+set N241e000 [stack 0]
+ Dot {
+  name Dot1
+  xpos 716
+  ypos 417
+ }
+set N241e400 [stack 0]
+ Dot {
+  name Dot2
+  xpos 590
+  ypos 417
+ }
+ IBKColourV3 {
+  name IBKColourV3_2
+  selected true
+  xpos 556
+  ypos 452
+  Size {{parent.IBKColourPrime.Size}}
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  erode {{parent.IBKColourPrime.erode}}
+ }
+set Nb02ccb00 [stack 0]
+push $N241e000
+ Dot {
+  name Dot6
+  xpos 1041
+  ypos 417
+ }
+ IBKColourV3 {
+  name IBKColourV3_1
+  xpos 1007
+  ypos 449
+  screen_type green
+  Size {{parent.IBKColourPrime.Size}}
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  erode {{parent.IBKColourPrime.erode}}
+ }
+set Nb02cd080 [stack 0]
+ Switch {
+  inputs 2
+  which {{parent.ScreenType}}
+  name Switch1
+  xpos 792
+  ypos 590
+ }
+ set Ccc050000 [stack 0]
+push $Nb02ccb00
+ IBKColourV3 {
+  name IBKColourV3_3
+  xpos 556
+  ypos 489
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 2
+ }
+ IBKColourV3 {
+  name IBKColourV3_4
+  xpos 556
+  ypos 515
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 4
+ }
+ IBKColourV3 {
+  name IBKColourV3_5
+  xpos 556
+  ypos 541
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 8
+ }
+ IBKColourV3 {
+  name IBKColourV3_6
+  xpos 556
+  ypos 567
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 16
+ }
+ IBKColourV3 {
+  name IBKColourV3_7
+  xpos 556
+  ypos 593
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 32
+ }
+ IBKColourV3 {
+  name IBKColourV3_8
+  xpos 556
+  ypos 619
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 64
+ }
+ IBKColourV3 {
+  name IBKColourV3_17
+  xpos 556
+  ypos 645
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 128
+ }
+ Dot {
+  name Dot3
+  xpos 590
+  ypos 713
+ }
+push $N241e400
+ IBKGizmoV3 {
+  inputs 2
+  name IBKGizmoV3_1
+  selected false
+  xpos 682
+  ypos 709
+  st {{curve x1001 0}}
+ }
+push $Nb02cd080
+ IBKColourV3 {
+  name IBKColourV3_10
+  xpos 1007
+  ypos 489
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 2
+ }
+ IBKColourV3 {
+  name IBKColourV3_11
+  xpos 1007
+  ypos 515
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 4
+ }
+ IBKColourV3 {
+  name IBKColourV3_12
+  xpos 1007
+  ypos 541
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 8
+ }
+ IBKColourV3 {
+  name IBKColourV3_13
+  xpos 1007
+  ypos 567
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 16
+ }
+ IBKColourV3 {
+  name IBKColourV3_14
+  xpos 1007
+  ypos 593
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 32
+ }
+ IBKColourV3 {
+  name IBKColourV3_15
+  xpos 1007
+  ypos 619
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 64
+ }
+ IBKColourV3 {
+  name IBKColourV3_16
+  xpos 1007
+  ypos 645
+  screen_type green
+  Size 1
+  off {{parent.IBKColourPrime.off} {parent.IBKColourPrime.off} {parent.IBKColourPrime.off}}
+  mult {{parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult} {parent.IBKColourPrime.mult}}
+  multi 128
+ }
+ Dot {
+  name Dot7
+  xpos 1041
+  ypos 713
+ }
+push $N241e000
+ IBKGizmoV3 {
+  inputs 2
+  name IBKGizmoV3_2
+  selected false
+  xpos 847
+  ypos 709
+  st {{curve x1001 1}}
+ }
+set Ncc602c00 [stack 0]
+clone $Ccc050000 {
+  inputs 2
+  xpos 847
+  ypos 753
+  selected false
+ }
+ Grade {
+  channels alpha
+  blackpoint {{parent.clipBlack}}
+  whitepoint {{parent.clipWhite}}
+  name Grade1
+  xpos 847
+  ypos 806
+ }
+ Switch {
+  inputs 2
+  which {{parent.view}}
+  name Switch2
+  xpos 847
+  ypos 942
+ }
+ Output {
+  name Output1
+  xpos 847
+  ypos 1160
+ }
+push $Ncc602c00
+ Viewer {
+  frame_range 1001-1131
+  name Viewer1
+  xpos 1243
+  ypos 847
+ }
+push $Nb02b9c00
+ IBKColourV3 {
+  name IBKColourPrime
+  xpos 1010
+  ypos 362
+  screen_type green
+  Size 0
+  erode 1
+ }
+end_group

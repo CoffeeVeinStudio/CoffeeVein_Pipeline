@@ -1,0 +1,22 @@
+#! C:/Program Files/Nuke14.0v3/nuke-14.0.3.dll -nx
+version 14.0 v3
+Gizmo {
+ inputs 0
+ addUserKnob {20 User}
+ addUserKnob {22 add_input l "Add Input" T "name = nuke.getInput('Input name', 'input')\ngroup = nuke.thisNode()\nwith group:\n    input = nuke.createNode('Input','name \{\}'.format(name),inpanel=False)\n    nuke.toNode('Switch1').connectInput(-1, input)\ninputs = list(filter(None, group\['switch'].values())) + \[name]\ngroup\['switch'].setValues(inputs)" +STARTLINE}
+ addUserKnob {4 switch l Switch M {""}}
+}
+ Switch {
+  inputs 0
+  which {{parent.switch}}
+  name Switch1
+  selected true
+  xpos 873
+  ypos 90
+ }
+ Output {
+  name Output1
+  xpos 873
+  ypos 173
+ }
+end_group
