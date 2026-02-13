@@ -288,12 +288,20 @@ class VersionPanel(QtWidgets.QWidget):
             if path.exists():
                 os.startfile(str(path))
         else:
-            # Shot outputs: calculate version_dir from shot_dir
+            # Shot or Reference outputs: calculate version_dir from base directory
+            from ..core import OutputType
             from .. import paths as path_module
-            version_dir = path_module.get_version_dir(
-                self._shot_dir, self._output.output_type,
-                self._output.name, self._current_version.version
-            )
+
+            if self._output.output_type == OutputType.REFERENCE:
+                # Reference outputs: simpler structure {reference_dir}/{output_name}/v001/
+                version_dir = Path(self._shot_dir) / self._output.name / f"v{self._current_version.version:03d}"
+            else:
+                # Shot outputs: use standard path calculation
+                version_dir = path_module.get_version_dir(
+                    self._shot_dir, self._output.output_type,
+                    self._output.name, self._current_version.version
+                )
+
             if version_dir.exists():
                 os.startfile(str(version_dir))
 

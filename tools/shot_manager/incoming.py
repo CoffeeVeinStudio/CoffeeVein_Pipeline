@@ -315,31 +315,46 @@ def _guess_shot_name(name):
 
 def ingest_item(item, project_root, shot_name, output_name, output_type,
                 notes="", creator="Admin"):
-    """Ingest an incoming item into the shot structure.
+    """Ingest an incoming item into the shot structure or project-level Reference.
 
     Moves files from _Incoming into the appropriate versioned folder
     and creates the .versions.json entry.
 
+    For REFERENCE outputs: targets {project_root}/Reference/{output_name}/
+    For other outputs: targets {shots_dir}/{shot_name}/Comp/{type_folder}/{output_name}/
+
     Args:
         item: IncomingItem to ingest.
         project_root: Path to the project root.
-        shot_name: Target shot name (e.g., "A004_C020").
+        shot_name: Target shot name (e.g., "A004_C020") — ignored for REFERENCE type.
         output_name: Name for this output (e.g., "GreenScreen", "Background").
-        output_type: OutputType string (e.g., "plate", "cg").
+        output_type: OutputType string (e.g., "plate", "cg", "reference").
         notes: Version notes.
         creator: Who ingested this.
 
     Returns:
         Tuple of (Output, Version) for the created version.
     """
-    shots_dir = paths.get_shots_dir(project_root)
-    shot_dir = shots_dir / shot_name
+    # Check if this is a project-level REFERENCE
+    if output_type == OutputType.REFERENCE:
+        # Use project-level Reference directory
+        reference_dir = paths.get_project_reference_dir(project_root)
+        base_dir = reference_dir
+        shot_name = "Project"  # Use "Project" as pseudo-shot name
+    else:
+        # Use shot-level directory
+        shots_dir = paths.get_shots_dir(project_root)
+        base_dir = shots_dir / shot_name
 
-    # Ensure shot directory exists
-    shot_dir.mkdir(parents=True, exist_ok=True)
+    # Ensure base directory exists
+    base_dir.mkdir(parents=True, exist_ok=True)
 
     # Get/create output
-    output_dir = paths.get_output_dir(shot_dir, output_type, output_name)
+    if output_type == OutputType.REFERENCE:
+        # For project-level reference, output_dir is directly under Reference/
+        output_dir = base_dir / output_name
+    else:
+        output_dir = paths.get_output_dir(base_dir, output_type, output_name)
     output = database.load_output(output_dir)
     if output is None:
         output = Output(
@@ -350,9 +365,13 @@ def ingest_item(item, project_root, shot_name, output_name, output_type,
 
     # Create version directory
     version_number = output.next_version_number
-    version_dir = paths.get_version_dir(
-        shot_dir, output_type, output_name, version_number
-    )
+    if output_type == OutputType.REFERENCE:
+        # For project-level reference, version_dir is directly under output_dir
+        version_dir = output_dir / f"v{version_number:03d}"
+    else:
+        version_dir = paths.get_version_dir(
+            base_dir, output_type, output_name, version_number
+        )
     version_dir.mkdir(parents=True, exist_ok=True)
 
     # Move files

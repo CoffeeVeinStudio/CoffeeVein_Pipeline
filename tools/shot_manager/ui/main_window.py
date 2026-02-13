@@ -36,6 +36,8 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._current_shot = None
         self._current_output = None
         self._viewing_incoming = False
+        self._viewing_reference = False
+        self._reference_dir = None  # Base dir for Reference outputs
         self._incoming_items = {}  # output.name → IncomingItem mapping
         self._in_nuke = is_nuke_available()
 
@@ -62,6 +64,14 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._project_label = QtWidgets.QLabel("(none)")
         self._project_label.setStyleSheet("font-weight: bold; font-size: 13px;")
         header.addWidget(self._project_label)
+
+        header.addSpacing(20)
+
+        # Shot indicator
+        self._shot_label = QtWidgets.QLabel("Shot: (none)")
+        self._shot_label.setStyleSheet("color: #888888;")  # Gray when none selected
+        header.addWidget(self._shot_label)
+
         header.addStretch()
 
         self._refresh_btn = QtWidgets.QPushButton("Refresh")
@@ -108,6 +118,23 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
 
         main_layout.addWidget(self._incoming_bar_widget)
         self._incoming_bar_widget.setVisible(False)
+
+        # Output action bar (shown when viewing shot or Reference)
+        self._output_action_bar_widget = QtWidgets.QWidget()
+        output_action_bar_inner = QtWidgets.QHBoxLayout(self._output_action_bar_widget)
+        output_action_bar_inner.setContentsMargins(0, 4, 0, 4)
+
+        self._move_output_btn = QtWidgets.QPushButton("Move...")
+        self._move_output_btn.setStyleSheet(
+            "QPushButton { background-color: #7b5a2d; padding: 6px 16px; }"
+            "QPushButton:hover { background-color: #ab7a3d; }"
+        )
+        self._move_output_btn.clicked.connect(self._on_move_output)
+        output_action_bar_inner.addWidget(self._move_output_btn)
+        output_action_bar_inner.addStretch()
+
+        main_layout.addWidget(self._output_action_bar_widget)
+        self._output_action_bar_widget.setVisible(False)
 
         # Nuke render controls (bottom bar, only in Nuke)
         if self._in_nuke:
@@ -196,6 +223,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         """Connect widget signals."""
         self._shot_list.shot_selected.connect(self._on_shot_selected)
         self._shot_list.incoming_selected.connect(self._on_incoming_selected)
+        self._shot_list.reference_selected.connect(self._on_reference_selected)
         self._output_list.output_selected.connect(self._on_output_selected)
         self._version_panel.live_changed.connect(self._on_live_changed)
 
@@ -260,6 +288,15 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
             items = incoming_module.scan_incoming(str(self._project_root))
             self._shot_list.set_incoming(str(incoming_dir), len(items))
 
+        # Scan project-level Reference directory
+        reference_dir = paths.get_project_reference_dir(self._project_root)
+        if reference_dir.exists():
+            # Count reference outputs
+            ref_outputs = database.discover_outputs(
+                str(reference_dir), OutputType.REFERENCE, "."
+            )
+            self._shot_list.set_reference(str(reference_dir), len(ref_outputs))
+
     def _auto_select_nuke_shot(self):
         """Auto-detect the current shot from the open Nuke script and select it."""
         try:
@@ -269,6 +306,10 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
                 self._current_shot = (shot_name, str(shot_dir))
                 self._shot_list.select_shot(shot_name)
                 self._refresh_outputs(str(shot_dir))
+
+                # Update shot indicator
+                self._shot_label.setText(f"Shot: {shot_name}")
+                self._shot_label.setStyleSheet("color: #47a3cb;")  # Active blue
         except Exception:
             pass
 
@@ -300,18 +341,25 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
     def _on_shot_selected(self, shot_name, shot_path):
         """Handle shot selection — populate outputs."""
         self._viewing_incoming = False
+        self._viewing_reference = False
+        self._reference_dir = None
         self._incoming_items.clear()
         self._current_shot = (shot_name, shot_path)
         self._incoming_bar_widget.setVisible(False)
         self._output_list.set_selection_mode(multi=False)
         self._refresh_outputs(shot_path)
+        self._output_action_bar_widget.setVisible(True)
+        self._move_output_btn.setEnabled(False)
 
     def _on_incoming_selected(self, incoming_path):
         """Handle _Incoming selection — show incoming items as outputs."""
         self._viewing_incoming = True
+        self._viewing_reference = False
+        self._reference_dir = None
         self._current_shot = None
         self._incoming_items.clear()
         self._version_panel.clear()
+        self._output_action_bar_widget.setVisible(False)
 
         from .. import incoming as incoming_module
         items = incoming_module.scan_incoming(str(self._project_root))
@@ -350,6 +398,33 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._output_list.set_selection_mode(multi=True)
         self._output_list.set_outputs(incoming_outputs)
         self._incoming_bar_widget.setVisible(True)
+
+    def _on_reference_selected(self, reference_path):
+        """Handle Reference selection — show project-level reference outputs."""
+        self._viewing_incoming = False
+        self._viewing_reference = True
+        self._current_shot = None
+        self._reference_dir = reference_path
+        self._incoming_items.clear()
+        self._version_panel.clear()
+        self._incoming_bar_widget.setVisible(False)
+        self._output_action_bar_widget.setVisible(True)
+        self._move_output_btn.setEnabled(False)  # Enable when output selected
+
+        # Scan Reference directory for versioned outputs
+        reference_dir = Path(reference_path)
+        all_outputs = []
+
+        if reference_dir.exists():
+            # Discover all REFERENCE outputs in the project-level Reference directory
+            outputs = database.discover_outputs(
+                str(reference_dir), OutputType.REFERENCE, "."
+            )
+            for output in outputs:
+                all_outputs.append(output)
+
+        self._output_list.set_selection_mode(multi=False)
+        self._output_list.set_outputs(all_outputs)
 
     def _on_move_to_shot(self):
         """Show ingest dialog and move selected _Incoming items to a shot."""
@@ -480,6 +555,89 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         incoming_dir = paths.get_incoming_dir(self._project_root)
         self._on_incoming_selected(str(incoming_dir))
 
+    def _on_move_output(self):
+        """Show move dialog and move the current output to a new location."""
+        if self._current_output is None:
+            return
+
+        from .. import move as move_module
+        from .move_dialog import MoveDialog
+
+        # Determine source context
+        if self._viewing_reference:
+            source_base_dir = self._reference_dir
+            current_shot_name = None
+        elif self._current_shot:
+            source_base_dir = self._current_shot[1]
+            current_shot_name = self._current_shot[0]
+        else:
+            return  # Should not happen
+
+        # Get shot list for destination selector
+        shots = paths.discover_shots(self._project_root)
+
+        # Show dialog
+        dialog = MoveDialog(
+            output_name=self._current_output.name,
+            shot_list=shots,
+            current_shot_name=current_shot_name,
+            parent=self,
+        )
+
+        if dialog.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        # Get destination from dialog
+        dest_type, target, new_name = dialog.get_destination()
+
+        # Perform move
+        try:
+            if dest_type == "shot":
+                success, message = move_module.move_output_to_shot(
+                    project_root=str(self._project_root),
+                    source_output=self._current_output,
+                    source_base_dir=source_base_dir,
+                    target_shot_name=target,
+                    new_output_name=new_name
+                )
+            elif dest_type == "reference":
+                success, message = move_module.move_output_to_reference(
+                    project_root=str(self._project_root),
+                    source_output=self._current_output,
+                    source_base_dir=source_base_dir,
+                    new_output_name=new_name
+                )
+            elif dest_type == "incoming":
+                success, message = move_module.move_output_to_incoming(
+                    project_root=str(self._project_root),
+                    source_output=self._current_output,
+                    source_base_dir=source_base_dir,
+                    incoming_subfolder=target
+                )
+            else:
+                return
+
+            # Show result
+            if success:
+                QtWidgets.QMessageBox.information(
+                    self, "Move Complete", message
+                )
+
+                # Refresh current view
+                if self._viewing_reference:
+                    self._on_reference_selected(self._reference_dir)
+                elif self._current_shot:
+                    self._on_shot_selected(self._current_shot[0], self._current_shot[1])
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self, "Move Failed", message
+                )
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Move Error", f"Failed to move output:\n{e}"
+            )
+
     # ------------------------------------------------------------------
     # Output browsing
     # ------------------------------------------------------------------
@@ -501,8 +659,23 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
     def _on_output_selected(self, output):
         """Handle output selection — show versions."""
         self._current_output = output
-        shot_dir = self._current_shot[1] if self._current_shot else None
-        self._version_panel.set_output(output, shot_dir)
+
+        # Determine base directory for path resolution
+        if self._viewing_reference:
+            # For Reference outputs, use the reference_dir as base
+            base_dir = self._reference_dir
+        elif self._current_shot:
+            # For shot outputs, use the shot directory
+            base_dir = self._current_shot[1]
+        else:
+            # For _Incoming, no base dir (uses absolute paths)
+            base_dir = None
+
+        self._version_panel.set_output(output, base_dir)
+
+        # Enable move button when output is selected (not in _Incoming)
+        if not self._viewing_incoming:
+            self._move_output_btn.setEnabled(True)
 
     def _on_live_changed(self, output, version_number):
         """Handle LIVE version change."""

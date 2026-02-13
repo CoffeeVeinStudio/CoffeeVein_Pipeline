@@ -170,9 +170,9 @@ class Output:
     def from_dict(cls, data):
         """Deserialize from dictionary."""
         return cls(
-            name=data["name"],
-            shot=data["shot"],
-            output_type=data["type"],
+            name=data.get("name", "unknown"),
+            shot=data.get("shot", ""),
+            output_type=data.get("type", "render"),
             versions=[Version.from_dict(v) for v in data.get("versions", [])],
             live_version=data.get("live_version"),
         )

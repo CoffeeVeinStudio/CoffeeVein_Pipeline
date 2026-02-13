@@ -82,9 +82,12 @@ def discover_outputs(shot_dir, output_type, type_folder):
     outputs = []
     for entry in sorted(base_dir.iterdir()):
         if entry.is_dir():
-            output = load_output(entry)
-            if output is not None:
-                outputs.append(output)
+            try:
+                output = load_output(entry)
+                if output is not None:
+                    outputs.append(output)
+            except Exception as e:
+                print(f"[ShotManager] Warning: failed to load output from {entry}: {e}")
     return outputs
 
 

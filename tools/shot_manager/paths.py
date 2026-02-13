@@ -93,6 +93,18 @@ def get_incoming_dir(project_root):
     return Path(project_root) / "_Incoming"
 
 
+def get_project_reference_dir(project_root):
+    """Get the project-level Reference directory.
+
+    Returns:
+        Path to {project_root}/Reference/
+
+    This is a project-wide asset directory (not per-shot) for shared
+    reference materials like HDRIs, texture libraries, LUTs, etc.
+    """
+    return Path(project_root) / "Reference"
+
+
 # ---------------------------------------------------------------------------
 # Shot discovery
 # ---------------------------------------------------------------------------

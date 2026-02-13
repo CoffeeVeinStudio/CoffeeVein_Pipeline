@@ -3,8 +3,9 @@
 from ..qt_compat import QtWidgets, QtCore, QtGui
 
 
-# Special marker for _Incoming entry
+# Special markers for special entries
 INCOMING_MARKER = "_incoming_"
+REFERENCE_MARKER = "_reference_"
 
 
 class ShotListWidget(QtWidgets.QWidget):
@@ -12,12 +13,15 @@ class ShotListWidget(QtWidgets.QWidget):
 
     shot_selected = QtCore.Signal(str, str)  # (shot_name, shot_path)
     incoming_selected = QtCore.Signal(str)   # (incoming_path)
+    reference_selected = QtCore.Signal(str)  # (reference_path)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._shots = []  # List of (name, path) tuples
         self._incoming_path = None
         self._incoming_count = 0
+        self._reference_path = None
+        self._reference_count = 0
         self._build_ui()
 
     def _build_ui(self):
@@ -55,6 +59,17 @@ class ShotListWidget(QtWidgets.QWidget):
         self._incoming_count = item_count
         self._populate()
 
+    def set_reference(self, reference_path, item_count=0):
+        """Set Reference entry info.
+
+        Args:
+            reference_path: Path to the project-level Reference directory.
+            item_count: Number of detected reference outputs.
+        """
+        self._reference_path = reference_path
+        self._reference_count = item_count
+        self._populate()
+
     def _populate(self):
         """Populate the list widget."""
         self._list.clear()
@@ -89,6 +104,22 @@ class ShotListWidget(QtWidgets.QWidget):
             incoming_item.setFont(font)
             self._list.addItem(incoming_item)
 
+        # Add Reference entry below _Incoming
+        if self._reference_path and (
+            not filter_text or "reference" in filter_text
+        ):
+            # Reference entry (no separator if right after _Incoming)
+            label = "Reference"
+            if self._reference_count > 0:
+                label += f"  ({self._reference_count} items)"
+            reference_item = QtWidgets.QListWidgetItem(label)
+            reference_item.setData(QtCore.Qt.UserRole, REFERENCE_MARKER)
+            reference_item.setForeground(QtGui.QColor("#9b59b6"))  # Purple
+            font = reference_item.font()
+            font.setItalic(True)
+            reference_item.setFont(font)
+            self._list.addItem(reference_item)
+
     def _apply_filter(self):
         """Re-filter the shot list."""
         self._populate()
@@ -103,12 +134,14 @@ class ShotListWidget(QtWidgets.QWidget):
         return False
 
     def _on_item_changed(self, current, previous):
-        """Emit shot_selected or incoming_selected when selection changes."""
+        """Emit shot_selected, incoming_selected, or reference_selected when selection changes."""
         if current is None:
             return
         path = current.data(QtCore.Qt.UserRole)
         if path == INCOMING_MARKER:
             self.incoming_selected.emit(self._incoming_path)
+        elif path == REFERENCE_MARKER:
+            self.reference_selected.emit(self._reference_path)
         elif path is not None:
             name = current.text()
             self.shot_selected.emit(name, path)

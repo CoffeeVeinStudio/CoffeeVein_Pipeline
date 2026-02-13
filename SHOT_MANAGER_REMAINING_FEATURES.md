@@ -2,11 +2,10 @@
 
 ## Overview
 
-This plan covers the **6 incomplete features** from SHOT_MANAGER_ITERATION5_PLAN.md:
-- 3 features partially implemented (need completion)
-- 3 features not yet started
+This plan covers the remaining features from SHOT_MANAGER_ITERATION5_PLAN.md plus
+new features discovered during development.
 
-**Status:** 6 of 12 features from Iteration 5 remain incomplete.
+**Status:** See individual feature sections for current state.
 
 ---
 
@@ -17,6 +16,9 @@ This plan covers the **6 incomplete features** from SHOT_MANAGER_ITERATION5_PLAN
 ✅ **Feature 4:** Re-Render Last (with status tracking)
 ✅ **Feature 5:** _Incoming Pre-sorted Subfolders (Plates/CG/Reference)
 ✅ **Feature 6:** Move Incoming Items to Shot (Ingest UI with dialog)
+✅ **Feature 7:** Project-Level Reference Directory
+✅ **Feature 12:** Active Shot Indicator in Header (shows Nuke working context)
+✅ **Move Output:** Move outputs between shots, to Reference, or back to _Incoming
 
 ---
 
@@ -63,54 +65,10 @@ def generate_thumbnail(version_dir: Path, file_pattern: str, frame: int) -> Path
 
 ---
 
-## Feature 7: Project-Level Reference Directory ⚠️ PARTIALLY IMPLEMENTED
+## Feature 7: Project-Level Reference Directory ✅ COMPLETED
 
-**Priority:** High (architectural change, affects organization)
-
-**Current State:**
-- `OutputType.REFERENCE` exists in core.py (line 25)
-- `_Incoming/Reference/` subfolder scanner works (incoming.py line 22-24)
-- **Missing:** Project-level Reference endpoint (`get_project_reference_dir()` in paths.py)
-- **Missing:** Reference entry in shot_list UI below _Incoming
-
-**What's Needed:**
-
-### Update: `paths.py`
-Add new function:
-```python
-def get_project_reference_dir(project_root: Path) -> Path:
-    """Return project-level Reference directory.
-
-    Returns: {project_root}/Reference/
-
-    This is a project-wide asset directory (not per-shot).
-    """
-    return Path(project_root) / "Reference"
-```
-
-### Update: `ui/shot_list.py`
-- Add "Reference" entry below shots (similar to _Incoming)
-- Style distinctly (e.g., different icon or color)
-- New signal: `reference_selected(str)` emitting the Reference directory path
-- When clicked, emit signal with `get_project_reference_dir(project_root)`
-
-### Update: `ui/main_window.py`
-- Connect `shot_list.reference_selected` signal to new handler `_on_reference_selected(ref_path)`
-- Handler scans Reference directory for outputs (similar to _Incoming logic)
-- Display in output panel with `OutputType.REFERENCE`
-- Refresh reference count on project load (alongside _Incoming)
-
-### Update: `incoming.py`
-- When ingesting from `_Incoming/Reference/`:
-  - Target should be `{project_root}/Reference/{name}/` (NOT `{shot_dir}/Reference/{name}/`)
-  - Use `paths.get_project_reference_dir()` to determine target
-
-**Dependencies:** None — independent architectural change
-
-**Testing:**
-1. Click "Reference" in shot list → shows project-level reference outputs
-2. Ingest item from `_Incoming/Reference/` → files move to project Reference directory
-3. Check file path: `{project_root}/Reference/{output_name}/v001/...`
+Implemented: `paths.get_project_reference_dir()`, Reference entry in shot_list,
+`_on_reference_selected()` handler in main_window, and reference output scanning.
 
 ---
 
@@ -320,91 +278,148 @@ self._splitter.setStretchFactor(2, 1)  # Version panel: stretch
 
 ---
 
-## Feature 12: Active Shot Indicator in Header ❌ NOT STARTED
+## Feature 12: Active Shot Indicator in Header ✅ COMPLETED
 
-**Priority:** Medium (user orientation, clarity)
+Implemented: Shows current Nuke working context (auto-detected from script path)
+in header bar. Updates on shot selection and _Incoming/Reference navigation.
+
+---
+
+## Feature 13: UI Button Reorganization in Version Panel ❌ NOT STARTED
+
+**Priority:** Low (polish, UX improvement)
 
 **Current State:**
-- Header shows: `Project: SWAN  [Refresh]  [Set Project]`
-- No indication of active shot
+- "Open Folder" and "Create LIVE Read" buttons are in separate rows
+- Takes up vertical space and looks disconnected from action bar
+
+**What's Needed:**
+
+### Update: `ui/version_panel.py`
+Reorganize buttons to be on same horizontal row:
+```python
+# Move "Open Folder" and "Create LIVE Read" buttons from their current location
+# to the same row as the output action bar (similar to "Move to Shot" button layout)
+
+# Create horizontal layout for action buttons
+button_row = QtWidgets.QHBoxLayout()
+button_row.addWidget(self._open_folder_btn)
+button_row.addWidget(self._create_read_btn)
+button_row.addStretch()
+```
+
+**Dependencies:** None — independent UI reorganization
+
+**Testing:**
+1. Check that buttons are on same horizontal row
+2. Verify functionality unchanged (Open Folder and Create Read still work)
+3. Confirm layout looks cleaner and more compact
+
+---
+
+## Feature 14: UI Button deactivation in Version Panel
+
+**Priority:** Low (polish, UX improvement)
+
+**Current State:**
+- "Move to shot" button are always active
 
 **What's Needed:**
 
 ### Update: `ui/main_window.py`
-Add shot label to header (after line 67):
-```python
-# Project label
-self._project_label = QtWidgets.QLabel("(no project)")
-header_layout.addWidget(self._project_label)
+Deactivete the button if there is no file selected.
+Like the "Move" button when you are in a shot or Reference
 
-header_layout.addSpacing(20)
-
-# Shot label (NEW)
-self._shot_label = QtWidgets.QLabel("Shot: (none)")
-self._shot_label.setStyleSheet("color: #888888;")  # Gray when none selected
-header_layout.addWidget(self._shot_label)
-
-header_layout.addStretch()
-```
-
-Update handlers:
-```python
-def _on_shot_selected(self, shot_name, shot_dir):
-    """Handle shot selection."""
-    # ... existing code ...
-
-    # Update shot indicator
-    self._shot_label.setText(f"Shot: {shot_name}")
-    self._shot_label.setStyleSheet("color: #47a3cb;")  # Active blue
-
-def _on_incoming_selected(self, incoming_dir):
-    """Handle _Incoming selection."""
-    # ... existing code ...
-
-    # Clear shot indicator
-    self._shot_label.setText("_Incoming")
-    self._shot_label.setStyleSheet("color: #888888;")  # Gray
-```
-
-Also update `_auto_select_nuke_shot()` to set shot label when auto-detecting from script path.
-
-**Dependencies:** None — independent UI addition
+**Dependencies:** None — independent UI reorganization
 
 **Testing:**
-1. Select shot → header shows "Shot: A004_C020" in blue
-2. Click _Incoming → header shows "_Incoming" in gray
-3. Open Nuke script → shot auto-detected and displayed in header
+1. Check that buttons are deactivated when no files ar selected
+2. Verify functionality by making sure that the button becomes active when a file is selected
+
+
+
+
+---
+
+## Feature 15: Resilient .versions.json Handling ⚠️ PARTIALLY IMPLEMENTED
+
+**Priority:** Medium (data integrity, prevents UI breakage)
+
+**Current State (partial fix already applied):**
+- `Output.from_dict()` in `core.py` now uses `.get()` with defaults instead of hard key access
+- `discover_outputs()` in `database.py` now catches per-output exceptions (one corrupt file won't break entire scan)
+- **Problem:** If you manually copy/rename an output folder (e.g., client wants a different name), the `.versions.json` inside still has the old name/shot/type — or may be missing keys entirely
+- PySide2 silently swallows exceptions in signal handlers, so a crash in output loading used to silently abort the entire shot selection handler
+
+**What's Still Needed:**
+
+### Auto-repair on load: `database.py`
+When loading a `.versions.json` that has missing or mismatched metadata, infer the correct values from the directory structure:
+```python
+def load_output(output_dir):
+    """Load output, auto-repairing .versions.json if metadata is stale."""
+    # ... existing load ...
+
+    # Infer correct values from directory path
+    expected_name = output_dir.name  # Folder name = output name
+    expected_shot = output_dir.parent.parent.parent.name  # e.g., A0001_C005
+    expected_type = _infer_type_from_path(output_dir)  # renders→render, Plates→plate, etc.
+
+    # If mismatch, update in-memory and optionally rewrite .versions.json
+    if output.name != expected_name or output.shot != expected_shot:
+        output.name = expected_name
+        output.shot = expected_shot
+        output.output_type = expected_type
+        # Optionally: save_output(output_dir, output) to fix on disk
+```
+
+### Warning/notification in UI
+- When auto-repair happens, show a subtle warning (e.g., yellow text in output list)
+- Optional: log repairs to a file for debugging
+
+**Root Cause Scenario:**
+User manually copies/renames an output folder on disk (e.g., client asks for different delivery name).
+The `.versions.json` inside still references the old name. Shot Manager should detect and handle this gracefully.
+
+**Dependencies:** None
+
+**Testing:**
+1. Copy an output folder, rename it → Shot Manager still loads it correctly
+2. Delete "name" key from .versions.json → output loads with inferred name from folder
+3. Mismatched shot name in .versions.json → auto-corrected from directory path
+4. Completely empty .versions.json `{}` → output loads with all values inferred
 
 ---
 
 ## Implementation Priority & Dependencies
 
 ### High Priority (implement first)
-1. **Feature 7: Project-Level Reference** — Architectural change, affects file organization
-2. **Feature 9: Loose Sequence Detection** — Common workflow, high usability impact
+1. **Feature 9: Loose Sequence Detection** — Common workflow, high usability impact
+2. **Feature 15: Resilient .versions.json** — Data integrity, prevents silent UI failures
 
 ### Medium Priority
 3. **Feature 2: Thumbnails** — Nice-to-have, improves UX significantly
 4. **Feature 8: Missing Files Detection** — Safety feature
-5. **Feature 12: Active Shot Indicator** — User orientation
 
 ### Low Priority (polish)
-6. **Feature 10: Sequence/Still Toggle** — Advanced feature
-7. **Feature 11: Fixed-Width Panels** — UI polish
+5. **Feature 10: Sequence/Still Toggle** — Advanced feature
+6. **Feature 11: Fixed-Width Panels** — UI polish
+7. **Feature 13: Button Reorganization** — Visual cleanup
+8. **Feature 14: Button Deactivation** — UX consistency
 
 ### Dependencies
-- **None** — All remaining features are independent!
-- No feature depends on another being implemented first
+- **None** — All remaining features are independent
 - Can be implemented in any order
 
 ### Recommended Implementation Order
-1. **Feature 12** (Active Shot Indicator) — Quickest win, 1 file, ~20 lines
+1. **Feature 15** (Resilient .versions.json) — Partial fix exists, finish auto-repair logic
 2. **Feature 9** (Loose Sequence Detection) — Builds on existing pattern, contained to incoming.py
-3. **Feature 7** (Project-Level Reference) — Completes the pre-sorted subdirs architecture
-4. **Feature 8** (Missing Files Detection) — Safety/defensive feature
-5. **Feature 2** (Thumbnails) — More complex, new file + generation logic
-6. **Feature 11** (Fixed-Width Panels) — Simple UI tweak
-7. **Feature 10** (Sequence/Still Toggle) — Lowest priority, advanced feature
+3. **Feature 8** (Missing Files Detection) — Safety/defensive feature
+4. **Feature 14** (Button Deactivation) — Quick UX fix
+5. **Feature 13** (Button Reorganization) — Quick layout tweak
+6. **Feature 2** (Thumbnails) — More complex, new file + generation logic
+7. **Feature 11** (Fixed-Width Panels) — Simple UI tweak
+8. **Feature 10** (Sequence/Still Toggle) — Lowest priority, advanced feature
 
 ---
 
@@ -415,7 +430,8 @@ After implementing each feature:
 2. **Integration testing:** Ensure feature doesn't break existing functionality
 3. **Edge cases:**
    - Empty directories
-   - Missing files
+   - Missing files / corrupt .versions.json
+   - Manually renamed output folders
    - Single-frame "sequences"
    - Very long paths
    - Non-standard naming conventions
@@ -424,13 +440,8 @@ After implementing each feature:
 
 ## Summary
 
-**6 features remain:**
-- 3 partially implemented (need completion)
-- 3 not yet started
-
-**Total estimated effort:** 2-3 days
-- High priority: 1 day
-- Medium priority: 1 day
-- Low priority: 0.5 days
+**8 features remain:**
+- 2 partially implemented (Feature 9, Feature 15)
+- 6 not yet started (Feature 2, 8, 10, 11, 13, 14)
 
 **No blocking dependencies** — all features are independent and can be implemented in parallel or any order.
