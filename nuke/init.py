@@ -1,4 +1,5 @@
 import nuke
+import os
 import sys
 from pathlib import Path
 
@@ -7,6 +8,7 @@ print('Coffee Vein Studio - Pipeline Init')
 print('=' * 50)
 
 NUKE_ROOT = Path(__file__).resolve().parent
+PIPELINE_ROOT = Path(os.environ.get("COFFEEVEIN_PIPELINE", str(NUKE_ROOT.parent)))
 
 def add_to_paths(path_obj):
     """Lägger till mappen i både Nuke och Python path."""
@@ -18,11 +20,18 @@ def add_to_paths(path_obj):
         return True
     return False
 
-# 1. Rotmappar
+# 1. TIK MANAGER (Global Pipeline)
+tik_path = PIPELINE_ROOT / "tikmanager" / "tik_manager4"
+print(f"[Global Pipeline]")
+if add_to_paths(tik_path):
+    print(f"    + TIK Manager")
+
+# 2. Rotmappar
 add_to_paths(NUKE_ROOT)
 add_to_paths(NUKE_ROOT / "icons")
+add_to_paths(NUKE_ROOT / "internal")
 
-# === 2. SKANNA INTERNAL OCH 3RD PARTY (MED HIERARKI) ===
+# === 3. SKANNA INTERNAL OCH 3RD PARTY (MED HIERARKI) ===
 for category in ["internal", "3rd_party"]:
     cat_path = NUKE_ROOT / category
     if not cat_path.exists():

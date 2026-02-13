@@ -815,10 +815,3 @@ def launch_packager():
     dialog = ScriptPackager()
     dialog.exec_()
 
-
-# Add to menu
-nuke.menu('Nuke').addCommand(
-    'CoffeeVein/Package Script for Delivery',
-    launch_packager,
-    'ctrl+alt+p'
-)

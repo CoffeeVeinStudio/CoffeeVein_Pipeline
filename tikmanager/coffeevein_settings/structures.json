@@ -1,8 +1,16 @@
 {
     "empty": {
-        "name": "Empty Project",
+        "name": "4C_Health",
         "path": "",
-        "subs": []
+        "subs": [],
+        "mode": "shot",
+        "colorspace": "rec709",
+        "resolution": [
+            4608,
+            2592
+        ],
+        "fps": 25.0,
+        "start_frame": 1001
     },
     "simple": {
         "name": "Simple Project",
@@ -148,15 +156,27 @@
         "path": "",
         "subs": [
             {
-                "name": "COMP",
-                "path": "COMP",
-                "subs": [],
-                "deleted": true
-            },
-            {
-                "name": "_Incoming",
-                "path": "_Incoming",
-                "subs": []
+                "name": "_incoming",
+                "path": "_incoming",
+                "subs": [
+                    {
+                        "name": "Reference",
+                        "path": "_incoming/Reference",
+                        "subs": [],
+                        "deleted": false
+                    },
+                    {
+                        "name": "Plates",
+                        "path": "_incoming/Plates",
+                        "subs": []
+                    },
+                    {
+                        "name": "CG",
+                        "path": "_incoming/CG",
+                        "subs": []
+                    }
+                ],
+                "deleted": false
             },
             {
                 "name": "Reference",
@@ -168,6 +188,15 @@
                 "path": "Shots",
                 "subs": []
             }
-        ]
+        ],
+        "mode": "shot",
+        "colorspace": "rec709",
+        "resolution": [
+            4608,
+            2592
+        ],
+        "fps": 25.0,
+        "start_frame": 1001,
+        "deleted": false
     }
 }

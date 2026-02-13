@@ -40,27 +40,38 @@ def build_recursive_menu(directory: Path, menu_obj, mode="gizmo"):
 nodes_menu = nuke.menu("Nodes")
 cv_menu = nodes_menu.addMenu("CoffeeVein", icon="coffeevein.png")
 
-# === 1. LADDA PLUGINS (Internal & 3rd Party) ===
+# === 1a. LADDA PLUGINS (Internal & 3rd Party) ===
 print("\n[Loading Plugin Menus]")
 for folder in ["internal", "3rd_party"]:
     root = NUKE_ROOT / folder
     if not root.exists():
         continue
-        
+
     for d in sorted(root.iterdir()):
         if d.is_dir() and d.name.lower() not in ["gizmos", "toolsets", "templates", "icons"]:
             m = d / "menu.py"
             if m.exists():
-                # Tysta ner output
                 with contextlib.redirect_stdout(io.StringIO()), \
                      contextlib.redirect_stderr(io.StringIO()):
                     try:
                         exec(open(m).read(), globals())
                         status = "[OK]"
                     except Exception as e:
-                        status = f"[ERROR]"
-                
+                        status = "[ERROR]"
+
                 print(f"  {status.ljust(10)} {d.name}")
+
+# === 1b. STANDALONE SCRIPTS (Internal) ===
+print("\n[Loading Standalone Scripts]")
+for script in sorted((NUKE_ROOT / "internal").glob("*.py")):
+    with contextlib.redirect_stdout(io.StringIO()), \
+         contextlib.redirect_stderr(io.StringIO()):
+        try:
+            exec(open(script).read(), globals())
+            status = "[OK]"
+        except Exception as e:
+            status = "[ERROR]"
+    print(f"  {status.ljust(10)} {script.stem}")
 
 # === 2. SPECIAL: MANUELLA IMPORTER (W_hotbox etc.) ===
 print("\n[Loading Manual Modules]")
@@ -84,6 +95,44 @@ build_recursive_menu(NUKE_ROOT / "3rd_party" / "gizmos", cv_menu.addMenu("3rd Pa
 # === 4. TEMPLATES / TOOLSETS ===
 print("[Building Template Menus]")
 build_recursive_menu(NUKE_ROOT / "3rd_party" / "ToolSets", cv_menu.addMenu("Templates"), mode="template")
+
+# === 5. TIK MANAGER + COFFEEVEIN TOOLS ===
+toolbar = nuke.menu('Nodes')
+smMenu = toolbar.addMenu('SceneManager', icon='tik4_main_ui.png')
+
+# -- TIK Manager --
+smMenu.addCommand('Main UI',
+    "from tik_manager4.ui import main as tik4_main\ntik4_main.launch(dcc='Nuke')",
+    "ctrl+shift+r",
+    icon='tik4_main_ui.png')
+smMenu.addCommand('New Version',
+    "from tik_manager4.ui import main\ntui = main.launch(dcc='Nuke', dont_show=True)\ntui.on_new_version()",
+    "ctrl+shift+s",
+    icon='tik4_new_version.png')
+#smMenu.addCommand('Publish',
+#    "from tik_manager4.ui import main\ntui = main.launch(dcc='Nuke', dont_show=True)\ntui.on_publish_scene()",
+#    icon='tik4_publish.png')
+
+# -- Divider: CoffeeVein --
+smMenu.addSeparator()
+
+# -- CoffeeVein Tools --
+# -- Shot Manager --
+smMenu.addCommand('Shot Manager',
+    "import sys\n"
+    "sys.path.insert(0, r'{tools_path}')\n"
+    "from shot_manager.launch import launch_in_nuke\n"
+    "launch_in_nuke()".format(tools_path=str(NUKE_ROOT.parent / "tools")),
+    "shift+r",
+    icon='coffeevein.png')
+# -- Apply TIK Settings --
+smMenu.addCommand('Apply TIK Settings to Script',
+    'from apply_tik_settings import apply_tik_settings; apply_tik_settings()',
+    icon='coffeevein.png')
+# -- Script Packager --
+smMenu.addCommand('Package Script for Delivery',
+    'from Script_Packager import launch_packager; launch_packager()',
+    'ctrl+alt+p', icon='coffeevein.png')
 
 print("\n" + "=" * 50)
 print("Menu Init Complete")

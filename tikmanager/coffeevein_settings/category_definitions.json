@@ -130,7 +130,7 @@
         "type": "",
         "validations": [],
         "extracts": [],
-        "archived": false
+        "archived": true
     },
     "Nuke": {
         "type": "",
@@ -147,6 +147,7 @@
     "Denoise": {
         "type": "",
         "validations": [],
-        "extracts": []
+        "extracts": [],
+        "archived": true
     }
 }
