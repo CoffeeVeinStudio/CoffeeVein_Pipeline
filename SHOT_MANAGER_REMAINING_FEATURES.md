@@ -345,16 +345,22 @@ Like the "Move" button when you are in a shot or Reference
 
 **Priority:** Medium (data integrity, prevents UI breakage)
 
-**Current State (partial fix already applied):**
-- `Output.from_dict()` in `core.py` now uses `.get()` with defaults instead of hard key access
-- `discover_outputs()` in `database.py` now catches per-output exceptions (one corrupt file won't break entire scan)
-- **Problem:** If you manually copy/rename an output folder (e.g., client wants a different name), the `.versions.json` inside still has the old name/shot/type — or may be missing keys entirely
-- PySide2 silently swallows exceptions in signal handlers, so a crash in output loading used to silently abort the entire shot selection handler
+**Background:**
+The Move Output feature had a bug where `_update_versions_json_after_move()` wrote
+`.versions.json` without the required top-level keys (`name`, `shot`, `type`).
+This caused `Output.from_dict()` to crash with `KeyError: 'name'`, which PySide2
+silently swallowed in signal handlers — making the entire shot selection break
+without visible errors.
 
-**What's Still Needed:**
+**Fixes already applied:**
+- **`move.py`:** `_update_versions_json_after_move()` now writes full metadata (`name`, `shot`, `type`) to target `.versions.json` — this was the root cause bug
+- **`core.py`:** `Output.from_dict()` uses `.get()` with defaults instead of hard key access — defensive fallback
+- **`database.py`:** `discover_outputs()` catches per-output exceptions so one bad file doesn't break the entire scan
+
+**What's Still Needed (optional hardening):**
 
 ### Auto-repair on load: `database.py`
-When loading a `.versions.json` that has missing or mismatched metadata, infer the correct values from the directory structure:
+When loading a `.versions.json` that has missing or mismatched metadata (e.g., from manual file operations), infer the correct values from the directory structure:
 ```python
 def load_output(output_dir):
     """Load output, auto-repairing .versions.json if metadata is stale."""
@@ -373,21 +379,12 @@ def load_output(output_dir):
         # Optionally: save_output(output_dir, output) to fix on disk
 ```
 
-### Warning/notification in UI
-- When auto-repair happens, show a subtle warning (e.g., yellow text in output list)
-- Optional: log repairs to a file for debugging
-
-**Root Cause Scenario:**
-User manually copies/renames an output folder on disk (e.g., client asks for different delivery name).
-The `.versions.json` inside still references the old name. Shot Manager should detect and handle this gracefully.
-
 **Dependencies:** None
 
 **Testing:**
-1. Copy an output folder, rename it → Shot Manager still loads it correctly
-2. Delete "name" key from .versions.json → output loads with inferred name from folder
-3. Mismatched shot name in .versions.json → auto-corrected from directory path
-4. Completely empty .versions.json `{}` → output loads with all values inferred
+1. Move output using "Move..." button → `.versions.json` has correct name/shot/type
+2. Copy an output folder, rename it → Shot Manager still loads it correctly (with auto-repair)
+3. Completely empty .versions.json `{}` → output loads with all values inferred
 
 ---
 

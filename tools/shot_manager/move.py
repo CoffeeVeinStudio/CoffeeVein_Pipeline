@@ -116,7 +116,9 @@ def move_output_to_shot(
         _update_versions_json_after_move(
             source_output_dir, target_output_dir,
             source_output.name, output_name,
-            moved_versions
+            target_shot=target_shot_name,
+            target_output_type=source_output.output_type,
+            moved_versions=moved_versions,
         )
 
         # Handle LIVE symlink
@@ -199,7 +201,9 @@ def move_output_to_reference(
         _update_versions_json_after_move(
             source_output_dir, target_output_dir,
             source_output.name, output_name,
-            moved_versions
+            target_shot="",  # Reference is project-level, no shot
+            target_output_type=OutputType.REFERENCE,
+            moved_versions=moved_versions,
         )
 
         # Handle LIVE
@@ -304,11 +308,14 @@ def _update_versions_json_after_move(
     target_dir: Path,
     source_name: str,
     target_name: str,
+    target_shot: str,
+    target_output_type: str,
     moved_versions: List[Tuple[int, int]]  # [(old_num, new_num), ...]
 ):
     """Update .versions.json files after moving versions.
 
     Removes moved versions from source, adds to target with new version numbers.
+    Ensures target .versions.json has full metadata (name, shot, type).
     """
     # Read source .versions.json
     source_json = source_dir / ".versions.json"
@@ -317,12 +324,18 @@ def _update_versions_json_after_move(
         with open(source_json, "r", encoding="utf-8") as f:
             source_data = json.load(f)
 
-    # Read or create target .versions.json
+    # Read or create target .versions.json with full metadata
     target_json = target_dir / ".versions.json"
-    target_data = {"versions": []}
+    target_data = {
+        "name": target_name,
+        "shot": target_shot,
+        "type": target_output_type,
+        "versions": [],
+    }
     if target_json.exists():
         with open(target_json, "r", encoding="utf-8") as f:
-            target_data = json.load(f)
+            existing = json.load(f)
+            target_data["versions"] = existing.get("versions", [])
 
     # Build mapping of old → new version numbers
     version_map = {old: new for old, new in moved_versions}
