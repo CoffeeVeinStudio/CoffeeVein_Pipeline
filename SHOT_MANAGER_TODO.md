@@ -23,6 +23,8 @@ See `SHOT_MANAGER_ITERATION5_PLAN.md` for original design specs.
 ✅ **Bug Fix:** LIVE Read Node Auto-Sync — `sync_all_live_readers()` added; `showEvent` in `ShotManagerWindow` calls it on panel show so nodes update when LIVE changes externally
 ✅ **Feature 8:** Missing Files Detection — `_check_files_exist()` in version_panel checks first/last frame for sequences (or the single file); missing files turn the version combo red and replace the Frames label with "⚠ FILES MISSING"
 ✅ **Feature 2:** Thumbnails — `.thumbnail.jpg` generated at render time (middle frame, 256px wide, native aspect ratio) via `thumbnails.py`; version panel loads cache or generates lazily in Nuke, shows text fallback in standalone
+✅ **Feature 13 (Plan):** Multi-Selection + Batch Move — `ExtendedSelection` enabled for all categories; `_on_move_output()` iterates `get_selected_outputs()`; move dialog handles multiple outputs
+✅ **Feature 14 (Plan):** Relocate Buttons — "Open Folder" moved to header bar; "Create Read" + "Set LIVE" moved to bottom action bar; version panel is now purely informational
 
 ---
 
@@ -170,38 +172,6 @@ in header bar. Updates on shot selection and _Incoming/Reference navigation.
 
 ---
 
-## Feature 13: UI Button Reorganization in Version Panel ❌ NOT STARTED
-
-**Priority:** Low (polish, UX improvement)
-
-**Current State:**
-- "Open Folder" and "Create LIVE Read" buttons are in separate rows
-- Takes up vertical space and looks disconnected from action bar
-
-**What's Needed:**
-
-### Update: `ui/version_panel.py`
-Reorganize buttons to be on same horizontal row:
-```python
-# Move "Open Folder" and "Create LIVE Read" buttons from their current location
-# to the same row as the output action bar (similar to "Move to Shot" button layout)
-
-# Create horizontal layout for action buttons
-button_row = QtWidgets.QHBoxLayout()
-button_row.addWidget(self._open_folder_btn)
-button_row.addWidget(self._create_read_btn)
-button_row.addStretch()
-```
-
-**Dependencies:** None — independent UI reorganization
-
-**Testing:**
-1. Check that buttons are on same horizontal row
-2. Verify functionality unchanged (Open Folder and Create Read still work)
-3. Confirm layout looks cleaner and more compact
-
----
-
 ## Feature 14: UI Button deactivation in Version Panel
 
 **Priority:** Low (polish, UX improvement)
@@ -238,14 +208,12 @@ against expected values, and auto-repairs both in-memory and on disk if there's 
 
 ### High Priority (implement first)
 
-
 ### Medium Priority
 
 ### Low Priority (polish)
-5. **Feature 10: Sequence/Still Toggle** — Advanced feature
-6. **Feature 11: Fixed-Width Panels** — UI polish
-7. **Feature 13: Button Reorganization** — Visual cleanup
-8. **Feature 14: Button Deactivation** — UX consistency
+1. **Feature 14: Button Deactivation** — UX consistency
+2. **Feature 11: Fixed-Width Panels** — UI polish
+3. **Feature 10: Sequence/Still Toggle** — Advanced feature
 
 ### Dependencies
 - **None** — All remaining features are independent
@@ -253,9 +221,8 @@ against expected values, and auto-repairs both in-memory and on disk if there's 
 
 ### Recommended Implementation Order
 1. **Feature 14** (Button Deactivation) — Quick UX fix
-2. **Feature 13** (Button Reorganization) — Quick layout tweak
-3. **Feature 11** (Fixed-Width Panels) — Simple UI tweak
-4. **Feature 10** (Sequence/Still Toggle) — Lowest priority, advanced feature
+2. **Feature 11** (Fixed-Width Panels) — Simple UI tweak
+3. **Feature 10** (Sequence/Still Toggle) — Lowest priority, advanced feature
 
 ---
 
@@ -276,7 +243,7 @@ After implementing each feature:
 
 ## Summary
 
-**4 features remain:**
-- 4 not yet started (Feature 10, 11, 13, 14)
+**3 features remain:**
+- 3 not yet started (Feature 10, 11, 14)
 
 **No blocking dependencies** — all features are independent and can be implemented in parallel or any order.
