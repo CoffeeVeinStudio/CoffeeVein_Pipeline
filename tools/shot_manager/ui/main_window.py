@@ -47,6 +47,15 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         if project_root:
             self.set_project(project_root)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self._in_nuke:
+            try:
+                from .. import nuke_read
+                nuke_read.sync_all_live_readers()
+            except Exception as e:
+                print(f"[ShotManager] Warning: Failed to sync LIVE Read nodes: {e}")
+
     # ------------------------------------------------------------------
     # UI construction
     # ------------------------------------------------------------------
@@ -131,6 +140,14 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         )
         self._move_output_btn.clicked.connect(self._on_move_output)
         output_action_bar_inner.addWidget(self._move_output_btn)
+
+        self._package_btn = QtWidgets.QPushButton("Package...")
+        self._package_btn.setStyleSheet(
+            "QPushButton { background-color: #2d7b5a; padding: 6px 16px; }"
+            "QPushButton:hover { background-color: #3dab7a; }"
+        )
+        self._package_btn.clicked.connect(self._on_package_shot)
+        output_action_bar_inner.addWidget(self._package_btn)
         output_action_bar_inner.addStretch()
 
         main_layout.addWidget(self._output_action_bar_widget)
@@ -350,6 +367,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._refresh_outputs(shot_path)
         self._output_action_bar_widget.setVisible(True)
         self._move_output_btn.setEnabled(False)
+        self._package_btn.setEnabled(True)
 
     def _on_incoming_selected(self, incoming_path):
         """Handle _Incoming selection — show incoming items as outputs."""
@@ -410,6 +428,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._incoming_bar_widget.setVisible(False)
         self._output_action_bar_widget.setVisible(True)
         self._move_output_btn.setEnabled(False)  # Enable when output selected
+        self._package_btn.setEnabled(False)  # Package is shot-only
 
         # Scan Reference directory for versioned outputs
         reference_dir = Path(reference_path)
@@ -424,7 +443,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
                 all_outputs.append(output)
 
         self._output_list.set_selection_mode(multi=False)
-        self._output_list.set_outputs(all_outputs)
+        self._output_list.set_outputs(all_outputs, self._reference_dir)
 
     def _on_move_to_shot(self):
         """Show ingest dialog and move selected _Incoming items to a shot."""
@@ -638,6 +657,21 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
                 self, "Move Error", f"Failed to move output:\n{e}"
             )
 
+    def _on_package_shot(self):
+        """Open the Package Shot dialog for the current shot."""
+        if self._current_shot is None:
+            return
+
+        from .package_dialog import PackageDialog
+
+        shot_name, shot_dir = self._current_shot
+        dialog = PackageDialog(
+            shot_name=shot_name,
+            shot_dir=shot_dir,
+            parent=self,
+        )
+        dialog.exec_()
+
     # ------------------------------------------------------------------
     # Output browsing
     # ------------------------------------------------------------------
@@ -653,7 +687,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
             for output in outputs:
                 all_outputs.append(output)
 
-        self._output_list.set_outputs(all_outputs)
+        self._output_list.set_outputs(all_outputs, shot_dir)
         self._version_panel.clear()
 
     def _on_output_selected(self, output):

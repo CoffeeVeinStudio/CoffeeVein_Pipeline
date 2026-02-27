@@ -29,8 +29,8 @@ INCOMING_SUBDIRS = {
 # Sequence detection
 # ---------------------------------------------------------------------------
 
-# Matches frame numbers in filenames: name.1001.exr, name_0119.tif
-_FRAME_PATTERN = re.compile(r'^(.+?)[._](\d{3,})(\.\w+)$')
+# Matches frame numbers in filenames: name.1001.exr, name_0119.tif, name.1.jpg
+_FRAME_PATTERN = re.compile(r'^(.+?)[._](\d+)(\.\w+)$')
 
 # Movie/video extensions
 _MOVIE_EXTS = {'.mov', '.mp4', '.avi', '.mxf', '.mkv'}
@@ -113,6 +113,8 @@ def scan_incoming(project_root):
         items.extend(sub_items)
 
     # Scan root for loose (unsorted) items
+    loose_root_images = []
+
     for entry in sorted(incoming_dir.iterdir()):
         if entry.name.startswith(('.', '_')):
             continue
@@ -134,16 +136,8 @@ def scan_incoming(project_root):
                 item.suggested_type = None  # Unsorted
                 items.append(item)
             elif ext in _SEQ_EXTS:
-                # Single image file at root level
-                item = IncomingItem(
-                    name=entry.stem,
-                    path=str(entry),
-                    item_type="file"
-                )
-                item.extension = ext
-                item.files = [str(entry)]
-                item.suggested_type = None  # Unsorted
-                items.append(item)
+                # Collect for sequence grouping
+                loose_root_images.append(entry)
         elif entry.is_dir():
             # Unrecognized folder at root — could be a sequence or misc folder
             seq = _detect_sequence(entry)
@@ -158,6 +152,13 @@ def scan_incoming(project_root):
                 )
                 item.suggested_type = None  # Unsorted
                 items.append(item)
+
+    # Group loose root image files into sequences where possible
+    seq_items, single_items = _group_loose_sequences(loose_root_images, incoming_dir)
+    for item in seq_items + single_items:
+        item.suggested_type = None  # Unsorted
+    items.extend(seq_items)
+    items.extend(single_items)
 
     return items
 
@@ -182,10 +183,96 @@ def create_incoming_dirs(project_root):
     return incoming_dir
 
 
+def _group_loose_sequences(image_files, parent_dir):
+    """Group loose image files into sequences by (base_name, extension).
+
+    Files matching _FRAME_PATTERN are grouped. Groups with >=2 frames become
+    a single sequence IncomingItem. Remaining files (non-matching or single-
+    frame groups) become individual file items.
+
+    Args:
+        image_files: List of Path objects for image files.
+        parent_dir: The directory containing these files (used as item.path
+                    for sequences since they have no dedicated folder).
+
+    Returns:
+        Tuple of (sequence_items, single_items).
+    """
+    seq_groups = defaultdict(list)  # (base_name, ext) → [(frame_num, path)]
+    non_matching = []
+
+    for f in image_files:
+        match = _FRAME_PATTERN.match(f.name)
+        if match:
+            base = match.group(1)
+            frame = int(match.group(2))
+            ext = match.group(3)
+            seq_groups[(base, ext)].append((frame, str(f)))
+        else:
+            non_matching.append(f)
+
+    sequence_items = []
+    single_items = []
+
+    for (base_name, ext), frames in seq_groups.items():
+        if len(frames) >= 2:
+            frames.sort()
+            first_frame = frames[0][0]
+            last_frame = frames[-1][0]
+
+            # Determine padding from first frame filename
+            first_file = Path(frames[0][1])
+            match = _FRAME_PATTERN.match(first_file.name)
+            padding = len(match.group(2))
+            pad_str = "#" * padding
+
+            item = IncomingItem(
+                name=base_name,
+                path=str(parent_dir),
+                item_type="sequence"
+            )
+            item.frame_range = (first_frame, last_frame)
+            item.frame_count = len(frames)
+            item.extension = ext
+            item.pattern = f"{base_name}.{pad_str}{ext}"
+            item.files = [f[1] for f in frames]
+            item.suggested_shot = _guess_shot_name(base_name)
+            sequence_items.append(item)
+        else:
+            # Single frame — treat as individual file
+            f_path = Path(frames[0][1])
+            item = IncomingItem(
+                name=f_path.stem,
+                path=str(f_path),
+                item_type="file"
+            )
+            item.extension = ext
+            item.files = [str(f_path)]
+            item.suggested_shot = _guess_shot_name(f_path.stem)
+            single_items.append(item)
+
+    # Non-matching image files are also individual items
+    for f in non_matching:
+        item = IncomingItem(
+            name=f.stem,
+            path=str(f),
+            item_type="file"
+        )
+        item.extension = f.suffix.lower()
+        item.files = [str(f)]
+        item.suggested_shot = _guess_shot_name(f.stem)
+        single_items.append(item)
+
+    return sequence_items, single_items
+
+
 def _scan_directory(directory, items, depth, max_depth):
     """Recursively scan a directory for items."""
     if depth > max_depth:
         return
+
+    # Collect loose image files for sequence grouping
+    loose_image_files = []
 
     for entry in sorted(Path(directory).iterdir()):
         if entry.name.startswith(('.', '_')):
@@ -213,16 +300,8 @@ def _scan_directory(directory, items, depth, max_depth):
                 item.files = [str(entry)]
                 items.append(item)
             elif ext in _SEQ_EXTS:
-                # Single image file (not part of a sequence folder)
-                item = IncomingItem(
-                    name=entry.stem,
-                    path=str(entry),
-                    item_type="file"
-                )
-                item.extension = ext
-                item.files = [str(entry)]
-                item.suggested_shot = _guess_shot_name(entry.stem)
-                items.append(item)
+                # Collect for sequence grouping instead of adding immediately
+                loose_image_files.append(entry)
 
         elif entry.is_dir():
             # Check if it's a sequence folder
@@ -232,6 +311,11 @@ def _scan_directory(directory, items, depth, max_depth):
             else:
                 # Recurse into subfolder
                 _scan_directory(entry, items, depth + 1, max_depth)
+
+    # Group loose image files into sequences where possible
+    seq_items, single_items = _group_loose_sequences(loose_image_files, directory)
+    items.extend(seq_items)
+    items.extend(single_items)
 
 
 def _detect_sequence(folder):

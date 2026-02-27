@@ -255,15 +255,111 @@ class VersionPanel(QtWidgets.QWidget):
         self._path_label.setText(version.path or "N/A")
         self._notes_text.setPlainText(version.notes)
 
+        # Check if files exist on disk
+        files_exist = self._check_files_exist(version)
+        if not files_exist:
+            self._version_combo.setStyleSheet("color: #ff6666;")
+            self._frames_label.setText("⚠ FILES MISSING")
+        else:
+            self._version_combo.setStyleSheet("")
+
         # Try to load thumbnail
         self._load_thumbnail(version)
 
     def _load_thumbnail(self, version):
-        """Try to load a thumbnail for the version."""
-        # TODO: Generate thumbnails from first frame of render
-        self._thumbnail_label.setText(
-            f"{self._output.name}\nv{version.version:03d}"
+        """Load cached thumbnail or generate one in Nuke, with text fallback."""
+        from .. import thumbnails
+
+        if not version.path:
+            self._thumbnail_label.setPixmap(QtGui.QPixmap())
+            self._thumbnail_label.setText("No preview")
+            return
+
+        # Resolve file_path — same logic as _check_files_exist
+        if self._shot_dir is None:
+            file_path = Path(version.path)
+        else:
+            from ..core import OutputType
+            from .. import paths as path_module
+            if self._output.output_type == OutputType.REFERENCE:
+                output_dir = Path(self._shot_dir) / self._output.name
+            else:
+                output_dir = path_module.get_output_dir(
+                    self._shot_dir, self._output.output_type, self._output.name
+                )
+            file_path = output_dir / version.path
+
+        thumbnail_path = thumbnails.get_thumbnail_path(file_path.parent)
+
+        if thumbnail_path.exists():
+            self._set_thumbnail_pixmap(thumbnail_path)
+            return
+
+        # Lazy Nuke generation (fallback for pre-existing renders and _Incoming)
+        try:
+            import nuke  # noqa: F401
+            frame = (
+                (version.frames[0] + version.frames[1]) // 2
+                if version.frames else 1
+            )
+            result = thumbnails.generate_thumbnail(file_path, frame)
+            if result and result.exists():
+                self._set_thumbnail_pixmap(result)
+                return
+        except ImportError:
+            pass
+
+        # Standalone / generation failed
+        self._thumbnail_label.setPixmap(QtGui.QPixmap())
+        self._thumbnail_label.setText(f"{self._output.name}\nv{version.version:03d}")
+
+    def _set_thumbnail_pixmap(self, path: Path):
+        """Scale and display a thumbnail image in the thumbnail label."""
+        pixmap = QtGui.QPixmap(str(path))
+        if pixmap.isNull():
+            self._thumbnail_label.setText("No preview")
+            return
+        w = max(self._thumbnail_label.width(), 256)
+        h = max(self._thumbnail_label.height(), 200)
+        scaled = pixmap.scaled(
+            w, h,
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation,
         )
+        self._thumbnail_label.setPixmap(scaled)
+        self._thumbnail_label.setText("")
+
+    def _check_files_exist(self, version) -> bool:
+        """Check if the version's files exist on disk."""
+        import re
+
+        if not version.path:
+            return True
+
+        def _resolve_frame(pattern_path, frame):
+            name = pattern_path.name
+            resolved = re.sub(r'#+', lambda m: str(frame).zfill(len(m.group(0))), name)
+            return pattern_path.parent / resolved
+
+        if self._shot_dir is None:
+            file_path = Path(version.path)
+        else:
+            from ..core import OutputType
+            from .. import paths as path_module
+            if self._output.output_type == OutputType.REFERENCE:
+                output_dir = Path(self._shot_dir) / self._output.name
+            else:
+                output_dir = path_module.get_output_dir(
+                    self._shot_dir, self._output.output_type, self._output.name
+                )
+            file_path = output_dir / version.path
+
+        if version.frames:
+            first = _resolve_frame(file_path, version.frames[0])
+            last = _resolve_frame(file_path, version.frames[1])
+            return first.exists() and last.exists()
+        else:
+            return file_path.exists()
 
     def _on_set_live(self):
         """Set the currently viewed version as LIVE."""

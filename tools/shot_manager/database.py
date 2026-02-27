@@ -9,10 +9,35 @@ import json
 import os
 from pathlib import Path
 
-from .core import Output
+from .core import Output, OutputType
 
 
 VERSIONS_FILENAME = ".versions.json"
+
+
+def _infer_metadata_from_path(output_dir):
+    """Infer output name, type, and shot name from directory structure.
+
+    Directory layouts:
+        {shot}/Comp/renders/{name}  → render, shot is 3 levels up
+        {shot}/Plates/{name}        → plate, shot is 2 levels up
+        {shot}/CG/{name}            → cg, shot is 2 levels up
+        {shot}/Reference/{name}     → reference, shot is 2 levels up
+    """
+    output_dir = Path(output_dir)
+    name = output_dir.name
+    parent_name = output_dir.parent.name.lower()
+
+    if parent_name == "renders":
+        return name, output_dir.parent.parent.parent.name, OutputType.RENDER
+    elif parent_name == "plates":
+        return name, output_dir.parent.parent.name, OutputType.PLATE
+    elif parent_name == "cg":
+        return name, output_dir.parent.parent.name, OutputType.CG
+    elif parent_name == "reference":
+        return name, output_dir.parent.parent.name, OutputType.REFERENCE
+    else:
+        return name, output_dir.parent.parent.name, OutputType.RENDER
 
 
 def _ensure_dir(path):
@@ -23,20 +48,42 @@ def _ensure_dir(path):
 def load_output(output_dir):
     """Load an Output from its .versions.json file.
 
+    Performs auto-repair if metadata (name, shot, type) doesn't match
+    the directory structure — fixes in-memory and rewrites JSON to disk.
+
     Args:
         output_dir: Path to the output directory (e.g., .../renders/Denoise/)
 
     Returns:
         Output object, or None if no .versions.json exists.
     """
-    versions_file = Path(output_dir) / VERSIONS_FILENAME
+    output_dir = Path(output_dir)
+    versions_file = output_dir / VERSIONS_FILENAME
     if not versions_file.exists():
         return None
 
-    with open(versions_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    try:
+        with open(versions_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        print(f"[ShotManager] Warning: corrupt .versions.json at {output_dir}, rebuilding metadata")
+        data = {}
 
-    return Output.from_dict(data)
+    output = Output.from_dict(data)
+
+    # Auto-repair: directory path is ground truth for name/shot/type
+    expected_name, expected_shot, expected_type = _infer_metadata_from_path(output_dir)
+    if output.name != expected_name or output.shot != expected_shot or output.output_type != expected_type:
+        print(f"[ShotManager] Repairing .versions.json metadata at {output_dir.name}")
+        output.name = expected_name
+        output.shot = expected_shot
+        output.output_type = expected_type
+        try:
+            save_output(output, output_dir)
+        except OSError as e:
+            print(f"[ShotManager] Warning: could not write repaired .versions.json: {e}")
+
+    return output
 
 
 def save_output(output, output_dir):

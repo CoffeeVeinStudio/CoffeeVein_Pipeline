@@ -1,0 +1,213 @@
+Group {
+ name HSVKeyer
+ knobChanged "\n\nif nuke.thisKnob().name()=='sample':\n    import colorsys\n    import json\n    n = nuke.thisNode()\n\n    minus = n\['minus'].getValue()\n    c = n\['continuous'].getValue()\n    reset = n\['reset_check'].getValue()\n\n    hue_enable = n\['hue_enable'].getValue()\n    sat_enable = n\['sat_enable'].getValue()\n    lum_enable = n\['lum_enable'].getValue()\n\n    sample = n\['sample'].getValue()\n    \n    hsv = colorsys.rgb_to_hsv(*sample)\n\n    hue_range = n\[\"hue_range\"].getValue()\n    sat_range = n\[\"saturation_range\"].getValue()\n    lum_range = n\[\"luminance_range\"].getValue()\n\n    hue = hsv\[0]\n    sat = hsv\[1]\n    lum = hsv\[2]\n\n    hue_min = hue_range\[1]\n    hue_max = hue_range\[2]\n    sat_min = sat_range\[1]\n    sat_max = sat_range\[2]\n    lum_min = lum_range\[1]\n    lum_max = lum_range\[2]\n\n    hue_low_soft = hue_min-hue_range\[0]\n    hue_high_soft = hue_range\[3] - hue_max\n    sat_low_soft =  sat_min - sat_range\[0]\n    sat_high_soft = sat_range\[3] - sat_max\n    lum_low_soft =  lum_min - lum_range\[0]\n    lum_high_soft = lum_range\[3] - lum_max\n\n    if reset:\n      n\[\"reset_check\"].setValue(False)\n      hue_min = hue_max = hue\n      sat_min = sat_max = sat\n      lum_min = lum_max = lum\n\n    elif not c:\n      hue_min = hue_max = hue\n      sat_min = sat_max = sat\n      lum_min = lum_max = lum\n\n    elif minus:\n      hue_in_range = hue > (hue_min-hue_low_soft) and hue<(hue_max + hue_high_soft)\n      sat_in_range = sat > (sat_min-sat_low_soft) and sat<(sat_max + sat_high_soft)\n      lum_in_range = lum > (lum_min-lum_low_soft) and lum<(lum_max + lum_high_soft)\n      \n      in_range = True\n\n      if(hue_enable):\n        in_range = hue_in_range and in_range\n\n      if(sat_enable):\n        in_range = sat_in_range and in_range\n\n      if(lum_enable):\n        in_range = lum_in_range and in_range\n\n      if in_range:\n        hue_center = hue_max - hue_min*.5\n        sat_center = sat_max - sat_min*.5\n        lum_center = lum_max - lum_min*.5\n\n        if hue > hue_min-hue_low_soft and hue < hue_max+hue_high_soft:\n          if hue > hue_center:\n            hue_max = hue - hue_high_soft\n            hue_max = max(hue_min, hue_max)\n          else:\n            hue_min = hue + hue_low_soft\n            hue_min = min(hue_min, hue_max)\n\n   \n        if sat > sat_min-sat_low_soft and sat < sat_max+sat_high_soft: \n          if sat > sat_center:\n            sat_max = sat - sat_high_soft\n            sat_max = max(sat_min, sat_max)\n          else:\n            sat_min = sat + sat_low_soft\n            sat_min = min(sat_min, sat_max)          \n\n\n        if lum > lum_min-lum_low_soft and lum < lum_max+lum_high_soft: \n          if lum > lum_center:\n            lum_max = lum - lum_high_soft\n            lum_max = max(lum_min, lum_max)\n          else:\n            lum_min = lum + lum_low_soft\n            lum_min = min(lum_min, lum_max)\n    else:\n      hue_min = min(hue, hue_min)\n      hue_max = max(hue, hue_max)\n      sat_min = min(sat, sat_min)\n      sat_max = max(sat, sat_max)\n      lum_min = min(lum, lum_min)\n      lum_max = max(lum, lum_max)\n\n    n\[\"hue_range\"].setValue(max(0, hue_min - hue_low_soft), 0)\n    n\[\"hue_range\"].setValue(hue_min, 1)\n    n\[\"hue_range\"].setValue(hue_max, 2)\n    n\[\"hue_range\"].setValue(min(1, hue_max + hue_high_soft), 3)\n\n    n\[\"saturation_range\"].setValue(max(0, sat_min - sat_low_soft), 0)\n    n\[\"saturation_range\"].setValue(sat_min, 1)\n    n\[\"saturation_range\"].setValue(sat_max, 2)\n    n\[\"saturation_range\"].setValue(min(1, sat_max + sat_high_soft), 3)\n\n    n\[\"luminance_range\"].setValue(max(0, lum_min - lum_low_soft), 0)\n    n\[\"luminance_range\"].setValue(lum_min, 1)\n    n\[\"luminance_range\"].setValue(lum_max, 2)\n    n\[\"luminance_range\"].setValue(min(1, lum_max + lum_high_soft), 3)\n\n\n\n"
+ tile_color 0xff02ff
+ selected true
+ xpos -291
+ ypos 4
+ addUserKnob {20 User l HSVKeyer}
+ addUserKnob {4 output M {combined hue saturation luminance}}
+ addUserKnob {26 ""}
+ addUserKnob {18 sample}
+ sample {0.1195384115 0.2581827939 0.4969329238}
+ addUserKnob {6 sample_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 minus +STARTLINE}
+ addUserKnob {6 continuous -STARTLINE}
+ continuous true
+ addUserKnob {22 reset l Reset -STARTLINE T "n = nuke.thisNode()\nn\['reset_check'].setValue(True)"}
+ addUserKnob {6 reset_check +INVISIBLE +STARTLINE}
+ reset_check true
+ addUserKnob {26 ""}
+ addUserKnob {6 invert +STARTLINE}
+ addUserKnob {41 size l blur T Blur.size}
+ addUserKnob {41 size_1 l shrink T Erode.size}
+ addUserKnob {26 ""}
+ addUserKnob {6 hue_enable l "" +STARTLINE +STARTLINE}
+ hue_enable true
+ addUserKnob {41 hue_range l "hue           " -STARTLINE T HUE_KEY.range}
+ addUserKnob {6 sat_enable l "" +STARTLINE +STARTLINE}
+ sat_enable true
+ addUserKnob {41 saturation_range l saturation -STARTLINE T SAT_KEY.range}
+ addUserKnob {6 lum_enable l "" +STARTLINE +STARTLINE}
+ lum_enable true
+ addUserKnob {41 luminance_range l luminance -STARTLINE T LUM_KEY.range}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 926
+  ypos -13
+ }
+ Dot {
+  name Dot2
+  xpos 960
+  ypos 132
+ }
+set N82c05c00 [stack 0]
+ Dot {
+  name Dot1
+  xpos 539
+  ypos 132
+ }
+ Colorspace {
+  colorspace_in sRGB
+  colorspace_out HSV
+  name HSV
+  xpos 505
+  ypos 193
+ }
+set N9f568400 [stack 0]
+ Keyer {
+  operation "blue keyer"
+  range {0 0.02937843728 0.747437428 1}
+  name LUM_KEY
+  xpos 620
+  ypos 239
+ }
+set N9f568800 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle2
+  xpos 620
+  ypos 359
+ }
+push $N9f568400
+ Keyer {
+  operation "green keyer"
+  range {0 0.03180022737 0.7594475919 1}
+  name SAT_KEY
+  xpos 505
+  ypos 242
+ }
+set N9f569000 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle3
+  xpos 505
+  ypos 352
+ }
+push $N9f568400
+ Keyer {
+  operation "red keyer"
+  range {0 0.04580245163 0.6955245451 1}
+  name HUE_KEY
+  xpos 393
+  ypos 245
+ }
+set N9f569800 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  xpos 393
+  ypos 354
+ }
+push $N9f569800
+push $N9f569000
+push $N9f568800
+push $N82c05c00
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle5
+  xpos 763
+  ypos 218
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name COMBINE_MULT1
+  xpos 765
+  ypos 270
+  disable {{!lum_enable}}
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name COMBINE_MULT2
+  xpos 765
+  ypos 312
+  disable {{!sat_enable}}
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name COMBINE_MULT
+  xpos 765
+  ypos 346
+  disable {{!hue_enable}}
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle7
+  xpos 765
+  ypos 380
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle6
+  xpos 765
+  ypos 406
+  disable {{"(lum_enable || sat_enable || hue_enable)"}}
+ }
+ Switch {
+  inputs 4
+  which {{output}}
+  name Switch1
+  xpos 765
+  ypos 466
+ }
+ Erode {
+  channels rgba
+  size 0
+  name Erode
+  xpos 765
+  ypos 526
+ }
+ Blur {
+  channels rgba
+  name Blur
+  xpos 765
+  ypos 552
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle4
+  xpos 765
+  ypos 589
+ }
+ Invert {
+  name Invert1
+  xpos 765
+  ypos 625
+  disable {{!parent.invert}}
+ }
+push $N82c05c00
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 926
+  ypos 625
+ }
+ Output {
+  name Output
+  xpos 926
+  ypos 751
+ }
+end_group

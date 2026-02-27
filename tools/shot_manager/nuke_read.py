@@ -230,6 +230,29 @@ def update_live_readers(output_dir):
         print(f"[ShotManager] Updated LIVE Read '{node.name()}' to {file_path_str}")
 
 
+def sync_all_live_readers():
+    """Sync all LIVE Read nodes in the current script to their current LIVE version.
+
+    Scans all Read nodes for the shot_manager_output_dir knob and calls
+    update_live_readers() for each unique output directory found.
+    Called on panel show so nodes stay fresh if LIVE changed externally.
+    """
+    import nuke
+
+    output_dirs = set()
+    for node in nuke.allNodes("Read"):
+        if "shot_manager_output_dir" in node.knobs():
+            val = node["shot_manager_output_dir"].value()
+            if val:
+                output_dirs.add(val)
+
+    for dir_str in output_dirs:
+        try:
+            update_live_readers(Path(dir_str))
+        except Exception as e:
+            print(f"[ShotManager] Warning: Failed to sync LIVE node for {dir_str}: {e}")
+
+
 def find_read_nodes():
     """Find all Read nodes in the current script.
 

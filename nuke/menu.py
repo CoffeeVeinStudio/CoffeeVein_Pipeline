@@ -80,7 +80,7 @@ for module_name in MANUAL_IMPORTS:
     try:
         # Importrerar modulen dynamiskt
         nuke.tprint = lambda *args, **kwargs: None  # Temporärt tysta nuke.tprint
-        __import__(module_name)
+        globals()[module_name] = __import__(module_name)
         nuke.tprint = original_tprint  # Återställ tprint
         
         print(f"  [OK]     {module_name}")
@@ -107,7 +107,7 @@ smMenu.addCommand('Main UI',
     icon='tik4_main_ui.png')
 smMenu.addCommand('New Version',
     "from tik_manager4.ui import main\ntui = main.launch(dcc='Nuke', dont_show=True)\ntui.on_new_version()",
-    "ctrl+shift+s",
+    "alt+shift+s",
     icon='tik4_new_version.png')
 #smMenu.addCommand('Publish',
 #    "from tik_manager4.ui import main\ntui = main.launch(dcc='Nuke', dont_show=True)\ntui.on_publish_scene()",
@@ -124,6 +124,13 @@ smMenu.addCommand('Shot Manager',
     "from shot_manager.launch import launch_in_nuke\n"
     "launch_in_nuke()".format(tools_path=str(NUKE_ROOT.parent / "tools")),
     "shift+r",
+    icon='coffeevein.png')
+# -- Package Shot --
+smMenu.addCommand('Package Shot for Delivery',
+    "import sys\n"
+    "sys.path.insert(0, r'{tools_path}')\n"
+    "from shot_manager.package_launcher import launch_package_dialog\n"
+    "launch_package_dialog()".format(tools_path=str(NUKE_ROOT.parent / "tools")),
     icon='coffeevein.png')
 # -- Apply TIK Settings --
 smMenu.addCommand('Apply TIK Settings to Script',

@@ -265,6 +265,14 @@ class RenderJob:
 
         database.save_output(self._output, self.output_dir)
 
+        # Generate thumbnail from middle frame (best-effort, never fails the render)
+        try:
+            from . import thumbnails
+            thumb_frame = (self.start_frame + self.end_frame) // 2
+            thumbnails.generate_thumbnail(Path(self.output_file_pattern), thumb_frame)
+        except Exception:
+            pass
+
         # Update LIVE directory
         self._update_live()
 

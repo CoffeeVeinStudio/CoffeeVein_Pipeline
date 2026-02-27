@@ -4,9 +4,46 @@ Shows all outputs (renders, plates, CG, etc.) for the selected shot,
 grouped by type.
 """
 
+import re
+from pathlib import Path
+
 from ..qt_compat import QtWidgets, QtCore, QtGui
 
 from ..core import OutputType
+
+
+def _live_files_exist(output, base_dir) -> bool:
+    """Check if the LIVE version's files exist on disk.
+
+    Returns True if there is no LIVE version, or if files are present.
+    """
+    live_version = output.live
+    if live_version is None or not live_version.path:
+        return True
+
+    def _resolve_frame(pattern_path, frame):
+        name = pattern_path.name
+        resolved = re.sub(r'#+', lambda m: str(frame).zfill(len(m.group(0))), name)
+        return pattern_path.parent / resolved
+
+    if base_dir is None:
+        file_path = Path(live_version.path)
+    else:
+        from .. import paths as path_module
+        if output.output_type == OutputType.REFERENCE:
+            output_dir = Path(base_dir) / output.name
+        else:
+            output_dir = path_module.get_output_dir(
+                base_dir, output.output_type, output.name
+            )
+        file_path = output_dir / live_version.path
+
+    if live_version.frames:
+        first = _resolve_frame(file_path, live_version.frames[0])
+        last = _resolve_frame(file_path, live_version.frames[1])
+        return first.exists() and last.exists()
+    else:
+        return file_path.exists()
 
 
 # Group labels and order
@@ -35,6 +72,7 @@ class OutputListWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._outputs = []
+        self._base_dir = None
         self._multi_select = False
         self._build_ui()
 
@@ -52,13 +90,16 @@ class OutputListWidget(QtWidgets.QWidget):
         self._tree.currentItemChanged.connect(self._on_item_changed)
         layout.addWidget(self._tree)
 
-    def set_outputs(self, outputs):
+    def set_outputs(self, outputs, base_dir=None):
         """Set and display outputs grouped by type.
 
         Args:
             outputs: List of Output objects.
+            base_dir: Shot or reference directory for resolving file paths.
+                      None for _Incoming (uses absolute paths).
         """
         self._outputs = outputs
+        self._base_dir = base_dir
         self._populate()
 
     def _populate(self):
@@ -90,16 +131,23 @@ class OutputListWidget(QtWidgets.QWidget):
             self._tree.addTopLevelItem(group_item)
 
             for output in sorted(outputs, key=lambda o: o.name):
-                # Show LIVE indicator
                 has_live = output.live_version is not None
                 display = f"  {output.name}"
-                if has_live:
-                    display += "  \u2666"  # Diamond character for LIVE
 
-                child = QtWidgets.QTreeWidgetItem([display])
-                child.setData(0, QtCore.Qt.UserRole, output)
                 if has_live:
-                    child.setForeground(0, QtGui.QColor(color))
+                    live_ok = _live_files_exist(output, self._base_dir)
+                    if live_ok:
+                        display += "  \u2666"  # Diamond: LIVE version present
+                        child = QtWidgets.QTreeWidgetItem([display])
+                        child.setForeground(0, QtGui.QColor(color))
+                    else:
+                        display += "  \u26a0"  # Warning triangle: LIVE files missing
+                        child = QtWidgets.QTreeWidgetItem([display])
+                        child.setForeground(0, QtGui.QColor("#ff6666"))
+                else:
+                    child = QtWidgets.QTreeWidgetItem([display])
+
+                child.setData(0, QtCore.Qt.UserRole, output)
                 group_item.addChild(child)
 
             group_item.setExpanded(True)

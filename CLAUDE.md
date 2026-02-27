@@ -50,6 +50,36 @@ The Shot Manager (`tools/shot_manager/`) is a custom tool that handles:
 - Always check `false_positives.csv` before classifying companies
 - Ask about ALL search criteria before searching (bransch, ort, antal anställda)
 
+## SHOT_MANAGER_TODO.md Format
+
+Two files exist side by side:
+- **`SHOT_MANAGER_ITERATION5_PLAN.md`** — Original design archive (all feature specs, read-only reference)
+- **`SHOT_MANAGER_TODO.md`** — Active TODO tracker (remaining work only)
+
+### Structure
+
+1. **Header:** `# Shot Manager — TODO`
+2. **Overview:** Brief description + link to iteration plan for original specs
+3. **Completed Features section:** One-line summaries with ✅ prefix, listed for reference
+4. **Feature sections:** Each remaining feature gets its own `## Feature N: Title <status>` section
+   - Status emoji in heading: `✅ COMPLETED`, `⚠️ PARTIALLY IMPLEMENTED`, or `❌ NOT STARTED`
+   - Contains: Priority, Current State, What's Needed (with code snippets), Dependencies, Testing
+5. **Implementation Priority & Dependencies:** Grouped by High/Medium/Low with recommended order
+6. **Summary:** Count of remaining features and their states
+
+### Maintaining the TODO
+
+When a feature is **completed**:
+1. Add a ✅ one-liner to the "Completed Features" section at the top
+2. Replace the feature's full section with a short "Implemented:" summary (remove code snippets and detailed specs)
+3. Update the Summary counts at the bottom
+4. Update the Priority list (remove completed items)
+
+When **adding** a new feature:
+1. Add a new `## Feature N: Title ❌ NOT STARTED` section following the existing format
+2. Add it to the Priority list in the appropriate tier
+3. Update the Summary counts
+
 ## Testing
 
 When implementing Shot Manager features:

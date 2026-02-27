@@ -352,13 +352,95 @@ Project: SWAN    Shot: A001_C020              [Refresh]  [Set Project]
 
 ---
 
+## 13. Multi-Selection for Shot/Reference Outputs + Batch Move
+
+**Current:** Multi-selection (`ExtendedSelection`) is only enabled when viewing `_Incoming`. Shot and Reference outputs use `SingleSelection`. The "Move..." button operates on a single `self._current_output`.
+
+**New:** Enable multi-selection in all categories (shots, Reference, _Incoming). Allow batch-moving multiple selected outputs to another shot, Reference, or _Incoming.
+
+### UI Changes
+
+**Bottom bar when viewing shots/Reference:**
+```
+[Move...]          [Create Read ▾]  [Set LIVE]
+```
+- "Move..." operates on all selected outputs (1 or more)
+- Confirmation dialog shows count: "Move 3 outputs to A004_C020?"
+
+### Implementation
+
+**File: `ui/output_list.py`**
+- Remove the single-only restriction: always use `ExtendedSelection` mode (drop `set_selection_mode()` or default `multi=True`)
+- Keep `get_selected_outputs()` as-is (already handles multi-selection)
+
+**File: `ui/main_window.py`**
+- `_on_shot_selected()`: enable multi-selection (`set_selection_mode(multi=True)`)
+- `_on_reference_selected()`: enable multi-selection (`set_selection_mode(multi=True)`)
+- `_on_move_output()`: iterate over `get_selected_outputs()` instead of using `self._current_output`
+  - For each output, call `move_module.move_output_to_shot()` / `move_output_to_reference()` / `move_output_to_incoming()`
+  - Collect errors per-output and report at the end
+  - Show confirmation: "Move {count} output(s) to {destination}?"
+- Update `_move_output_btn` enable logic: enable when ≥1 output is selected
+
+**File: `ui/move_dialog.py`**
+- Accept list of output names instead of single name
+- Header: "Moving 3 outputs" (or "Moving output: Name" for single)
+- Rename field hidden when moving multiple (keep original names)
+- Preview shows list of outputs being moved
+
+---
+
+## 14. Relocate Buttons — Clean Version Panel Layout
+
+**Current:** The version panel has "Open Folder" and "Create Read" buttons at the bottom of the panel, below the thumbnail/preview area. The bottom action bar only has "Move...".
+
+**New:** Move all buttons out of the version panel:
+- **"Open Folder"** → next to the shot name in the header bar. When no shot is selected (or viewing _Incoming), opens the shot root directory.
+- **"Create Read" dropdown + "Set LIVE"** → bottom action bar, next to "Move..."
+
+### Header bar (new layout)
+```
+Project: 4C_Health    Shot: A0001_C005   [📂]       [Refresh]  [Set Project]
+```
+- `[📂]` opens the current shot's directory on disk
+- If no shot selected → opens the project's `Shots/` root directory
+- If viewing _Incoming → opens the `_Incoming/` directory
+- If viewing Reference → opens the `Reference/` directory
+
+### Bottom action bar (new layout)
+```
+[Move...]   [Create Read ▾]   [Set LIVE]                    (stretch)
+```
+- "Create Read" and "Set LIVE" are only visible when in Nuke and an output is selected (not _Incoming)
+- "Set LIVE" operates on the currently viewed version in the version panel
+
+### Implementation
+
+**File: `ui/version_panel.py`**
+- Remove the button row (`btn_row`) entirely — no more `_open_folder_btn` or `_create_read_btn`
+- Remove `_on_open_folder()`, `_on_create_static_read()`, `_on_create_live_read()`, `_on_update_existing_read()` methods
+- Keep `_on_set_live()` signal emission but remove the `_set_live_btn` from the version selector row (button moves to bottom bar)
+- The version panel becomes purely informational: version selector + details + notes + thumbnail
+
+**File: `ui/main_window.py`**
+- **Header:** Add `_open_folder_btn` (folder icon) next to `_shot_label`
+  - `_on_open_folder()`: if shot selected → `os.startfile(shot_dir)`. If viewing _Incoming → open `_Incoming/`. If viewing Reference → open Reference dir. If nothing selected → open `Shots/` root.
+- **Bottom action bar** (merge `_incoming_bar` and `_output_action_bar` into one unified bar, always visible):
+  - `[Move...]` — visible when outputs are selected (any category)
+  - `[Move to Shot]` — visible only when viewing _Incoming
+  - `[Create Read ▾]` — visible only in Nuke, when output selected (not _Incoming)
+  - `[Set LIVE]` — visible only when output selected (not _Incoming)
+  - Logic from version_panel's button handlers moves here (read node creation, set LIVE delegates to `_version_panel.live_changed` signal)
+
+---
+
 ## Summary of All File Changes
 
 | File | Changes |
 |------|---------|
-| `ui/main_window.py` | Frame range controls; remove Cancel + Render All; add Re-Render Last; Move to Shot button; LIVE Read node updates; Reference selection handling |
-| `ui/version_panel.py` | Thumbnail display; Create Read / LIVE Read / Update Read buttons |
-| `ui/output_list.py` | Multi-selection mode for _Incoming |
+| `ui/main_window.py` | Frame range controls; remove Cancel + Render All; add Re-Render Last; Move to Shot button; LIVE Read node updates; Reference selection handling; Open Folder in header; unified bottom bar with Create Read + Set LIVE; batch move for multi-selected outputs |
+| `ui/version_panel.py` | Thumbnail display; buttons removed (moved to main_window bottom bar) |
+| `ui/output_list.py` | Multi-selection mode for all categories (shots, Reference, _Incoming) |
 | `ui/shot_list.py` | Reference entry below shots |
 | `core.py` | Add `status` field to Version |
 | `render.py` | `prepare_overwrite()`; upfront version registration with status tracking |
@@ -367,6 +449,7 @@ Project: SWAN    Shot: A001_C020              [Refresh]  [Set Project]
 | **New: `nuke_read.py`** | Create/update Read nodes; LIVE expression Read; update LIVE readers |
 | **New: `thumbnails.py`** | Thumbnail generation (Nuke) + caching |
 | **New: `ui/ingest_dialog.py`** | Dialog for moving incoming items to shots |
+| `ui/move_dialog.py` | Batch mode for multiple outputs |
 
 ## Implementation Order
 
@@ -377,3 +460,5 @@ Project: SWAN    Shot: A001_C020              [Refresh]  [Set Project]
 5. **Move to Shot (ingest UI)** — builds on updated scanner + reference
 6. **Import to Script (Read nodes + LIVE Read)** — new nuke_read.py + version panel
 7. **Thumbnails** — nice-to-have, last priority
+8. **Multi-selection + batch move** — enable multi-select on all categories, update move dialog and logic
+9. **Relocate buttons** — move Open Folder to header, Create Read + Set LIVE to bottom bar, clean up version panel
