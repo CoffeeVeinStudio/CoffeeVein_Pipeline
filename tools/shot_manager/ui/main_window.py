@@ -123,6 +123,14 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         )
         self._move_to_shot_btn.clicked.connect(self._on_move_to_shot)
         incoming_bar_inner.addWidget(self._move_to_shot_btn)
+
+        self._move_to_ref_btn = QtWidgets.QPushButton("Move to Reference")
+        self._move_to_ref_btn.setStyleSheet(
+            "QPushButton { background-color: #2d5a7b; padding: 6px 16px; }"
+            "QPushButton:hover { background-color: #3d7aab; }"
+        )
+        self._move_to_ref_btn.clicked.connect(self._on_move_to_reference)
+        incoming_bar_inner.addWidget(self._move_to_ref_btn)
         incoming_bar_inner.addStretch()
 
         main_layout.addWidget(self._incoming_bar_widget)
@@ -243,6 +251,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._shot_list.reference_selected.connect(self._on_reference_selected)
         self._output_list.output_selected.connect(self._on_output_selected)
         self._version_panel.live_changed.connect(self._on_live_changed)
+        self._version_panel.frames_move_requested.connect(self._on_move_frames)
 
     # ------------------------------------------------------------------
     # Project management
@@ -362,6 +371,8 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._reference_dir = None
         self._incoming_items.clear()
         self._current_shot = (shot_name, shot_path)
+        self._version_panel.set_fallback_dir(shot_path)
+        self._version_panel.clear()
         self._incoming_bar_widget.setVisible(False)
         self._output_list.set_selection_mode(multi=False)
         self._refresh_outputs(shot_path)
@@ -376,6 +387,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._reference_dir = None
         self._current_shot = None
         self._incoming_items.clear()
+        self._version_panel.set_fallback_dir(incoming_path)
         self._version_panel.clear()
         self._output_action_bar_widget.setVisible(False)
 
@@ -415,6 +427,8 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
 
         self._output_list.set_selection_mode(multi=True)
         self._output_list.set_outputs(incoming_outputs)
+        self._move_to_shot_btn.setEnabled(False)  # Enable when item selected
+        self._move_to_ref_btn.setEnabled(False)
         self._incoming_bar_widget.setVisible(True)
 
     def _on_reference_selected(self, reference_path):
@@ -424,6 +438,7 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         self._current_shot = None
         self._reference_dir = reference_path
         self._incoming_items.clear()
+        self._version_panel.set_fallback_dir(reference_path)
         self._version_panel.clear()
         self._incoming_bar_widget.setVisible(False)
         self._output_action_bar_widget.setVisible(True)
@@ -574,6 +589,198 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         incoming_dir = paths.get_incoming_dir(self._project_root)
         self._on_incoming_selected(str(incoming_dir))
 
+    def _on_move_to_reference(self):
+        """Move selected _Incoming items directly to the project-level Reference."""
+        from .. import incoming as incoming_module
+        from ..core import OutputType
+
+        selected_outputs = self._output_list.get_selected_outputs()
+        if not selected_outputs:
+            QtWidgets.QMessageBox.information(
+                self, "No Selection",
+                "Select one or more items to move."
+            )
+            return
+
+        pairs = []
+        for output in selected_outputs:
+            item = self._incoming_items.get(output.name)
+            if item is not None:
+                pairs.append((output, item))
+
+        if not pairs:
+            return
+
+        # Single item: let the user rename; batch: confirm and use existing names
+        if len(pairs) == 1:
+            output, item = pairs[0]
+            name, ok = QtWidgets.QInputDialog.getText(
+                self, "Move to Reference",
+                "Output name in Reference:",
+                text=item.name,
+            )
+            if not ok:
+                return
+            names = [name.strip() or item.name]
+        else:
+            reply = QtWidgets.QMessageBox.question(
+                self, "Move to Reference",
+                f"Move {len(pairs)} item(s) to project Reference?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            )
+            if reply != QtWidgets.QMessageBox.Yes:
+                return
+            names = [item.name for _, item in pairs]
+
+        errors = []
+        for i, (output, item) in enumerate(pairs):
+            try:
+                incoming_module.ingest_item(
+                    item=item,
+                    project_root=str(self._project_root),
+                    shot_name="",
+                    output_name=names[i],
+                    output_type=OutputType.REFERENCE,
+                )
+            except Exception as e:
+                errors.append(f"{item.name}: {e}")
+
+        if errors:
+            QtWidgets.QMessageBox.warning(
+                self, "Move Errors",
+                "Some items failed to move:\n\n" + "\n".join(errors)
+            )
+        else:
+            count = len(pairs)
+            QtWidgets.QMessageBox.information(
+                self, "Move Complete",
+                f"Moved {count} item{'s' if count > 1 else ''} to project Reference."
+            )
+
+        incoming_dir = paths.get_incoming_dir(self._project_root)
+        self._on_incoming_selected(str(incoming_dir))
+
+    def _on_move_frames(self, output, file_paths, shot_dir):
+        """Move individual frames selected in the frame list to a shot via IngestDialog."""
+        from pathlib import Path as _Path
+        from .. import incoming as incoming_module
+        from ..incoming import IncomingItem
+        from ..core import Output as _Output, OutputType
+        from .ingest_dialog import IngestDialog
+
+        if not file_paths or self._project_root is None:
+            return
+
+        # Build one (Output, IncomingItem) pair per selected file
+        pairs = []
+        for abs_path in file_paths:
+            f = _Path(abs_path)
+            suggested_type = output.output_type if output.output_type != OutputType.UNSORTED else OutputType.PLATE
+            item = IncomingItem(name=f.stem, path=str(f), item_type="file")
+            item.frame_range = None
+            item.frame_count = 1
+            item.extension = f.suffix
+            item.pattern = ""
+            item.suggested_shot = output.shot if output.shot not in ("_Incoming", "") else None
+            item.suggested_type = suggested_type
+            item.files = [str(f)]
+            pseudo_output = _Output(name=f.stem, shot="_Incoming", output_type=suggested_type)
+            pairs.append((pseudo_output, item))
+
+        # Suggested shot: from output context or Nuke
+        suggested_shot = output.shot if output.shot not in ("_Incoming", "") else None
+        if suggested_shot is None and self._in_nuke:
+            try:
+                from .. import render as render_module
+                _, shot_name, _ = render_module.get_current_nuke_context()
+                if shot_name:
+                    suggested_shot = shot_name
+            except Exception:
+                pass
+
+        shots = paths.discover_shots(self._project_root)
+        dialog = IngestDialog(
+            shots=shots,
+            items=pairs,
+            project_root=self._project_root,
+            suggested_shot=suggested_shot,
+            parent=self,
+        )
+
+        if dialog.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        target_shot = dialog.target_shot_name
+        notes = dialog.notes
+        errors = []
+
+        for i, (pseudo_output, item) in enumerate(pairs):
+            output_name = dialog.get_item_name(i) or item.name
+            output_type = dialog.get_item_type(i)
+            try:
+                incoming_module.ingest_item(
+                    item=item,
+                    project_root=str(self._project_root),
+                    shot_name=target_shot,
+                    output_name=output_name,
+                    output_type=output_type,
+                    notes=notes,
+                )
+            except Exception as e:
+                errors.append(f"{item.name}: {e}")
+
+        if errors:
+            QtWidgets.QMessageBox.warning(
+                self, "Move Errors",
+                "Some frames failed to move:\n\n" + "\n".join(errors)
+            )
+
+        # Source cleanup: update .versions.json if frames came from a shot version
+        if shot_dir is not None and not errors:
+            self._cleanup_source_after_frame_move(output, shot_dir)
+
+        # Refresh whichever view is active
+        if self._viewing_incoming:
+            incoming_dir = paths.get_incoming_dir(self._project_root)
+            self._on_incoming_selected(str(incoming_dir))
+        elif self._current_shot:
+            self._refresh_outputs(self._current_shot[1])
+        elif self._viewing_reference and self._reference_dir:
+            self._on_reference_selected(self._reference_dir)
+
+    def _cleanup_source_after_frame_move(self, output, shot_dir):
+        """Update source version metadata after individual frames were moved out."""
+        import re
+        from .. import database as database_module
+
+        version = self._version_panel._current_version
+        if version is None:
+            return
+
+        output_dir = paths.get_output_dir(shot_dir, output.output_type, output.name)
+        version_dir = output_dir / f"v{version.version:03d}"
+
+        if not version_dir.exists():
+            return
+
+        # Find remaining frame numbers in the version directory
+        frame_re = re.compile(r'(\d+)\.\w+$')
+        remaining = []
+        for f in sorted(version_dir.iterdir()):
+            if f.is_file() and not f.name.startswith('.'):
+                m = frame_re.search(f.name)
+                if m:
+                    remaining.append(int(m.group(1)))
+
+        if remaining:
+            version.frames = [min(remaining), max(remaining)]
+        else:
+            output.versions = [v for v in output.versions if v.version != version.version]
+            if output.live_version == version.version:
+                output.live_version = output.latest_version_number or None
+
+        database_module.save_output(output, output_dir)
+
     def _on_move_output(self):
         """Show move dialog and move the current output to a new location."""
         if self._current_output is None:
@@ -710,6 +917,9 @@ class ShotManagerWindow(QtWidgets.QMainWindow):
         # Enable move button when output is selected (not in _Incoming)
         if not self._viewing_incoming:
             self._move_output_btn.setEnabled(True)
+        else:
+            self._move_to_shot_btn.setEnabled(True)
+            self._move_to_ref_btn.setEnabled(True)
 
     def _on_live_changed(self, output, version_number):
         """Handle LIVE version change."""

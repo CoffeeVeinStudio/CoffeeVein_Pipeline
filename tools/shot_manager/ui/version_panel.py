@@ -16,12 +16,14 @@ class VersionPanel(QtWidgets.QWidget):
     """Right panel: version details and controls."""
 
     live_changed = QtCore.Signal(object, int)  # (Output, version_number)
+    frames_move_requested = QtCore.Signal(object, list, object)  # (Output, [abs_paths], shot_dir)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._output = None
         self._shot_dir = None
         self._current_version = None
+        self._fallback_dir = None
         self._build_ui()
 
     def _build_ui(self):
@@ -76,11 +78,17 @@ class VersionPanel(QtWidgets.QWidget):
 
         self._source_label = QtWidgets.QLabel()
         self._source_label.setWordWrap(True)
+        _sp = self._source_label.sizePolicy()
+        _sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Ignored)
+        self._source_label.setSizePolicy(_sp)
         info_layout.addRow("Source:", self._source_label)
 
         self._path_label = QtWidgets.QLabel()
         self._path_label.setWordWrap(True)
         self._path_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        _sp = self._path_label.sizePolicy()
+        _sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Ignored)
+        self._path_label.setSizePolicy(_sp)
         info_layout.addRow("Path:", self._path_label)
 
         layout.addWidget(self._info_group)
@@ -94,6 +102,20 @@ class VersionPanel(QtWidgets.QWidget):
         notes_layout.addWidget(self._notes_text)
         layout.addWidget(notes_group)
 
+        # Frame list toggle (only shown for image sequences)
+        self._frames_toggle = QtWidgets.QCheckBox("Show individual frames")
+        self._frames_toggle.toggled.connect(self._on_frames_toggle_changed)
+        self._frames_toggle.setVisible(False)
+        layout.addWidget(self._frames_toggle)
+
+        self._frame_list = QtWidgets.QListWidget()
+        self._frame_list.setMaximumHeight(180)
+        self._frame_list.setVisible(False)
+        self._frame_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self._frame_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._frame_list.customContextMenuRequested.connect(self._on_frame_context_menu)
+        layout.addWidget(self._frame_list)
+
         # Thumbnail area
         self._thumbnail_label = QtWidgets.QLabel()
         self._thumbnail_label.setAlignment(QtCore.Qt.AlignCenter)
@@ -102,6 +124,9 @@ class VersionPanel(QtWidgets.QWidget):
             "background-color: #1a1a1a; border: 1px solid #333;"
         )
         self._thumbnail_label.setText("No preview")
+        _sp = self._thumbnail_label.sizePolicy()
+        _sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Ignored)
+        self._thumbnail_label.setSizePolicy(_sp)
         layout.addWidget(self._thumbnail_label, stretch=1)
 
         # Action buttons
@@ -147,12 +172,15 @@ class VersionPanel(QtWidgets.QWidget):
         self._set_enabled(False)
 
     def _set_enabled(self, enabled):
-        """Enable/disable all controls."""
+        """Enable/disable all controls except Open Folder (always enabled)."""
         self._version_combo.setEnabled(enabled)
         self._set_live_btn.setEnabled(enabled)
-        self._open_folder_btn.setEnabled(enabled)
         if self._create_read_btn:
             self._create_read_btn.setEnabled(enabled)
+
+    def set_fallback_dir(self, path):
+        """Set the directory opened when no output is selected."""
+        self._fallback_dir = path
 
     def clear(self):
         """Clear all version info."""
@@ -168,6 +196,10 @@ class VersionPanel(QtWidgets.QWidget):
         self._path_label.clear()
         self._notes_text.clear()
         self._thumbnail_label.setText("No preview")
+        self._frames_toggle.setChecked(False)
+        self._frames_toggle.setVisible(False)
+        self._frame_list.clear()
+        self._frame_list.setVisible(False)
         self._set_enabled(False)
 
     def set_output(self, output, shot_dir=None):
@@ -242,13 +274,22 @@ class VersionPanel(QtWidgets.QWidget):
         self._date_label.setText(version.created)
         self._creator_label.setText(version.creator)
 
-        if version.frames:
+        has_sequence = bool(version.frames)
+        if has_sequence:
             frame_count = version.frames[1] - version.frames[0] + 1
             self._frames_label.setText(
                 f"{version.frames[0]} - {version.frames[1]} ({frame_count} frames)"
             )
         else:
             self._frames_label.setText("N/A")
+
+        # Show frame list toggle only for sequences; auto-refresh if already open
+        self._frames_toggle.setVisible(has_sequence)
+        if not has_sequence:
+            self._frames_toggle.setChecked(False)
+            self._frame_list.setVisible(False)
+        elif self._frames_toggle.isChecked():
+            self._populate_frame_list(version)
 
         self._format_label.setText(version.format or "Unknown")
         self._source_label.setText(version.source_work or "N/A")
@@ -289,7 +330,7 @@ class VersionPanel(QtWidgets.QWidget):
                 )
             file_path = output_dir / version.path
 
-        thumbnail_path = thumbnails.get_thumbnail_path(file_path.parent)
+        thumbnail_path = thumbnails.get_thumbnail_path(file_path)
 
         if thumbnail_path.exists():
             self._set_thumbnail_pixmap(thumbnail_path)
@@ -361,6 +402,63 @@ class VersionPanel(QtWidgets.QWidget):
         else:
             return file_path.exists()
 
+    def _on_frame_context_menu(self, pos):
+        selected = self._frame_list.selectedItems()
+        if not selected or self._output is None:
+            return
+
+        file_paths = [item.data(QtCore.Qt.UserRole) for item in selected]
+
+        menu = QtWidgets.QMenu(self)
+        count = len(file_paths)
+        label = f"Move {count} frame{'s' if count > 1 else ''} to Shot..."
+        move_action = menu.addAction(label)
+        action = menu.exec_(self._frame_list.viewport().mapToGlobal(pos))
+
+        if action == move_action:
+            self.frames_move_requested.emit(self._output, file_paths, self._shot_dir)
+
+    def _on_frames_toggle_changed(self, show_frames: bool):
+        if show_frames and self._current_version and self._current_version.frames:
+            self._populate_frame_list(self._current_version)
+            self._frame_list.setVisible(True)
+        else:
+            self._frame_list.setVisible(False)
+
+    def _populate_frame_list(self, version):
+        import re
+        self._frame_list.clear()
+
+        if not version.path or not version.frames:
+            return
+
+        # Resolve the absolute base path (same logic as _check_files_exist)
+        if self._shot_dir is None:
+            base_path = Path(version.path)
+        else:
+            from ..core import OutputType
+            from .. import paths as path_module
+            if self._output.output_type == OutputType.REFERENCE:
+                output_dir = Path(self._shot_dir) / self._output.name
+            else:
+                output_dir = path_module.get_output_dir(
+                    self._shot_dir, self._output.output_type, self._output.name
+                )
+            base_path = output_dir / version.path
+
+        first, last = version.frames
+        for frame in range(first, last + 1):
+            filename = re.sub(
+                r'#+',
+                lambda m, f=frame: str(f).zfill(len(m.group(0))),
+                base_path.name
+            )
+            full_path = str(base_path.parent / filename)
+            item = QtWidgets.QListWidgetItem(filename)
+            item.setToolTip(full_path)
+            item.setData(QtCore.Qt.UserRole, full_path)
+            self._frame_list.addItem(item)
+
     def _on_set_live(self):
         """Set the currently viewed version as LIVE."""
         if self._output is None or self._current_version is None:
@@ -373,6 +471,10 @@ class VersionPanel(QtWidgets.QWidget):
     def _on_open_folder(self):
         """Open the version folder in the system file explorer."""
         if self._output is None or self._current_version is None:
+            if self._fallback_dir:
+                path = Path(self._fallback_dir)
+                if path.exists():
+                    os.startfile(str(path))
             return
 
         if self._shot_dir is None:

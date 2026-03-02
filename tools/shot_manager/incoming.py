@@ -116,7 +116,7 @@ def scan_incoming(project_root):
     loose_root_images = []
 
     for entry in sorted(incoming_dir.iterdir()):
-        if entry.name.startswith(('.', '_')):
+        if entry.name.startswith(('.', '_')) or entry.name.endswith('.thumbnail.jpg'):
             continue
         # Skip the known subdirectories
         if entry.is_dir() and entry.name in INCOMING_SUBDIRS:
@@ -275,7 +275,7 @@ def _scan_directory(directory, items, depth, max_depth):
     loose_image_files = []
 
     for entry in sorted(Path(directory).iterdir()):
-        if entry.name.startswith(('.', '_')):
+        if entry.name.startswith(('.', '_')) or entry.name.endswith('.thumbnail.jpg'):
             continue
 
         if entry.is_file():
@@ -459,6 +459,8 @@ def ingest_item(item, project_root, shot_name, output_name, output_type,
     version_dir.mkdir(parents=True, exist_ok=True)
 
     # Move files
+    src_thumb_path = None
+    dst_thumb_path = None
     if item.item_type == "sequence":
         # Build new pattern with version number in filename
         base_name = item.name
@@ -480,10 +482,8 @@ def ingest_item(item, project_root, shot_name, output_name, output_type,
                 dst = version_dir / new_name
                 shutil.move(str(src), str(dst))
 
-        # Clean up empty source folder
-        src_folder = Path(item.path)
-        if src_folder.exists() and not any(src_folder.iterdir()):
-            src_folder.rmdir()
+        src_thumb_path = Path(item.path) / item.pattern
+        dst_thumb_path = version_dir / new_pattern
 
         # Build relative path pattern
         rel_path = f"v{version_number:03d}/{new_pattern}"
@@ -496,6 +496,9 @@ def ingest_item(item, project_root, shot_name, output_name, output_type,
         new_name = f"{item.name}{version_suffix}{item.extension}"
         dst = version_dir / new_name
         shutil.move(str(src), str(dst))
+
+        src_thumb_path = src
+        dst_thumb_path = dst
 
         rel_path = f"v{version_number:03d}/{new_name}"
         fmt = item.extension.lstrip(".")
@@ -511,8 +514,27 @@ def ingest_item(item, project_root, shot_name, output_name, output_type,
         else:
             dst = version_dir / src.name
             shutil.move(str(src), str(dst))
+            src_thumb_path = src
+            dst_thumb_path = dst
             rel_path = f"v{version_number:03d}/{src.name}"
             fmt = src.suffix.lstrip(".")
+
+    # Move thumbnail sidecar if present (best-effort, never fails the ingest)
+    if src_thumb_path is not None and dst_thumb_path is not None:
+        try:
+            from . import thumbnails
+            src_thumb = thumbnails.get_thumbnail_path(src_thumb_path)
+            dst_thumb = thumbnails.get_thumbnail_path(dst_thumb_path)
+            if src_thumb.exists():
+                shutil.move(str(src_thumb), str(dst_thumb))
+        except Exception:
+            pass
+
+    # Clean up empty source folder for sequences
+    if item.item_type == "sequence":
+        src_folder = Path(item.path)
+        if src_folder.exists() and not any(src_folder.iterdir()):
+            src_folder.rmdir()
 
     # Add version to output
     version = output.add_version(

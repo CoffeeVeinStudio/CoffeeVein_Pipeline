@@ -10,9 +10,10 @@ from pathlib import Path
 from typing import Optional
 
 
-def get_thumbnail_path(version_dir: Path) -> Path:
-    """Return the cached thumbnail path for a version directory."""
-    return version_dir / ".thumbnail.jpg"
+def get_thumbnail_path(file_path: Path) -> Path:
+    """Return the cached thumbnail path for a given file or sequence pattern."""
+    base = re.sub(r'\.#+', '', file_path.stem)
+    return file_path.parent / f"{base}.thumbnail.jpg"
 
 
 def generate_thumbnail(file_path: Path, frame: int) -> Optional[Path]:
@@ -40,7 +41,7 @@ def generate_thumbnail(file_path: Path, frame: int) -> Optional[Path]:
         print(f"[ShotManager] Thumbnail: frame file not found: {resolved_path}")
         return None
 
-    thumbnail_path = get_thumbnail_path(file_path.parent)
+    thumbnail_path = get_thumbnail_path(file_path)
     is_sequence = '#' in file_path.name
     read = reformat = write = None
     try:
