@@ -190,6 +190,9 @@ class VersionPanel(QtWidgets.QWidget):
             self._create_deep_action = read_menu.addAction("Create ReadDeep")
             self._create_deep_action.triggered.connect(self._on_create_deep_read)
 
+            self._create_camera_action = read_menu.addAction("Create Camera")
+            self._create_camera_action.triggered.connect(self._on_create_camera_read)
+
             self._create_read_btn.setMenu(read_menu)
             self._create_read_btn.setDefaultAction(self._create_static_action)
             btn_row.addWidget(self._create_read_btn)
@@ -991,6 +994,39 @@ class VersionPanel(QtWidgets.QWidget):
             QtWidgets.QMessageBox.critical(
                 self, "Error",
                 f"Failed to create DeepRead node:\n\n{e}"
+            )
+
+    def _on_create_camera_read(self):
+        """Create a Camera2 node reading from the current version's camera file."""
+        if self._output is None or self._current_version is None:
+            return
+        if self._shot_dir is None:
+            return
+
+        try:
+            from .. import nuke_read, paths as path_module
+
+            if not self._current_version.path:
+                QtWidgets.QMessageBox.warning(
+                    self, "No Path",
+                    f"Version v{self._current_version.version:03d} has no file path set."
+                )
+                return
+
+            output_dir = path_module.get_output_dir(
+                self._shot_dir, self._output.output_type, self._output.name
+            )
+            file_path = output_dir / self._current_version.path
+
+            nuke_read.create_camera_read_node(
+                file_path=file_path,
+                name=f"{self._output.name}_v{self._current_version.version:03d}",
+            )
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Error",
+                f"Failed to create Camera node:\n\n{e}"
             )
 
 

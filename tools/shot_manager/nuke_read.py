@@ -225,6 +225,32 @@ def create_deep_read_node(file_path, first_frame=None, last_frame=None, name=Non
     return node
 
 
+def create_camera_read_node(file_path, name=None):
+    """Create a Camera2 node reading animation data from a file (.chan, .abc, .fbx).
+
+    Args:
+        file_path: Absolute path to the camera file.
+        name: Optional custom name for the Camera node.
+
+    Returns:
+        The created nuke.Node (Camera2 node).
+    """
+    import nuke
+
+    file_path = str(file_path).replace("\\", "/")
+    node = nuke.createNode("Camera2", inpanel=False)
+    node["read_from_file"].setValue(True)
+    node["file"].setValue(file_path)
+
+    if name:
+        node.setName(sanitize_node_name(name), uncollide=True)
+
+    node.setXpos(int(nuke.selectedNode().xpos()) if nuke.selectedNodes() else 0)
+    node.setYpos((int(nuke.selectedNode().ypos()) + 80) if nuke.selectedNodes() else 80)
+
+    return node
+
+
 def update_live_readers(output_dir):
     """Update all LIVE Read nodes that reference this output directory.
 
