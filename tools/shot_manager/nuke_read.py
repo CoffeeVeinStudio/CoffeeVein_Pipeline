@@ -33,7 +33,7 @@ def sanitize_node_name(name):
     return name
 
 
-def create_read_node(file_path, first_frame=None, last_frame=None, name=None, colorspace="default"):
+def create_read_node(file_path, first_frame=None, last_frame=None, name=None, colorspace="default", output_dir=None):
     """Create a Read node with a static file path.
 
     Args:
@@ -42,6 +42,7 @@ def create_read_node(file_path, first_frame=None, last_frame=None, name=None, co
         last_frame: Last frame of the sequence (None for movies).
         name: Optional custom name for the Read node.
         colorspace: Colorspace to set (default: "default" uses Nuke's auto-detect).
+        output_dir: If provided, stores a hidden sm_output_dir knob for reconnect support.
 
     Returns:
         The created nuke.Node (Read node).
@@ -75,6 +76,14 @@ def create_read_node(file_path, first_frame=None, last_frame=None, name=None, co
     if name:
         safe_name = sanitize_node_name(name)
         read_node.setName(safe_name, uncollide=True)
+
+    if output_dir is not None:
+        tab = nuke.Tab_Knob("shot_manager_static", "Shot Manager", nuke.TABBEGINGROUP)
+        read_node.addKnob(tab)
+        dir_knob = nuke.String_Knob("sm_output_dir", "Output Directory")
+        dir_knob.setValue(str(output_dir).replace("\\", "/"))
+        read_node.addKnob(dir_knob)
+        read_node.addKnob(nuke.Tab_Knob("shot_manager_static_end", "", nuke.TABENDGROUP))
 
     # Position the node nicely in the DAG
     read_node.setXpos(int(nuke.selectedNode().xpos()) if nuke.selectedNodes() else 0)
@@ -156,6 +165,64 @@ def create_live_read_node(output_dir, output, name=None):
     read_node.setYpos(int(nuke.selectedNode().ypos()) if nuke.selectedNodes() else 0)
 
     return read_node
+
+
+def create_geo_read_node(file_path, name=None):
+    """Create a ReadGeo2 node pointing to a geometry file (.abc, .obj, .fbx).
+
+    Args:
+        file_path: Absolute path to the geometry file.
+        name: Optional custom name for the ReadGeo2 node.
+
+    Returns:
+        The created nuke.Node (ReadGeo2 node).
+    """
+    import nuke
+
+    file_path = str(file_path).replace("\\", "/")
+    geo = nuke.createNode("ReadGeo2", inpanel=False)
+    geo["file"].setValue(file_path)
+
+    if name:
+        geo.setName(sanitize_node_name(name), uncollide=True)
+
+    geo.setXpos(int(nuke.selectedNode().xpos()) if nuke.selectedNodes() else 0)
+    geo.setYpos((int(nuke.selectedNode().ypos()) + 80) if nuke.selectedNodes() else 80)
+
+    return geo
+
+
+def create_deep_read_node(file_path, first_frame=None, last_frame=None, name=None):
+    """Create a DeepRead node pointing to a deep image file.
+
+    Args:
+        file_path: Absolute path to the deep file (.exr, .dtex, .dex).
+        first_frame: First frame of the sequence (None for single-frame deep files).
+        last_frame: Last frame of the sequence.
+        name: Optional custom name for the DeepRead node.
+
+    Returns:
+        The created nuke.Node (DeepRead node).
+    """
+    import nuke
+
+    file_path = str(file_path).replace("\\", "/")
+    node = nuke.createNode("DeepRead", inpanel=False)
+    node["file"].setValue(file_path)
+
+    if first_frame is not None and last_frame is not None:
+        node["first"].setValue(int(first_frame))
+        node["last"].setValue(int(last_frame))
+        node["origfirst"].setValue(int(first_frame))
+        node["origlast"].setValue(int(last_frame))
+
+    if name:
+        node.setName(sanitize_node_name(name), uncollide=True)
+
+    node.setXpos(int(nuke.selectedNode().xpos()) if nuke.selectedNodes() else 0)
+    node.setYpos((int(nuke.selectedNode().ypos()) + 80) if nuke.selectedNodes() else 80)
+
+    return node
 
 
 def update_live_readers(output_dir):
@@ -312,3 +379,216 @@ def update_read_node(node, file_path, first_frame=None, last_frame=None):
             node["origlast"].setValue(int(last_frame))
 
     print(f"[ShotManager] Updated Read node '{node.name()}' to {file_path}")
+
+
+def update_live_read_dir(old_output_dir, new_output_dir):
+    """Update LIVE Read nodes whose output dir changed (called after a move).
+
+    Updates the shot_manager_output_dir knob value for any LIVE Read nodes
+    pointing at old_output_dir, then triggers update_live_readers() so their
+    file paths refresh to the new location.
+    """
+    try:
+        import nuke
+    except ImportError:
+        return
+    old_str = str(old_output_dir).replace("\\", "/")
+    new_str = str(new_output_dir).replace("\\", "/")
+    for node in nuke.allNodes("Read"):
+        if "shot_manager_output_dir" not in node.knobs():
+            continue
+        if node["shot_manager_output_dir"].value() == old_str:
+            node["shot_manager_output_dir"].setValue(new_str)
+    update_live_readers(Path(new_output_dir))
+
+
+def reconnect_broken_reads(project_root):
+    """Show a dialog to reconnect static Read nodes whose file paths have moved.
+
+    Scans all Read nodes for broken file paths (parent directory missing).
+    Nodes with sm_output_dir knob are matched by output name against
+    .versions.json files found under project_root.
+    Nodes without the knob get a simple prefix-substitution UI.
+    """
+    try:
+        import nuke
+    except ImportError:
+        return
+
+    if project_root is None:
+        return
+
+    project_root = Path(project_root)
+
+    # --- Collect broken Read nodes ---
+    keyed_nodes = []    # [(node, output_name, old_dir_str)]  — have sm_output_dir
+    legacy_nodes = []   # [node]  — no knob
+
+    for node in nuke.allNodes("Read"):
+        file_val = node["file"].value()
+        if not file_val:
+            continue
+        parent = Path(file_val).parent
+        if parent.exists():
+            continue  # not broken
+
+        if "sm_output_dir" in node.knobs():
+            dir_val = node["sm_output_dir"].value()
+            output_name = Path(dir_val).name if dir_val else ""
+            keyed_nodes.append((node, output_name, dir_val))
+        else:
+            legacy_nodes.append(node)
+
+    if not keyed_nodes and not legacy_nodes:
+        nuke.message("No broken Read nodes found.")
+        return
+
+    # --- Search project for .versions.json candidates ---
+    candidates_by_name = {}  # output_name -> [Path(output_dir), ...]
+    for vj in project_root.rglob(".versions.json"):
+        try:
+            with open(vj, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            vname = data.get("name", "")
+            if vname:
+                candidates_by_name.setdefault(vname, []).append(vj.parent)
+        except Exception:
+            continue
+
+    # --- Build the Qt dialog ---
+    try:
+        from PySide6 import QtWidgets, QtCore
+    except ImportError:
+        from PySide2 import QtWidgets, QtCore
+
+    dialog = QtWidgets.QDialog()
+    dialog.setWindowTitle("Reconnect Read Nodes")
+    dialog.setMinimumWidth(700)
+    layout = QtWidgets.QVBoxLayout(dialog)
+
+    # -- Keyed nodes table --
+    row_data = []  # [(node, output_name, [candidate_paths])]
+    if keyed_nodes:
+        layout.addWidget(QtWidgets.QLabel("<b>Read nodes with Shot Manager metadata:</b>"))
+        table = QtWidgets.QTableWidget(len(keyed_nodes), 3)
+        table.setHorizontalHeaderLabels(["Node", "Old Location", "New Location"])
+        table.horizontalHeader().setStretchLastSection(True)
+        table.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+        for row, (node, output_name, old_dir) in enumerate(keyed_nodes):
+            candidates = candidates_by_name.get(output_name, [])
+            row_data.append((node, output_name, candidates))
+
+            table.setItem(row, 0, QtWidgets.QTableWidgetItem(node.name()))
+            table.setItem(row, 1, QtWidgets.QTableWidgetItem(old_dir or "(unknown)"))
+
+            combo = QtWidgets.QComboBox()
+            combo.addItem("-- Not found --", None)
+            for cand in candidates:
+                combo.addItem(str(cand).replace("\\", "/"), str(cand))
+            table.setCellWidget(row, 2, combo)
+
+        table.resizeColumnsToContents()
+        layout.addWidget(table)
+
+    # -- Legacy nodes section --
+    from_edit = None
+    to_edit = None
+    if legacy_nodes:
+        layout.addWidget(QtWidgets.QLabel(
+            f"<b>{len(legacy_nodes)} legacy Read node(s) without metadata</b> — replace path prefix:"
+        ))
+        grid = QtWidgets.QWidget()
+        grid_layout = QtWidgets.QFormLayout(grid)
+        from_edit = QtWidgets.QLineEdit()
+        to_edit = QtWidgets.QLineEdit()
+        grid_layout.addRow("From:", from_edit)
+        grid_layout.addRow("To:", to_edit)
+        layout.addWidget(grid)
+
+    # -- Buttons --
+    buttons = QtWidgets.QDialogButtonBox(
+        QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+    )
+    buttons.button(QtWidgets.QDialogButtonBox.Ok).setText("Reconnect Selected")
+    buttons.accepted.connect(dialog.accept)
+    buttons.rejected.connect(dialog.reject)
+    layout.addWidget(buttons)
+
+    if dialog.exec_() != QtWidgets.QDialog.Accepted:
+        return
+
+    # --- Apply reconnections ---
+    reconnected = 0
+
+    # Keyed nodes: update from chosen candidate
+    if keyed_nodes:
+        for row, (node, output_name, candidates) in enumerate(row_data):
+            combo = table.cellWidget(row, 2)
+            new_dir_str = combo.currentData()
+            if not new_dir_str:
+                continue
+
+            new_output_dir = Path(new_dir_str)
+            vj = new_output_dir / ".versions.json"
+            if not vj.exists():
+                continue
+
+            try:
+                with open(vj, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception:
+                continue
+
+            live_version_num = data.get("live_version")
+            versions = {v["version"]: v for v in data.get("versions", [])}
+
+            # Pick live version, else latest
+            version_entry = None
+            if live_version_num and live_version_num in versions:
+                version_entry = versions[live_version_num]
+            elif versions:
+                version_entry = versions[max(versions)]
+
+            if not version_entry:
+                continue
+
+            rel_path = version_entry.get("path", "")
+            new_file_path = new_output_dir / rel_path
+            new_file_str = str(new_file_path).replace("\\", "/")
+
+            frames = version_entry.get("frames")
+            first_frame = frames[0] if frames and len(frames) >= 2 else None
+            last_frame = frames[1] if frames and len(frames) >= 2 else None
+
+            ext = Path(new_file_str).suffix.lower()
+            is_movie = ext in ('.mov', '.mp4', '.avi', '.mxf', '.mkv', '.mov64')
+            if is_movie:
+                node["file"].fromUserText(new_file_str)
+            else:
+                node["file"].setValue(new_file_str)
+                if first_frame is not None and last_frame is not None:
+                    node["first"].setValue(int(first_frame))
+                    node["last"].setValue(int(last_frame))
+                    node["origfirst"].setValue(int(first_frame))
+                    node["origlast"].setValue(int(last_frame))
+
+            node["sm_output_dir"].setValue(str(new_output_dir).replace("\\", "/"))
+            print(f"[ShotManager] Reconnected '{node.name()}' → {new_file_str}")
+            reconnected += 1
+
+    # Legacy nodes: prefix substitution
+    if legacy_nodes and from_edit and to_edit:
+        from_str = from_edit.text().strip()
+        to_str = to_edit.text().strip()
+        if from_str and to_str:
+            for node in legacy_nodes:
+                old_file = node["file"].value()
+                if from_str in old_file:
+                    new_file = old_file.replace(from_str, to_str).replace("\\", "/")
+                    node["file"].setValue(new_file)
+                    print(f"[ShotManager] Prefix-fixed '{node.name()}' → {new_file}")
+                    reconnected += 1
+
+    nuke.message(f"Reconnected {reconnected} Read node(s).")

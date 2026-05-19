@@ -17,6 +17,7 @@ class VersionPanel(QtWidgets.QWidget):
 
     live_changed = QtCore.Signal(object, int)  # (Output, version_number)
     frames_move_requested = QtCore.Signal(object, list, object)  # (Output, [abs_paths], shot_dir)
+    meta_changed = QtCore.Signal(object)  # (Output) — meta dict was modified, save needed
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -24,6 +25,11 @@ class VersionPanel(QtWidgets.QWidget):
         self._shot_dir = None
         self._current_version = None
         self._fallback_dir = None
+        # Scene mode state
+        self._mode = "output"  # "output" or "scene"
+        self._scene_work = None
+        self._scenes_dir = None
+        self._shot_dir_for_scene = None
         self._build_ui()
 
     def _build_ui(self):
@@ -127,6 +133,8 @@ class VersionPanel(QtWidgets.QWidget):
         _sp = self._thumbnail_label.sizePolicy()
         _sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Ignored)
         self._thumbnail_label.setSizePolicy(_sp)
+        self._thumbnail_label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._thumbnail_label.customContextMenuRequested.connect(self._on_thumb_context_menu)
         layout.addWidget(self._thumbnail_label, stretch=1)
 
         # Action buttons
@@ -135,6 +143,21 @@ class VersionPanel(QtWidgets.QWidget):
         self._open_folder_btn = QtWidgets.QPushButton("Open Folder")
         self._open_folder_btn.clicked.connect(self._on_open_folder)
         btn_row.addWidget(self._open_folder_btn)
+
+        # Open in Nuke button (scene mode only, Nuke-only)
+        self._open_scene_btn = None
+        try:
+            import nuke  # noqa: F401
+            self._open_scene_btn = QtWidgets.QPushButton("Open in Nuke")
+            self._open_scene_btn.setStyleSheet(
+                "QPushButton { background-color: #2d5a7b; padding: 4px 12px; }"
+                "QPushButton:hover { background-color: #3d7aab; }"
+            )
+            self._open_scene_btn.clicked.connect(self._on_open_scene)
+            self._open_scene_btn.setVisible(False)
+            btn_row.addWidget(self._open_scene_btn)
+        except ImportError:
+            pass
 
         # Create Read button (Nuke-only, with dropdown menu)
         self._create_read_btn = None
@@ -158,6 +181,14 @@ class VersionPanel(QtWidgets.QWidget):
 
             self._update_existing_action = read_menu.addAction("Update Existing Read...")
             self._update_existing_action.triggered.connect(self._on_update_existing_read)
+
+            read_menu.addSeparator()
+
+            self._create_geo_action = read_menu.addAction("Create ReadGeo")
+            self._create_geo_action.triggered.connect(self._on_create_geo_read)
+
+            self._create_deep_action = read_menu.addAction("Create ReadDeep")
+            self._create_deep_action.triggered.connect(self._on_create_deep_read)
 
             self._create_read_btn.setMenu(read_menu)
             self._create_read_btn.setDefaultAction(self._create_static_action)
@@ -185,6 +216,10 @@ class VersionPanel(QtWidgets.QWidget):
     def clear(self):
         """Clear all version info."""
         self._output = None
+        self._scene_work = None
+        self._scenes_dir = None
+        self._shot_dir_for_scene = None
+        self._mode = "output"
         self._current_version = None
         self._version_combo.clear()
         self._live_label.clear()
@@ -201,6 +236,129 @@ class VersionPanel(QtWidgets.QWidget):
         self._frame_list.clear()
         self._frame_list.setVisible(False)
         self._set_enabled(False)
+        self._set_live_btn.setVisible(True)
+        if self._open_scene_btn:
+            self._open_scene_btn.setVisible(False)
+        if self._create_read_btn:
+            self._create_read_btn.setVisible(True)
+
+    def set_scene_work(self, work, scenes_dir, shot_dir=None):
+        """Display versions for a SceneWork in scene mode.
+
+        Switches the panel to scene mode: hides Set LIVE and Create Read,
+        shows Open in Nuke. Populates the version combo with SceneVersions.
+
+        Args:
+            work: SceneWork object.
+            scenes_dir: Path to the shot's Comp/scenes/ directory.
+            shot_dir: Path to the shot root (used to find render thumbnails).
+        """
+        self._mode = "scene"
+        self._scene_work = work
+        self._scenes_dir = scenes_dir
+        self._shot_dir_for_scene = Path(shot_dir) if shot_dir else None
+        self._output = None
+        self._set_enabled(True)
+
+        # Toggle scene-mode buttons
+        self._set_live_btn.setVisible(False)
+        if self._open_scene_btn:
+            self._open_scene_btn.setVisible(True)
+        if self._create_read_btn:
+            self._create_read_btn.setVisible(False)
+
+        # Hide sequence-specific widgets
+        self._frames_toggle.setVisible(False)
+        self._frame_list.setVisible(False)
+        self._live_label.clear()
+
+        # Populate version combo (newest first)
+        self._version_combo.blockSignals(True)
+        self._version_combo.clear()
+        for ver in sorted(work.versions, key=lambda v: v.version, reverse=True):
+            self._version_combo.addItem(f"v{ver.version:03d}", ver.version)
+        self._version_combo.blockSignals(False)
+
+        if self._version_combo.count() > 0:
+            self._version_combo.setCurrentIndex(0)
+            self._on_scene_version_changed(0)
+
+    def _on_scene_version_changed(self, index):
+        """Handle version combo change in scene mode."""
+        if self._scene_work is None or index < 0:
+            return
+        version_number = self._version_combo.itemData(index)
+        version = self._scene_work.get_version(version_number)
+        if version is None:
+            return
+
+        self._current_version = version
+        self._date_label.setText(version.created)
+        self._creator_label.setText(version.creator)
+        meta = version.meta or {}
+        if meta.get("root_first") is not None:
+            rf = meta["root_first"]
+            rl = meta["root_last"]
+            h = meta.get("handles", 0)
+            frames_text = f"{rf}–{rl}"
+            if h:
+                frames_text += f"  (+{h} handles)"
+            self._frames_label.setText(frames_text)
+        else:
+            self._frames_label.setText("N/A")
+        self._format_label.setText(version.dcc.upper() if version.dcc else "")
+        self._source_label.setText("")
+
+        # Resolve and display the file path
+        from .. import scene_database
+        file_path = scene_database.get_scene_version_path(self._scenes_dir, version)
+        if file_path:
+            self._path_label.setText(str(file_path))
+            exists = file_path.exists()
+            self._version_combo.setStyleSheet("" if exists else "color: #ff6666;")
+        else:
+            self._path_label.setText("N/A")
+
+        self._notes_text.setPlainText(version.notes)
+
+        # Try to show the shot's latest render thumbnail; fall back to text
+        thumb = self._find_scene_thumbnail()
+        if thumb:
+            self._set_thumbnail_pixmap(thumb)
+        else:
+            self._thumbnail_label.setPixmap(QtGui.QPixmap())
+            self._thumbnail_label.setText(
+                f"{self._scene_work.name}\nv{version.version:03d}"
+            )
+
+    def _find_scene_thumbnail(self):
+        """Return the most-recently-modified thumbnail in the shot's output dirs, or None."""
+        if not self._shot_dir_for_scene or not self._shot_dir_for_scene.is_dir():
+            return None
+        candidates = list(self._shot_dir_for_scene.rglob("*.thumbnail.jpg"))
+        if not candidates:
+            return None
+        return max(candidates, key=lambda p: p.stat().st_mtime)
+
+    def _on_open_scene(self):
+        """Open the selected scene version in Nuke."""
+        if self._scene_work is None or self._current_version is None:
+            return
+        from .. import scene_database
+        from ..dcc import get_dcc
+        file_path = scene_database.get_scene_version_path(
+            self._scenes_dir, self._current_version
+        )
+        if not file_path or not file_path.exists():
+            QtWidgets.QMessageBox.warning(
+                self, "File Not Found", f"Scene file not found:\n{file_path}"
+            )
+            return
+        get_dcc().open_scene(file_path)
+
+    def set_frames_label(self, text):
+        """Update the Frames label directly (used for async updates)."""
+        self._frames_label.setText(text)
 
     def set_output(self, output, shot_dir=None):
         """Display versions for an output.
@@ -209,12 +367,18 @@ class VersionPanel(QtWidgets.QWidget):
             output: Output object.
             shot_dir: Path to the shot directory (for resolving absolute paths).
         """
+        self._mode = "output"
         self._output = output
         self._shot_dir = shot_dir
         self._set_enabled(True)
 
+        # Reset scene-mode button visibility
+        self._set_live_btn.setVisible(True)
+        if self._open_scene_btn:
+            self._open_scene_btn.setVisible(False)
+
         # Detect if viewing _Incoming (no shot_dir or output.shot == "_Incoming")
-        is_incoming = (shot_dir is None or output.shot == "_Incoming")
+        is_incoming = (shot_dir is None or output.shot == "Incoming")
 
         # Hide Create Read button for _Incoming (Open Folder still works)
         if self._create_read_btn:
@@ -244,6 +408,9 @@ class VersionPanel(QtWidgets.QWidget):
 
     def _on_version_changed(self, index):
         """Handle version selection change."""
+        if self._mode == "scene":
+            self._on_scene_version_changed(index)
+            return
         if self._output is None or index < 0:
             return
 
@@ -275,11 +442,25 @@ class VersionPanel(QtWidgets.QWidget):
         self._creator_label.setText(version.creator)
 
         has_sequence = bool(version.frames)
-        if has_sequence:
+        meta = version.meta or {}
+        if meta.get("root_first") is not None:
+            rf = meta["root_first"]
+            rl = meta["root_last"]
+            h = meta.get("handles", 0)
+            frames_text = f"{rf}–{rl}"
+            if h:
+                frames_text += f"  (+{h} handles)"
+            self._frames_label.setText(frames_text)
+        elif has_sequence:
             frame_count = version.frames[1] - version.frames[0] + 1
             self._frames_label.setText(
                 f"{version.frames[0]} - {version.frames[1]} ({frame_count} frames)"
             )
+        elif meta.get("mov_frames") is not None:
+            count = meta["mov_frames"]
+            self._frames_label.setText(f"1 - {count} ({count} frames)")
+        elif meta.get("is_movie"):
+            self._frames_label.setText("Detecting...")
         else:
             self._frames_label.setText("N/A")
 
@@ -307,6 +488,20 @@ class VersionPanel(QtWidgets.QWidget):
         # Try to load thumbnail
         self._load_thumbnail(version)
 
+    def _get_file_path(self, version) -> Path:
+        """Resolve the absolute file path for a version."""
+        if self._shot_dir is None:
+            return Path(version.path)
+        from ..core import OutputType
+        from .. import paths as path_module
+        if self._output.output_type == OutputType.REFERENCE:
+            output_dir = Path(self._shot_dir) / self._output.name
+        else:
+            output_dir = path_module.get_output_dir(
+                self._shot_dir, self._output.output_type, self._output.name
+            )
+        return output_dir / version.path
+
     def _load_thumbnail(self, version):
         """Load cached thumbnail or generate one in Nuke, with text fallback."""
         from .. import thumbnails
@@ -316,41 +511,63 @@ class VersionPanel(QtWidgets.QWidget):
             self._thumbnail_label.setText("No preview")
             return
 
-        # Resolve file_path — same logic as _check_files_exist
-        if self._shot_dir is None:
-            file_path = Path(version.path)
-        else:
-            from ..core import OutputType
-            from .. import paths as path_module
-            if self._output.output_type == OutputType.REFERENCE:
-                output_dir = Path(self._shot_dir) / self._output.name
-            else:
-                output_dir = path_module.get_output_dir(
-                    self._shot_dir, self._output.output_type, self._output.name
-                )
-            file_path = output_dir / version.path
-
+        file_path = self._get_file_path(version)
         thumbnail_path = thumbnails.get_thumbnail_path(file_path)
 
         if thumbnail_path.exists():
             self._set_thumbnail_pixmap(thumbnail_path)
             return
 
-        # Lazy Nuke generation (fallback for pre-existing renders and _Incoming)
+        is_incoming = (self._shot_dir is None)
+
+        # Only attempt generation for file types Nuke can read
+        if not thumbnails.is_thumbnail_supported(file_path):
+            self._thumbnail_label.setPixmap(QtGui.QPixmap())
+            self._thumbnail_label.setText(f"{self._output.name}\nv{version.version:03d}")
+            return
+
+        # Skip if a previous attempt already failed
+        if is_incoming:
+            if thumbnails.get_thumbnail_failed_path(file_path).exists():
+                self._thumbnail_label.setPixmap(QtGui.QPixmap())
+                self._thumbnail_label.setText(f"{self._output.name}\nv{version.version:03d}")
+                return
+        elif version.meta.get("thumbnail_failed"):
+            self._thumbnail_label.setPixmap(QtGui.QPixmap())
+            self._thumbnail_label.setText(f"{self._output.name}\nv{version.version:03d}")
+            return
+
+        # Use a stored layer preference if one exists
+        if is_incoming:
+            layer_file = thumbnails.get_thumbnail_layer_path(file_path)
+            stored_layer = layer_file.read_text().strip() if layer_file.exists() else None
+        else:
+            stored_layer = version.meta.get("thumbnail_layer")
+
+        # Lazy Nuke generation
         try:
             import nuke  # noqa: F401
             frame = (
                 (version.frames[0] + version.frames[1]) // 2
                 if version.frames else 1
             )
-            result = thumbnails.generate_thumbnail(file_path, frame)
+            result = thumbnails.generate_thumbnail(file_path, frame, layer=stored_layer)
             if result and result.exists():
                 self._set_thumbnail_pixmap(result)
                 return
+            # Record the failure so we don't retry on every selection
+            if is_incoming:
+                try:
+                    thumbnails.get_thumbnail_failed_path(file_path).touch()
+                except Exception:
+                    pass
+            else:
+                version.meta["thumbnail_failed"] = True
+                self.meta_changed.emit(self._output)
         except ImportError:
             pass
 
-        # Standalone / generation failed
+        # Fallback to text
         self._thumbnail_label.setPixmap(QtGui.QPixmap())
         self._thumbnail_label.setText(f"{self._output.name}\nv{version.version:03d}")
 
@@ -382,18 +599,7 @@ class VersionPanel(QtWidgets.QWidget):
             resolved = re.sub(r'#+', lambda m: str(frame).zfill(len(m.group(0))), name)
             return pattern_path.parent / resolved
 
-        if self._shot_dir is None:
-            file_path = Path(version.path)
-        else:
-            from ..core import OutputType
-            from .. import paths as path_module
-            if self._output.output_type == OutputType.REFERENCE:
-                output_dir = Path(self._shot_dir) / self._output.name
-            else:
-                output_dir = path_module.get_output_dir(
-                    self._shot_dir, self._output.output_type, self._output.name
-                )
-            file_path = output_dir / version.path
+        file_path = self._get_file_path(version)
 
         if version.frames:
             first = _resolve_frame(file_path, version.frames[0])
@@ -418,6 +624,80 @@ class VersionPanel(QtWidgets.QWidget):
         if action == move_action:
             self.frames_move_requested.emit(self._output, file_paths, self._shot_dir)
 
+    def _on_thumb_context_menu(self, pos):
+        if self._current_version is None or self._output is None:
+            return
+        try:
+            import nuke  # noqa: F401
+        except ImportError:
+            return
+        from .. import thumbnails
+        file_path = self._get_file_path(self._current_version)
+        if not thumbnails.is_thumbnail_supported(file_path):
+            return
+
+        menu = QtWidgets.QMenu(self)
+        action = menu.addAction("Create thumbnail from Layer...")
+        if menu.exec_(self._thumbnail_label.mapToGlobal(pos)) == action:
+            frame = (
+                (self._current_version.frames[0] + self._current_version.frames[1]) // 2
+                if self._current_version.frames else 1
+            )
+            self._create_thumbnail_from_layer(file_path, frame)
+
+    def _create_thumbnail_from_layer(self, file_path, frame):
+        import nuke
+        from .. import thumbnails
+
+        read = None
+        try:
+            read = nuke.nodes.Read(file=str(file_path).replace('\\', '/'))
+            layers = nuke.layers(read)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(
+                self, "Layer Enumeration Failed",
+                f"Could not read layers from file:\n{e}"
+            )
+            return
+        finally:
+            if read is not None:
+                try:
+                    nuke.delete(read)
+                except Exception:
+                    pass
+
+        if not layers:
+            QtWidgets.QMessageBox.information(self, "No Layers", "No layers found in the file.")
+            return
+
+        dialog = LayerSelectDialog(layers, parent=self)
+        if dialog.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        selected_layer = dialog.selected_layer()
+        result = thumbnails.generate_thumbnail(file_path, frame, layer=selected_layer)
+        is_incoming = (self._shot_dir is None)
+
+        if result and result.exists():
+            if is_incoming:
+                try:
+                    thumbnails.get_thumbnail_layer_path(file_path).write_text(selected_layer)
+                    failed = thumbnails.get_thumbnail_failed_path(file_path)
+                    if failed.exists():
+                        failed.unlink()
+                except Exception:
+                    pass
+            else:
+                self._current_version.meta["thumbnail_layer"] = selected_layer
+                self._current_version.meta.pop("thumbnail_failed", None)
+                self.meta_changed.emit(self._output)
+            self._load_thumbnail(self._current_version)
+        else:
+            QtWidgets.QMessageBox.warning(
+                self, "Thumbnail Failed",
+                f"Could not create thumbnail with layer '{selected_layer}'."
+            )
+
     def _on_frames_toggle_changed(self, show_frames: bool):
         if show_frames and self._current_version and self._current_version.frames:
             self._populate_frame_list(self._current_version)
@@ -432,19 +712,7 @@ class VersionPanel(QtWidgets.QWidget):
         if not version.path or not version.frames:
             return
 
-        # Resolve the absolute base path (same logic as _check_files_exist)
-        if self._shot_dir is None:
-            base_path = Path(version.path)
-        else:
-            from ..core import OutputType
-            from .. import paths as path_module
-            if self._output.output_type == OutputType.REFERENCE:
-                output_dir = Path(self._shot_dir) / self._output.name
-            else:
-                output_dir = path_module.get_output_dir(
-                    self._shot_dir, self._output.output_type, self._output.name
-                )
-            base_path = output_dir / version.path
+        base_path = self._get_file_path(version)
 
         first, last = version.frames
         for frame in range(first, last + 1):
@@ -548,12 +816,8 @@ class VersionPanel(QtWidgets.QWidget):
                 file_path=file_path,
                 first_frame=first_frame,
                 last_frame=last_frame,
-                name=f"{self._output.name}_v{self._current_version.version:03d}"
-            )
-
-            QtWidgets.QMessageBox.information(
-                self, "Read Node Created",
-                f"Created Read node '{node.name()}' for {self._output.name} v{self._current_version.version:03d}."
+                name=f"{self._output.name}_v{self._current_version.version:03d}",
+                output_dir=output_dir,
             )
 
         except Exception as e:
@@ -589,12 +853,6 @@ class VersionPanel(QtWidgets.QWidget):
                 output_dir=output_dir,
                 output=self._output,
                 name=f"{self._output.name}_LIVE"
-            )
-
-            QtWidgets.QMessageBox.information(
-                self, "LIVE Read Created",
-                f"Created LIVE Read node '{node.name()}' for {self._output.name}.\n\n"
-                f"This node will automatically track LIVE version changes."
             )
 
         except Exception as e:
@@ -656,13 +914,103 @@ class VersionPanel(QtWidgets.QWidget):
                 last_frame=last_frame
             )
 
-            QtWidgets.QMessageBox.information(
-                self, "Read Node Updated",
-                f"Updated '{selected_node.name()}' to {self._output.name} v{self._current_version.version:03d}."
-            )
-
         except Exception as e:
             QtWidgets.QMessageBox.critical(
                 self, "Error",
                 f"Failed to update Read node:\n\n{e}"
             )
+
+    def _on_create_geo_read(self):
+        """Create a ReadGeo2 node for the current version's geometry file."""
+        if self._output is None or self._current_version is None:
+            return
+        if self._shot_dir is None:
+            return
+
+        try:
+            from .. import nuke_read, paths as path_module
+
+            if not self._current_version.path:
+                QtWidgets.QMessageBox.warning(
+                    self, "No Path",
+                    f"Version v{self._current_version.version:03d} has no file path set."
+                )
+                return
+
+            output_dir = path_module.get_output_dir(
+                self._shot_dir, self._output.output_type, self._output.name
+            )
+            file_path = output_dir / self._current_version.path
+
+            node = nuke_read.create_geo_read_node(
+                file_path=file_path,
+                name=f"{self._output.name}_v{self._current_version.version:03d}",
+            )
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Error",
+                f"Failed to create ReadGeo node:\n\n{e}"
+            )
+
+    def _on_create_deep_read(self):
+        """Create a DeepRead node for the current version's deep image file."""
+        if self._output is None or self._current_version is None:
+            return
+        if self._shot_dir is None:
+            return
+
+        try:
+            from .. import nuke_read, paths as path_module
+
+            if not self._current_version.path:
+                QtWidgets.QMessageBox.warning(
+                    self, "No Path",
+                    f"Version v{self._current_version.version:03d} has no file path set."
+                )
+                return
+
+            output_dir = path_module.get_output_dir(
+                self._shot_dir, self._output.output_type, self._output.name
+            )
+            file_path = output_dir / self._current_version.path
+
+            if self._current_version.frames:
+                first_frame, last_frame = self._current_version.frames
+            else:
+                first_frame = last_frame = 1001
+
+            node = nuke_read.create_deep_read_node(
+                file_path=file_path,
+                first_frame=first_frame,
+                last_frame=last_frame,
+                name=f"{self._output.name}_v{self._current_version.version:03d}",
+            )
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Error",
+                f"Failed to create DeepRead node:\n\n{e}"
+            )
+
+
+class LayerSelectDialog(QtWidgets.QDialog):
+    """Dialog for selecting an EXR layer to use for thumbnail generation."""
+
+    def __init__(self, layers, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Select Layer for Thumbnail")
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(QtWidgets.QLabel("Select layer for thumbnail:"))
+        self._combo = QtWidgets.QComboBox()
+        self._combo.addItems(layers)
+        layout.addWidget(self._combo)
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        )
+        btns.accepted.connect(self.accept)
+        btns.rejected.connect(self.reject)
+        layout.addWidget(btns)
+
+    def selected_layer(self):
+        return self._combo.currentText()
