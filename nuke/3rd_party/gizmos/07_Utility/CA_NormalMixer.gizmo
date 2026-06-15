@@ -1,0 +1,81 @@
+Group {
+ name CA_NormalMixerV2
+ tile_color 0x4f7fbfff
+ note_font "Verdana Bold"
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 title l "" +STARTLINE T "<b><font size='4' color='#5F9FDF'>CA_NormalMixer</font></b>"}
+ addUserKnob {26 subtitle l "" +STARTLINE T "<font size='2' color='#888'>Blend normal maps using Reoriented Normal Mapping</font>"}
+ addUserKnob {26 divider1 l "" +STARTLINE T " "}
+ addUserKnob {7 mix l Mix t "Dissolve between base normals and blended result.\n0 = pure base normals.\n1 = full detail blend."}
+ mix 1
+ addUserKnob {26 divider2 l "" +STARTLINE T " "}
+ addUserKnob {4 blend_mode l "Blend Mode" t "RNM: Reoriented Normal Mapping (most accurate)\nUDN: Whiteout blending (fast, good quality)\nLinear: Simple addition (fastest, least accurate)" M {"Reoriented (RNM)" "UDN (Whiteout)" Linear ""}}
+ addUserKnob {26 divider3 l "" +STARTLINE T " "}
+ addUserKnob {6 input_signed l "Inputs are Signed (-1 to 1)" t "Enable if normal maps are in -1 to 1 range.\nDisable if they are in 0 to 1 range." +STARTLINE}
+ input_signed true
+ addUserKnob {26 divider_edge l "" +STARTLINE T " "}
+ addUserKnob {26 edge_label l "" +STARTLINE T "<b><font color='#5F9FDF'>Edge Protection</font></b>"}
+ addUserKnob {26 edge_subtitle l "" +STARTLINE T "<font size='2' color='#888'>Suppress detail at silhouette edges to prevent hard edge artifacts</font>"}
+ addUserKnob {6 edge_protect l "Enable Edge Protection" t "Fades out detail blending where the base normal faces away from camera (silhouette edges).\nPrevents hard edge artifacts from luminance-derived detail normals." +STARTLINE}
+ edge_protect true
+ addUserKnob {7 edge_threshold l Threshold t "Base normal Z value below which detail starts fading.\nHigher = more aggressive protection, affects more of the surface.\nLower = only protects extreme edges."}
+ edge_threshold 0.025
+ addUserKnob {7 edge_softness l Softness t "Width of the falloff zone between full detail and no detail.\nHigher = smoother, more gradual transition.\nLower = sharper cutoff." R 0.01 1}
+ edge_softness 0.17
+ addUserKnob {7 edge_gradient_protect l "Gradient Clamp" t "Suppress detail where the detail normal itself has extreme XY gradients (hard luminance discontinuities).\n0 = disabled. Higher = more aggressive clamping of extreme detail normals."}
+ edge_gradient_protect 0.645
+ addUserKnob {26 divider4 l "" +STARTLINE T " "}
+ addUserKnob {26 inputs_label l "" +STARTLINE T "<font size='2' color='#888'><b>A input</b> = Base normals (AI or CG render)<br><b>B input</b> = Detail normals (from CA_LumaToNormals)</font>"}
+ addUserKnob {26 info l "" +STARTLINE T "<font size='1' color='#666'>Compositing Academy | RNM normal blending</font>"}
+ addUserKnob {26 divider5 l "" +STARTLINE T " "}
+}
+ Input {
+  inputs 0
+  name detail
+  label "B: Detail Normals"
+  xpos 200
+  ypos -200
+  number 1
+ }
+ Input {
+  inputs 0
+  name base
+  label "A: Base Normals"
+  xpos 0
+  ypos -200
+ }
+set Nc010000 [stack 0]
+ BlinkScript {
+  inputs 2
+  recompileCount 1
+  ProgramGroup 1
+  KernelDescription "3 \"NormalMixer\" iterate pixelWise 9aba08a538c31485b440d37cbfc908fc367f769fc7923b62e5607b5872fbaf8d 3 \"base\" Read Point \"detail\" Read Point \"dst\" Write Point 6 \"blend_mode\" Int 1 AAAAAA== \"input_signed\" Bool 1 AQ== \"edge_protect\" Bool 1 AQ== \"edge_threshold\" Float 1 AACAPg== \"edge_softness\" Float 1 mpkZPg== \"edge_gradient_protect\" Float 1 AAAAPw== 6 \"blend_mode\" 1 1 Default \"input_signed\" 1 1 Default \"edge_protect\" 1 1 Default \"edge_threshold\" 1 1 Default \"edge_softness\" 1 1 Default \"edge_gradient_protect\" 1 1 Default 0"
+  EncodedSource "1 3917 nr71j3f1QYlPecNPikwam+2gTV4YBfrEbJGqo8nUrhW5JIF2eWqQJVANv69l5kcEsyrI9badfx2JjTqvkGF8NDPXszYru80+pgDYqetlJEb7F6dT1pFZshSz4c5FGna3NYbAaz7QR3zQ/c75km4XNASZBfVVcO6ucmeZEYobBkehcRmSx/XwaCf25O/zaP8oz5pGd2NzjJj6FZQV/cSAwyTN3WQIn8wDUg/g+iOFymKkSjXgAkzMUHuhdAunaScGvhmfkCaQPWLykrH21McKEbnjBEKp711j3Q1TJ7+bDiiYph4Jn3n7gDemdfkaLuxwY5ks4XfKsBzZjqXU5I3NlFrKJpOkB7nU8FYfn9b88xepxAMLPKmwBQ2GrsRjhH/DtAYKeskk6Kc4m6omB8/oIrFfZLZdIGn/8Kqmcb8YXMvpGSLh33Q/Tc/LdF7RhhXVAkjGM19Sg/9kzEqEeEByGIPdxhrUYSmR2lE3sW8pCGjFNjg+t8H4qcQE3QPVMp5XnXKcw48DSN16Ze+PpDhQnv0BIfAGPIrfH40yX6mAtKBeelYB1MhVBXIQiZKDIpXffQ/jGfQ1r2nC0fpT3mG0mdqyJTgHZlfjgFXia8Y1m3tfLGqxlw5v4KEXJiXW9D4E49KlJB5or3bK3lx0qJAKLzZlVzzD6ochqIADCrSChYwKoJ8jchK7nOSS9ZW6cPMuaoFwv8O0ZxvSEJE9QybPvPdQiwjboYPfuWBt48hd5qhukzN8dyUxQ4gk/Skk8JtNgxqQ/BfeacLto5+WbyZzyik5DtCxuS+mKFYlwvvzQhbvf/iAXyozn+FRNTYWyCIOoaJGt9f0KAqpPhxVJ2TWriCdjghvEDpjOrYoKTdwRtu+wG8B1UOVMUZ9iPxSl4DA0Mf6DtK+8RqSxm2sc6uaMvl2fjQasL0w9tWSUg5MZoz+FCDtuijmQ2coNeZ0Xg5QLh8quHG6n8xyKvkaO/dt9G31cTPGQm6wESgpzHQgG8tJQFKzhVRRM0e+Heri1QJKZeOfg30ct2xVLtsN8KLVtYNk+9KmY0iDY7NOQUO2SDWkhWiWsEKGh1mdsZqglRGeTXOdW6ISbrzSVzDqjbPpEFK1tNQx+WhZkVHP7V8mEzOclcNIGRADYi8gvcdoWw0qqAsGzGRcbXrOiFtBolCO24AStbALoTVhlD2TrZzPxS3z7LVRYdLhqJqhrrMUsT5ZI3TVeYCk/Qn1nD2oICXIUVGX9umbx9v+Xn7sbDZagpxBJKpAKkCeEvTe+059IupHgGWBm1MVS+MWemiWmNZG827Fg/+04YrkQ787PkUnVU6u/St4LIiYhuk91mN7hPS0RyPLwfNLDvSAq40kjKvsLTtfUz1Lv0/OXe4LEnEPieMxVBtAIuLOEppOvUbdMvuEqFXumnr6ZTZ+AmsumZeZ7p7rZkwAwwYRLv9qlJnBMhZqpTphb748XRX2RA2LvAzPXER8onP3V4tmXma4q7GxlTq2fkd54ohQQoS+h1PgshZN/5MvuRkwkihRuOeJV15ZOHdICttM+8Li3WEe9KCDgxXsSmOT6Sez6eYVUAkVOu4N1unBMYmdk9I6IhKmxR1WNdjvLyte8F9qWxS6v0Dhk9r42yKgSUhAP5zgtqLY88NB/hKX+4C9I4M1YV73QW9CBtrGMSM4RTNrIo9MPKwp4Rm0afiyi++ZoVsz5Mtd5HXRrp86nSQPiLVO3kireUU7AQvI21Rdg/e741ZD8XKr8/bjsVJto5TgArblyp03uJhg8kKCfoMidXlVavAMPeQdKiYZETVe8k5RtCrEn2SeViLLWx38Z1Iay7dzSI7q+TKZ/3b9IEC8+l9ZZe32S0VLcDYmXpO5/fT4FA85HOZHfQFVUUs/0xd6H1RVIAMFj24LS/9yYm9vXMCUeArpv7YvCXjX68cSbgtGVwBA4YTBvM2MxmBwTXbwf4ID5wZoQSiLkMAb0vUmOAmJTkFn90tEleAOnh5leICNTWjHIMzrfQD+S5aoC7FNTIRnn43rVRz9Em2evP4cc+qDmmDU3h4fQ7o+G1HjyqVWkr7f8iD/HH+EmpBnCwGDSlwmSKSyrOQT8/QooFBt3dOngEJYpL3MPksOAolQX3WpNknDErcwvQJsce9dKAhJ6OHVLHVlpOz9BPKjyvQ/RIIjmqfq9VxJUgoVJtowPwluqb5KxeQWN4UD4ehefKO2VRMj1P9W4Zo0ok7c0R1M1HRkKxj75eGsm092Fwypqcd7XKMo1S7J4u35UaK7Dmgzpn4Z7LkxkQ9dv27TZYzMEGK9WVd0D4NRg7SJmCPwrYYKtthW8a64ydch/L4edY8LlZ0GLgdehBu2UJW4s23x3tbjZpUHVGihqhCUv4NMhGqb9T53AIzl6epZgnAVHabrIfDhKiL2n7PUBU4yP+W8KXP/PRlwt2b8NGHgvyMfXoFYl0zkY/tiTPkvVdKiKCw28Q/uy7oanIpdF2Vzx4n7JEMRkzWqTwMYX1INfzYzEAYrtxqnnCA/gSc9TK1lFCkaY6xfLh6O6OCOKIHFDd+HQNQ4khpIYZpgY3ijfrxOqEsGgfBF81Z8fqP8uIyhwdUdOSRUt/qq/Q1Q31o+3NKDSM44UNfqhlS5ASuOzARC5soWU0u8gsIZ23ugtbNKFJgpX+f8wHhtWLwJJMsQeR86ZtWp4HucZbR2f2/fq5/Q+F/p3ii27xsxiqgBGY4RJN9AZDttibABQS2gwhQjQdkpDcwLUyhGwY0RGTAJJ52abbzsdfrQio/8bCW/IqCzzezrGIC151bTko2l0GKF6jgtc6IbnIHBUfPhm9LCbsYwXuPgNLWMhNxXXvHX337h2wUtch18JMYekaycdlj0O946G+Dt7M4lBxnvT+MGfxoS707PS+SaP99Zal4ZBqFiqW1eupCNeWQo+rZD5VWIcbbPWn0YM73U12QVue07z1wPbOHos60KC5P4qyArLMOLesU0h/4Ij6M6kbaEOX4GaJq9ABBuqQYD9hEz+7W/8x4155M/a4i+Dsi+ELUIwZ0KkyKcFIxHO5ndl5eQ2Z1QJ56GdbdozIJqEvzFdy8qfuiWrR76+uR3hNaHfFKauVD7JhTe2WPwwK83oFmA4OFlXvqmOVoT02Zvn4Xg/b38LgU7mEepm9LiMINBcM7nVXxWVjOT5uxR1soBAoSTd0VdLRjc6yVZr0VXznZr232OonC4JC/kcD6s4hi6AHDlQY8ddq229ey1eeMJOqdlGMLGiJ2XdJCeSnYMumyXzfuf7ySVcY2UC2JiO8X8TAdC25dSkPcBrzmtBVROZtnO0Prg4NVxnVVFfDV70ATLCfQZLXqJoTtkydQqPavF/ecjkPzpA4jSp41yqqxfsozBjOkiC4cn0DVHL5oOnKHbrW21RYOZIyAkq0Wc3An5qxM8jbu6vnAFBg7FdnBzShD3hj6jz7zxNAWGU2XPxkhBrVepQPA/ekIRFmy5jzTpPxz1ruuEdMXktEEA5VqAMp9B7I78h0X7fwg5yN9S0xzAevVefP6of2KaFJmwvx7Wyh2GzxdAEKpGqSseDQ7nYLNwSsqWpbdkA7RDRB6LjUSziNQ6V4eUuiW3BFloecYDPdkOPjZlmADqyCj3fI/zCT0cPqJsBf7/se3zgX2PPgjnUmy/rdbaVRGvCn/k0UgRDacNwCOs2kE+MRZtvyAELSmyLwjH4hCs/P3qr1NKmGIp+jTBHZ4yntvyGedQjnp1Yh8Cjq6UdB7Y4FBif6OxY9bWBNHFqwsGD6FQ/OZXuFwz41t9vHJjwjVhCew9CjgThTk8SxKHujO47YmGjp4GoByGkp2lxKWoXlisF5zcEVOSVY55nL3a0wnHRdrQKpgSwWomQWFHPzzWpKLyofLLpFMf59xs7xC4cuKfVnn+Wel4s1LGaU0K3fL2g6YFTZVEFPc41iTZFNqZMZqxw4iDCB6stHebFKhYOAXs7cdiznJTCPguVpBLBKTZFe6RnXFadmgis6H/Q3cYZ98MUtD0RcL2C0+1yjCVf8gMl4ck6SbEkoKO5SqqT85TW3DH8tjnYsW2g2b84biwwpQB41U3pZMoaN0m8k+OWxUiLlDdem3Dw4uzHsgUWtRRUjftGNJ/7ipZzR5EA36XN8BKTyRtZCZj+4ssJJv/i5PwRM2TpzT/Wis6kt8q2ixX4bNqnONcB5Jt7d7NGPthHtQ6aekt42S2Z7vH51gPZR0EIS165MjpEelIlHheFVSk5IwhfEyHY4NyTVfY8ho0aipWaEXClkTVZetI/6Mqa5n/u3htZC0ci+TnGNUExWNa//t6lqJWu1RCYaaq54edIC6y/ZiUaCCT1jOGCrrfouDJqXMOyoHuqCBNXly3kh7tNrMLQmTBf/moDUBJaWviH/ke5r9dgLl2/Z3oDOOdmZIBnDW8vwvHyYM9AQMbi4kepvdMU7yApqCYCra2TheXEIzbZsqAqZ9u3IOdgYGNAHVh8q3h5AY6xkJHfscDIYYDc+zOv0vuqKZesaFM5TCLX+kR38kSnSqKP0oevSaJVUkKnK5EgOy4B/d1F5qI48kIWUFEU+qDvZ2YCnNnmXuBiDhrs0nj+pfvLEp3Kz4Qy/eCvRVgV50yzbGXuY5lbeHywfVF1xepttWis2Ofptg1Eo4X7SydF6p4vEF0CZI+9fZB8AyjPoSl7SsRTrKbUwsegnYCrfXomsDKoyU/YEml+Ad0vyb39AC1XB3oImO5Yz3PkdqLmk54T//Q7qZI5pSSJ2JawtJ30SsGSbJ4nsaEFWeN/yS1Kl7e56rqi002pb0g5PxYblayPl2hBSlPtUKvSVgL9m9RM4sVYRhvR54C7atLt+akpKyLdbNxLSed5nNGdbCkxWIxs8A3d8xZL1Bz1FZrsdq2sj6DMC+RtQl2wPBP0z0rqCt0MADVXotk5gX2QbpThPgmL+UX0R++Y+jxV7bqMipYsu7PhQW+s8a3g/l13rh5msp6H8hyYZhYelqZpMaWWf+GMfLenOirDsvJpTglPtP+hvkj043xIDPu/dCyEhO/efIWV/tJ2FuF852HEljkDQHMnZYtWXGtYs1i03LMhU/QVSm9Fsc7yfWghfXne2QP1oDjHwou1YfYQ7GRv7zaeW4H2z82PQL5LuKNDUZ5rODw1L+tz1vjmasEWLjlKXvmNO6EE5q1kMvq1mLW4T9vL1YhzOcFlAcjCt0Pq4Sf8bx2ys+qIUpZzMuEJ7uzuq7vFEM="
+  vectorize false
+  rebuild ""
+  NormalMixer_blend_mode {{parent.blend_mode}}
+  NormalMixer_input_signed {{parent.input_signed}}
+  NormalMixer_edge_protect {{parent.edge_protect}}
+  NormalMixer_edge_threshold {{parent.edge_threshold}}
+  NormalMixer_edge_softness {{parent.edge_softness}}
+  NormalMixer_edge_gradient_protect {{parent.edge_gradient_protect}}
+  rebuild_finalise ""
+  name NormalMixer_Blink
+  xpos 200
+  ypos -29
+ }
+push $Nc010000
+ Dissolve {
+  inputs 2
+  which {{parent.mix}}
+  name Dissolve_mix
+  xpos 0
+  ypos -29
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 93
+ }
+end_group

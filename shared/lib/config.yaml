@@ -1,0 +1,3 @@
+pipeline_root: "D:/CoffeeVeinStudio/Pipeline"
+projects_root: "D:/CoffeeVeinStudio/Projects"
+kitsu_host: "http://vonsydow.local:8012/api"

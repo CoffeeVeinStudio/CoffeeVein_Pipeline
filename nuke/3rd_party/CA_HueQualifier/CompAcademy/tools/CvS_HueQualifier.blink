@@ -1,0 +1,150 @@
+kernel CA_HueQualifier : ImageComputationKernel<ePixelWise>
+{
+  Image<eRead, eAccessPoint, eEdgeClamped> src;
+  Image<eWrite, eAccessPoint> dst;
+
+  param:
+    float hueLow;
+    float hueHigh;
+    float hueLowSoft;
+    float hueHighSoft;
+    bool  hueEnabled;
+    float satLow;
+    float satHigh;
+    float satLowSoft;
+    float satHighSoft;
+    bool  satEnabled;
+    float lumLow;
+    float lumHigh;
+    float lumLowSoft;
+    float lumHighSoft;
+    bool  lumEnabled;
+    float cleanBlack;
+    float cleanWhite;
+    float matteGamma;
+    int   viewMode;
+    bool  invertMatte;
+
+  void define() {
+    defineParam(hueLow,      "Hue Low",       0.0f);
+    defineParam(hueHigh,     "Hue High",      1.0f);
+    defineParam(hueLowSoft,  "Hue Low Soft",  0.05f);
+    defineParam(hueHighSoft, "Hue High Soft", 0.05f);
+    defineParam(hueEnabled,  "Hue Enabled",   true);
+    defineParam(satLow,      "Sat Low",       0.0f);
+    defineParam(satHigh,     "Sat High",      1.0f);
+    defineParam(satLowSoft,  "Sat Low Soft",  0.05f);
+    defineParam(satHighSoft, "Sat High Soft", 0.05f);
+    defineParam(satEnabled,  "Sat Enabled",   true);
+    defineParam(lumLow,      "Lum Low",       0.0f);
+    defineParam(lumHigh,     "Lum High",      1.0f);
+    defineParam(lumLowSoft,  "Lum Low Soft",  0.05f);
+    defineParam(lumHighSoft, "Lum High Soft", 0.05f);
+    defineParam(lumEnabled,  "Lum Enabled",   true);
+    defineParam(cleanBlack,  "Clean Black",   0.0f);
+    defineParam(cleanWhite,  "Clean White",   0.0f);
+    defineParam(matteGamma,  "Matte Gamma",   1.0f);
+    defineParam(viewMode,    "View Mode",     0);
+    defineParam(invertMatte, "Invert Matte",  false);
+  }
+
+  float smoothStep(float t) {
+    t = clamp(t, 0.0f, 1.0f);
+    return t * t * (3.0f - 2.0f * t);
+  }
+
+  // Standard (non-wrapping) trapezoid alpha
+  float trapAlpha(float val, float lo, float hi, float loSoft, float hiSoft) {
+    if (val < lo - loSoft || val > hi + hiSoft) return 0.0f;
+    if (val >= lo && val <= hi) return 1.0f;
+    if (val < lo)
+      return (loSoft > 1e-9f) ? smoothStep((val - (lo - loSoft)) / loSoft) : 1.0f;
+    return (hiSoft > 1e-9f) ? smoothStep(((hi + hiSoft) - val) / hiSoft) : 1.0f;
+  }
+
+  // Hue trapezoid with red/purple wrap-around support
+  float hueAlpha(float h, float lo, float hi, float loSoft, float hiSoft) {
+    if (lo <= hi)
+      return trapAlpha(h, lo, hi, loSoft, hiSoft);
+    // Wrapped range: [lo, 1] U [0, hi], gap = (hi, lo)
+    if (h > hi && h < lo) return 0.0f;
+    if (h <= hi) {
+      float d = hi - h;
+      return (d < hiSoft) ? ((hiSoft > 1e-9f) ? smoothStep(d / hiSoft) : 1.0f) : 1.0f;
+    }
+    float d = h - lo;
+    return (d < loSoft) ? ((loSoft > 1e-9f) ? smoothStep(d / loSoft) : 1.0f) : 1.0f;
+  }
+
+  void process() {
+    float4 in = src();
+    float r = in.x;
+    float g = in.y;
+    float b = in.z;
+
+    // HSV decomposition — saturation is HDR-safe (always [0,1])
+    float mx  = max(r, max(g, b));
+    float mn  = min(r, min(g, b));
+    float d   = mx - mn;
+    float sat = (mx > 1e-6f) ? d / mx : 0.0f;
+
+    // Rec.709 luminance — unbounded for HDR
+    float lum = 0.2126f * r + 0.7152f * g + 0.0722f * b;
+
+    // Hue in [0, 1]
+    float hue = 0.0f;
+    if (d > 1e-6f) {
+      if (mx == r) {
+        hue = (g - b) / d;
+        if (g < b) hue += 6.0f;
+        hue /= 6.0f;
+      } else if (mx == g) {
+        hue = ((b - r) / d + 2.0f) / 6.0f;
+      } else {
+        hue = ((r - g) / d + 4.0f) / 6.0f;
+      }
+    }
+
+    float hA = hueEnabled ? hueAlpha(hue, hueLow, hueHigh, hueLowSoft, hueHighSoft) : 1.0f;
+    float sA = satEnabled ? trapAlpha(sat, satLow, satHigh, satLowSoft, satHighSoft) : 1.0f;
+    float lA = lumEnabled ? trapAlpha(lum, lumLow, lumHigh, lumLowSoft, lumHighSoft) : 1.0f;
+
+    float alpha = hA * sA * lA;
+
+    // Matte cleanup
+    if (cleanBlack > 0.0f && alpha < cleanBlack)        alpha = 0.0f;
+    if (cleanWhite > 0.0f && alpha > 1.0f - cleanWhite) alpha = 1.0f;
+
+    // Matte gamma (applied as pow(alpha, 1/gamma))
+    if (matteGamma != 1.0f && alpha > 0.0f)
+      alpha = pow(alpha, 1.0f / matteGamma);
+
+    alpha = clamp(alpha, 0.0f, 1.0f);
+
+    if (invertMatte) alpha = 1.0f - alpha;
+
+    float4 out;
+    if (viewMode == 1) {
+      // Matte: white on black
+      out = float4(alpha, alpha, alpha, alpha);
+    } else if (viewMode == 2) {
+      // Highlight: selected stays color, unselected goes grey
+      float grey = lum;
+      out = float4(
+        r * alpha + grey * (1.0f - alpha),
+        g * alpha + grey * (1.0f - alpha),
+        b * alpha + grey * (1.0f - alpha),
+        1.0f
+      );
+    } else if (viewMode == 3) {
+      // Inverted matte: black on white
+      float inv = 1.0f - alpha;
+      out = float4(inv, inv, inv, inv);
+    } else {
+      // Composite: RGB + alpha (default)
+      out = float4(r, g, b, alpha);
+    }
+
+    dst() = out;
+  }
+};

@@ -1,0 +1,110 @@
+Group {
+ knobChanged "if nuke.thisKnob().name() in (\"ca_lum_mode\",\"ca_lum_stops\",\"ca_lum_max\"):\n    try:\n        import CA_QualifierWidget as cq; cq._on_apply_lum(nuke.thisNode(), auto_derive=False)\n    except: pass\n"
+ tile_color 0xaa55ffff
+ note_font "Verdana Italic"
+ addUserKnob {20 ca_qual_tab l "CA Qualifier"}
+ addUserKnob {26 ca_header l "" +STARTLINE T "CA Hue Qualifier"}
+ addUserKnob {52 ca_header_init T "nuke.thisNode().knob(\"ca_header\").setValue(\"<img src=\"+nuke.pluginPath()\[\[i for i, s in enumerate(nuke.pluginPath()) if \"/CompAcademy/graphics\" in s]\[0]]+\"/qualifier_header.png>\")" +STARTLINE}
+ addUserKnob {26 ca_div_sample l "" +STARTLINE T "<b>Color Sampling</b>"}
+ addUserKnob {18 ca_pick_color l "Pick Color" t "Pick a color from the viewer with the eyedropper, or type an RGB value.\nThen press 'Apply Sample' to commit it to the qualifier ranges using the mode below.\nHDR values (>1.0) are respected — sampling a super-white pixel auto-switches to HDR mode."}
+ ca_pick_color {0.5 0.5 0.5}
+ addUserKnob {6 ca_pick_color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {4 ca_sample_mode l Mode t "How 'Apply Sample' modifies the current H/S/L ranges:\n• Set Range: replace ranges with a new window centered on the sample\n• Add to Range: expand the nearest edge so the sample is INSIDE the selection\n• Remove from Range: pull the nearest edge inward so the sample is EXCLUDED\n• Add Softness: extend the falloff region to catch the sample softly\n• Remove Softness: tighten the falloff region" M {"Set Range" "Add to Range" "Remove from Range" "Add Softness" "Remove Softness"}}
+ addUserKnob {22 ca_apply l "Apply Sample" t "Commit the Pick Color to the qualifier ranges using the selected Mode." -STARTLINE T "import CA_QualifierWidget as cq; cq._on_apply(nuke.thisNode())"}
+ addUserKnob {26 ca_div_hdr l "" +STARTLINE T "<b>HDR Luminance</b>"}
+ addUserKnob {26 ca_desc_hdr l "" +STARTLINE T "Either manually set max luminance and press \"Update Sliders\", or press \"Analyze Input\" to detect max luma."}
+ addUserKnob {4 ca_lum_mode l "Lum Mode" t "How the luminance slider maps to actual pixel values:\n• SDR: slider is linear \[0, 1]. For standard plates with no super-whites.\n• HDR: slider's LOWER half covers \[0, 1] linearly, UPPER half covers \[1, 2^Stops]\n   log-spaced. A faint tick at the midpoint marks where SDR ends.\nAuto-switches to HDR if you pick a color brighter than 1.0." M {SDR HDR}}
+ addUserKnob {3 ca_lum_stops l Stops t "HDR mode only. Number of photographic stops above white the slider's upper half covers.\n1 stop = 2x brighter. So 8 stops = up to 256x over white. 4 stops = up to 16x.\nThe 'Analyze Input' button sets this automatically based on your footage.\nLower this for tighter control on dimmer HDR; raise it for very bright sources (sun, fire)." -STARTLINE R 2 10}
+ ca_lum_stops 8
+ addUserKnob {7 ca_lum_max l "Lum Max" t "Brightest luminance value detected in the input (Rec.709 weighted). Can also be set manually.\nDisplayed as a gold dashed line on the luminance graph so you know where your data actually is.\nPress 'Update Sliders' after changing manually to push new range to the slider." R 0 1000}
+ addUserKnob {22 ca_apply_lum l "Update Sliders" t "Apply the current Lum Max / Mode / Stops values to the luminance slider.\nAlso auto-sets Mode and Stops to sensibly match the current Lum Max:\n  Lum Max ≤ 1.0 → SDR mode\n  Lum Max > 1.0 → HDR mode, Stops = ceil(log2(Lum Max))\nUse this after typing Lum Max manually, or if sliders get out of sync." -STARTLINE T "import CA_QualifierWidget as cq; cq._on_apply_lum(nuke.thisNode())"}
+ addUserKnob {4 ca_lum_percentile l Analyze t "Which pixel value to use as 'brightest' when analyzing:\n• P99.9: ignore the top 0.1% of pixels. RECOMMENDED — kills raytrace fireflies/specks.\n• P99: ignore the top 1% of pixels. Even more tolerant of outliers.\n• Max: the single brightest pixel. Strict but catches fireflies." -STARTLINE M {P99.9 P99 Max}}
+ addUserKnob {22 ca_analyze l "Analyze Input" t "Scan the input on the current frame (100x100 pixel grid) and auto-configure HDR settings.\nSets Mode (SDR/HDR), Stops, and Lum Max based on the percentile above.\nRequires something connected to the node's input." -STARTLINE T "import CA_QualifierWidget as cq; cq._on_analyze(nuke.thisNode())"}
+ addUserKnob {26 ca_div1 l "" +STARTLINE}
+ addUserKnob {26 ca_div_ranges l "" +STARTLINE T "<b>Qualifier Ranges</b>  <span style=\"color:#666;font-size:9px;\">double-click graph to cycle falloff</span>"}
+ addUserKnob {52 ca_qualifier_ui l "" +STARTLINE T "__import__('CA_QualifierWidget').CA_QualifierKnob()" +STARTLINE}
+ addUserKnob {7 hue_lo +INVISIBLE}
+ addUserKnob {7 hue_hi +INVISIBLE}
+ addUserKnob {7 hue_lo_s +INVISIBLE}
+ addUserKnob {7 hue_hi_s +INVISIBLE}
+ addUserKnob {7 sat_lo +INVISIBLE}
+ addUserKnob {7 sat_hi +INVISIBLE}
+ addUserKnob {7 sat_lo_s +INVISIBLE}
+ addUserKnob {7 sat_hi_s +INVISIBLE}
+ addUserKnob {7 lum_lo +INVISIBLE R 0 10000}
+ addUserKnob {7 lum_hi +INVISIBLE R 0 10000}
+ addUserKnob {7 lum_lo_s +INVISIBLE R 0 10000}
+ addUserKnob {7 lum_hi_s +INVISIBLE R 0 10000}
+ addUserKnob {26 ca_div2 l "" +STARTLINE}
+ addUserKnob {26 ca_div_ch l "" +STARTLINE T "<b>Channel Enables</b>"}
+ addUserKnob {6 ca_enable_hue l Hue t "Include the hue dimension in the qualifier.\nUncheck to let any hue through (qualify on sat/lum only)." +STARTLINE}
+ ca_enable_hue true
+ addUserKnob {6 ca_enable_sat l Saturation t "Include the saturation dimension in the qualifier.\nUncheck to let any saturation through." +STARTLINE}
+ ca_enable_sat true
+ addUserKnob {6 ca_enable_lum l Luminance t "Include the luminance dimension in the qualifier.\nUncheck to let any brightness through (qualify on hue/sat only)." +STARTLINE}
+ ca_enable_lum true
+ addUserKnob {26 ca_div3 l "" +STARTLINE}
+ addUserKnob {26 ca_div_matte l "" +STARTLINE T "<b>Matte Finesse</b>"}
+ addUserKnob {7 ca_clean_black l "Clean Black" t "Matte floor. Alpha values below this threshold get crushed to 0.\nUse to kill grey fringe in the 'black' (unselected) areas.\nTypical: 0.05 - 0.2"}
+ addUserKnob {7 ca_clean_white l "Clean White" t "Matte ceiling. Alpha values above (1 - this) get boosted to 1.\nUse to solidify the core of the matte and remove grey fringe in the 'white' area.\nTypical: 0.05 - 0.2"}
+ addUserKnob {7 ca_matte_gamma l "Matte Gamma" t "Gamma curve on the alpha. <1.0 pushes mids brighter (denser matte, harder edges).\n>1.0 pushes mids darker (softer matte, wider falloff). 1.0 = no change." R 0.1 4}
+ ca_matte_gamma 1
+ addUserKnob {7 ca_matte_shrink l "Shrink / Grow (px)" t "Spatial erode (negative) or dilate (positive) of the final matte edge, in PIXELS.\nUses a Gaussian-filtered FilterErode for smooth sub-pixel precision.\nPositive = grow (catches more edge). Negative = shrink (tightens inside the subject).\nRange ±4 pixels." R -4 4}
+ addUserKnob {26 ca_div4 l "" +STARTLINE}
+ addUserKnob {4 ca_view_mode l "View Mode" t "What the node outputs:\n• Composite: original RGB with the qualifier matte in alpha. Use this for your comp.\n• Matte: white-on-black visualization. Use to inspect matte quality.\n• Highlight: selected area stays in color, rest desaturates. Best for tuning ranges visually.\n• Inverted Matte: black-on-white visualization." M {"Composite (RGB + Alpha)" "Matte (White on Black)" "Highlight (Selected in Color)" "Inverted Matte (Black on White)"}}
+ addUserKnob {6 ca_invert l "Invert Matte" t "Flip the alpha (selected area becomes unselected and vice versa).\nApplied after Shrink/Grow." -STARTLINE}
+ addUserKnob {26 ca_div_attr l "" +STARTLINE}
+ addUserKnob {26 ca_attribution l "" +STARTLINE T "<div style=\"text-align:center; padding-top:6px; color:#888; font-size:10px; line-height:1.4;\">For more useful Tools / Stock Assets / Nuke Training<br><a href=\"https://www.compositingacademy.com\" style=\"color:#6ab0e8; text-decoration:none; font-weight:bold;\">www.CompositingAcademy.com</a></div>"}
+}
+ Input {
+  inputs 0
+  name Input1
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  name Constant1
+  tile_color 0x55bfffff
+ }
+ Switch {
+  inputs 2
+  which {{"\[exists parent.input0] ? 1 : 0"}}
+  name Switch1
+ }
+ BlinkScript {
+  recompileCount 1
+  KernelDescription "3 \"CA_HueQualifier\" iterate pixelWise 349a832aedf46f9ea18da60bb169ce771b80dc8227e7debba9a7ab305043848e 2 \"src\" Read Point \"dst\" Write Point 20 \"Hue Low\" Float 1 AAAAAA== \"Hue High\" Float 1 AACAPw== \"Hue Low Soft\" Float 1 zcxMPQ== \"Hue High Soft\" Float 1 zcxMPQ== \"Hue Enabled\" Bool 1 AQ== \"Sat Low\" Float 1 AAAAAA== \"Sat High\" Float 1 AACAPw== \"Sat Low Soft\" Float 1 zcxMPQ== \"Sat High Soft\" Float 1 zcxMPQ== \"Sat Enabled\" Bool 1 AQ== \"Lum Low\" Float 1 AAAAAA== \"Lum High\" Float 1 AACAPw== \"Lum Low Soft\" Float 1 zcxMPQ== \"Lum High Soft\" Float 1 zcxMPQ== \"Lum Enabled\" Bool 1 AQ== \"Clean Black\" Float 1 AAAAAA== \"Clean White\" Float 1 AAAAAA== \"Matte Gamma\" Float 1 AACAPw== \"View Mode\" Int 1 AAAAAA== \"Invert Matte\" Bool 1 AA== 20 \"hueLow\" 1 1 Default \"hueHigh\" 1 1 Default \"hueLowSoft\" 1 1 Default \"hueHighSoft\" 1 1 Default \"hueEnabled\" 1 1 Default \"satLow\" 1 1 Default \"satHigh\" 1 1 Default \"satLowSoft\" 1 1 Default \"satHighSoft\" 1 1 Default \"satEnabled\" 1 1 Default \"lumLow\" 1 1 Default \"lumHigh\" 1 1 Default \"lumLowSoft\" 1 1 Default \"lumHighSoft\" 1 1 Default \"lumEnabled\" 1 1 Default \"cleanBlack\" 1 1 Default \"cleanWhite\" 1 1 Default \"matteGamma\" 1 1 Default \"viewMode\" 1 1 Default \"invertMatte\" 1 1 Default 0"
+  EncodedSource "1 4664 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"
+  rebuild ""
+  "CA_HueQualifier_Hue Low" {{parent.hue_lo}}
+  "CA_HueQualifier_Hue High" {{parent.hue_hi}}
+  "CA_HueQualifier_Hue Low Soft" {{parent.hue_lo_s}}
+  "CA_HueQualifier_Hue High Soft" {{parent.hue_hi_s}}
+  "CA_HueQualifier_Hue Enabled" {{parent.ca_enable_hue}}
+  "CA_HueQualifier_Sat Low" {{parent.sat_lo}}
+  "CA_HueQualifier_Sat High" {{parent.sat_hi}}
+  "CA_HueQualifier_Sat Low Soft" {{parent.sat_lo_s}}
+  "CA_HueQualifier_Sat High Soft" {{parent.sat_hi_s}}
+  "CA_HueQualifier_Sat Enabled" {{parent.ca_enable_sat}}
+  "CA_HueQualifier_Lum Low" {{parent.lum_lo}}
+  "CA_HueQualifier_Lum High" {{parent.lum_hi}}
+  "CA_HueQualifier_Lum Low Soft" {{parent.lum_lo_s}}
+  "CA_HueQualifier_Lum High Soft" {{parent.lum_hi_s}}
+  "CA_HueQualifier_Lum Enabled" {{parent.ca_enable_lum}}
+  "CA_HueQualifier_Clean Black" {{parent.ca_clean_black}}
+  "CA_HueQualifier_Clean White" {{parent.ca_clean_white}}
+  "CA_HueQualifier_Matte Gamma" {{parent.ca_matte_gamma}}
+  "CA_HueQualifier_View Mode" {{parent.ca_view_mode}}
+  "CA_HueQualifier_Invert Matte" {{parent.ca_invert}}
+  rebuild_finalise ""
+  name Qualifier_Kernel
+ }
+ FilterErode {
+  size {{parent.ca_matte_shrink}}
+  filter gaussian
+  name FilterErode1
+ }
+ Output {
+  name Output1
+ }
+end_group

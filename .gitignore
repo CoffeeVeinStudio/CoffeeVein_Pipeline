@@ -3,22 +3,55 @@ __pycache__/
 *.pyc
 *.nk~
 
-# Nuke temporära filer
-*.nk~
-*.autosave
+# Enviroment files
+.env
+
+# Vendor (installera med pip)
+shared/vendor/
 
 # OS junk
 .DS_Store
 Thumbs.db
 
-# User-specific settings (om TikManager genererar sådana)
-*/user_prefs.json
+# Tredjepartsverktyg med egna repos
+nuke/3rd_party/BackdropDraw/
+nuke/3rd_party/gizmos/05_Grade_Effects/oklch_nuke/
+tools/CoffeeBoard/
+
+# Nuke temporära filer
+*.nk~
+*.autosave
 
 # Backups
 _Backup/
 
 # Claude Code
 .claude/
+AGENTS.md
+CLAUDE.md
 
 # Nuke tab stats
 tab_stats.dat
+
+#TIK Pipeline
+tik_manager4-dev/
+TIK_planning/
+tikmanager/
+launch_tik_manager.py
+# User-specific settings (om TikManager genererar sådana)
+*/user_prefs.json
+
+# Gamla shot_manager
+tools/shot_manager/
+tools/SAFE/
+tools/test_pure_exr.py
+
+#REF Bilder
+tools/_CoffeeBoardREF
+tools/_shotManagerREF
+
+# Gamla todo och planering
+PIPELINE_TODO.md
+SHOT_MANAGER_TODO.md
+IdeasToPipeline.md
+structure.md

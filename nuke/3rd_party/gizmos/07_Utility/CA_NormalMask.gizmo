@@ -1,0 +1,86 @@
+Group {
+ name CA_NormalMask3
+ tile_color 0x5fbfdfff
+ note_font "Verdana Bold"
+ selected true
+ xpos 2815
+ ypos 383
+ addUserKnob {20 Settings}
+ addUserKnob {26 title l "" +STARTLINE T "<b><font size='4' color='#5FBFDF'>CA_NormalMask</font></b>"}
+ addUserKnob {26 subtitle l "" +STARTLINE T "<font size='2' color='#888'>Generate alpha mask from normal direction</font>"}
+ addUserKnob {26 divider1 l "" +STARTLINE T " "}
+ addUserKnob {4 dir_mode l "Direction Mode" t "Rotation: dial in a direction using rotation angles.\nSample: ctrl+click in the viewer to pick a normal direction from the image." M {Rotation Sample ""}}
+ addUserKnob {26 divider2 l "" +STARTLINE T " "}
+ addUserKnob {26 rot_label l "" +STARTLINE T "<font size='2' color='#aaa'><b>Rotation</b></font>"}
+ addUserKnob {13 rotate l Rotate t "Rotate from camera-facing (0,0,1) to aim the mask.\n\nX = tilt up/down\nY = pan left/right\nZ = has no effect (roll doesn't change aim direction)"}
+ rotate {85 0 0}
+ addUserKnob {26 divider3 l "" +STARTLINE T " "}
+ addUserKnob {26 sample_label l "" +STARTLINE T "<font size='2' color='#aaa'><b>Sample</b></font>"}
+ addUserKnob {18 sampled_normal l "Sampled Normal" t "Ctrl+click in the viewer on the normal pass to pick a direction.\nThe RGB value at that pixel becomes the direction vector."}
+ sampled_normal {0 0 1}
+ addUserKnob {6 sampled_normal_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 divider4 l "" +STARTLINE T " "}
+ addUserKnob {26 falloff_label l "" +STARTLINE T "<font size='2' color='#aaa'><b>Falloff</b></font>"}
+ addUserKnob {7 softness l Softness t "Shape the falloff curve.\n1 = linear (diffuse-like).\nHigher = tighter, more concentrated (specular-like).\n\nLow (1-3) = broad diffuse wrap\nMedium (10-30) = soft specular\nHigh (50-200) = tight sharp specular" R 0.1 30}
+ softness 1
+ addUserKnob {7 range_min l "Range Min" t "Clip glancing angles. Raise to tighten the mask."}
+ addUserKnob {7 range_max l "Range Max" t "Clip the hottest facing angles."}
+ range_max 1
+ addUserKnob {26 divider5 l "" +STARTLINE T " "}
+ addUserKnob {6 clamp_negatives l "Clamp Negatives" t "Back-facing surfaces read as 0.\nDisable for full -1 to 1 range." +STARTLINE}
+ clamp_negatives true
+ addUserKnob {6 input_signed l "Input is Signed (-1 to 1)" t "Enable if normals are in -1 to 1 range.\nDisable if 0 to 1 range." +STARTLINE}
+ input_signed true
+ addUserKnob {26 divider6 l "" +STARTLINE T " "}
+ addUserKnob {26 info l "" +STARTLINE T "<font size='1' color='#666'>Compositing Academy | Normal direction masking</font>"}
+}
+ Input {
+  inputs 0
+  name normals
+  label Normals
+  xpos 0
+  ypos -300
+ }
+ NoOp {
+  name DirCompute
+  xpos 0
+  ypos -220
+  addUserKnob {20 User}
+  addUserKnob {7 rad_x}
+  rad_x {{"parent.rotate.x / 360.0 * (2 * 3.14159265359)"}}
+  addUserKnob {7 rad_y}
+  rad_y {{"parent.rotate.y / 360.0 * (2 * 3.14159265359)"}}
+  addUserKnob {7 dir_x}
+  dir_x {{"parent.dir_mode == 0 ? sin(rad_y) * cos(rad_x) : parent.sampled_normal.r"}}
+  addUserKnob {7 dir_y}
+  dir_y {{"parent.dir_mode == 0 ? -sin(rad_x) : parent.sampled_normal.g"}}
+  addUserKnob {7 dir_z}
+  dir_z {{"parent.dir_mode == 0 ? cos(rad_y) * cos(rad_x) : parent.sampled_normal.b"}}
+ }
+ BlinkScript {
+  recompileCount 2
+  ProgramGroup 1
+  KernelDescription "3 \"NormalMask\" iterate pixelWise ce6369c49451e335a931353ef4ecd4753acbe6cc2a05a2bcbbe48621be7663ff 2 \"normals\" Read Point \"dst\" Write Point 8 \"dir_x\" Float 1 AAAAAA== \"dir_y\" Float 1 AAAAAA== \"dir_z\" Float 1 AACAPw== \"input_signed\" Bool 1 AQ== \"clamp_neg\" Bool 1 AQ== \"softness\" Float 1 AACAPw== \"range_min\" Float 1 AAAAAA== \"range_max\" Float 1 AACAPw== 8 \"dir_x\" 1 1 Default \"dir_y\" 1 1 Default \"dir_z\" 1 1 Default \"input_signed\" 1 1 Default \"clamp_neg\" 1 1 Default \"softness\" 1 1 Default \"range_min\" 1 1 Default \"range_max\" 1 1 Default 0"
+  EncodedSource "1 1896 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"
+  vectorize false
+  rebuild ""
+  NormalMask_dir_x {{DirCompute.dir_x}}
+  NormalMask_dir_y {{DirCompute.dir_y}}
+  NormalMask_dir_z {{DirCompute.dir_z}}
+  NormalMask_input_signed {{parent.input_signed}}
+  NormalMask_clamp_neg {{parent.clamp_negatives}}
+  NormalMask_softness {{parent.softness}}
+  NormalMask_range_min {{parent.range_min}}
+  NormalMask_range_max {{parent.range_max}}
+  rebuild_finalise ""
+  name NormalMask_Blink
+  selected true
+  xpos -2
+  ypos -155
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos -60
+ }
+end_group

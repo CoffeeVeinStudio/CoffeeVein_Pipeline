@@ -1,0 +1,29 @@
+
+
+
+|| STEP ONE ||
+
+To install:
+
+Place "CompAcademy" folder and "CA_QualifierWidget.py" in your /.Nuke/ directory.
+
+
+|| STEP TWO ||
+
+Paste these lines into your "init.py" located in your /.Nuke/ directory.  If it doesn't exist, create one.
+
+# Compositing Academy Tools
+nuke.pluginAddPath('./CompAcademy')
+nuke.pluginAddPath('./CompAcademy/icons')
+nuke.pluginAddPath('./CompAcademy/tools')
+nuke.pluginAddPath('./CompAcademy/graphics')
+
+|| STEP THREE ||
+
+Paste these lines into your "menu.py" located in your /.Nuke/ directory.  If it doesn't exist, create one.
+
+# Compositing Academy Tools
+import CA_QualifierWidget
+toolbar = nuke.toolbar("Nodes")
+m = toolbar.addMenu("Compositing Academy", icon="qf_logo.png")
+m.addCommand("CA_HueQualifier", "nuke.createNode('CA_HueQualifier')", icon="qf_logo.png")

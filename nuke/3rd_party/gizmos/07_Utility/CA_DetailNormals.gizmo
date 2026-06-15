@@ -1,0 +1,156 @@
+Group {
+ name CA_DetailNormals2
+ tile_color 0x7f4fbfff
+ note_font "Verdana Bold"
+ selected true
+ xpos 2781
+ ypos -570
+ addUserKnob {20 Settings}
+ addUserKnob {26 title l "" +STARTLINE T "<b><font size='4' color='#9F7FDF'>CA_DetailNormals</font></b>"}
+ addUserKnob {26 subtitle l "" +STARTLINE T "<font size='2' color='#888'>Generate detail normals from luma or laplacian</font>"}
+ addUserKnob {26 divider1 l "" +STARTLINE T " "}
+ addUserKnob {4 mode l Mode t "Luma: generate normals from input directly.\nLaplacian: subtract blurred from original to isolate detail, then generate normals." M {Luma Laplacian ""}}
+ addUserKnob {26 divider_lap l "" +STARTLINE T " "}
+ addUserKnob {26 lap_label l "" +STARTLINE T "<font size='2' color='#aaa'><b>Laplacian</b></font>"}
+ addUserKnob {7 lap_size l Size t "Blur size for the laplacian.\nSmall = fine detail. Large = broader features." R 0 100}
+ lap_size 69
+ addUserKnob {7 lap_gain l Gain t "Boost the laplacian result before generating normals.\nOften needs to be cranked quite high." R 1 50}
+ lap_gain 1
+ addUserKnob {26 divider2 l "" +STARTLINE T " "}
+ addUserKnob {26 normal_label l "" +STARTLINE T "<font size='2' color='#aaa'><b>Normal Generation</b></font>"}
+ addUserKnob {7 strength l Strength t "Intensity of the generated normals." R 0 10}
+ strength 4.55
+ addUserKnob {7 sample_scale l "Sample Scale" t "Blur the input before the Sobel to detect features at a larger scale.\n0 = pixel-level detail (sharpest).\nHigher = broader, smoother slopes.\n\nUse this to match the Sobel detection to the size of features\nyou're generating normals for. Fine pores = low. Large rocks = high." R 0 50}
+ sample_scale 5.8
+ addUserKnob {26 divider3 l "" +STARTLINE T " "}
+ addUserKnob {6 FlipX l "Flip X " +STARTLINE}
+ FlipX true
+ addUserKnob {6 FlipY l "Flip Y" +STARTLINE}
+ FlipY true
+ addUserKnob {26 divider4 l "" +STARTLINE T " "}
+ addUserKnob {6 use_luminance l "Convert to Luminance" t "Convert RGB to luminance first.\nDisable if input is already single-channel." +STARTLINE}
+ use_luminance true
+ addUserKnob {6 normalize_output l "Normalize Output" t "Ensure output normals are unit length." +STARTLINE}
+ normalize_output true
+ addUserKnob {26 divider5 l "" +STARTLINE T " "}
+ addUserKnob {26 info l "" +STARTLINE T "<font size='1' color='#666'>Compositing Academy | Detail normal generation</font>"}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 0
+  ypos -504
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  name Constant1
+  xpos -319
+  ypos -482
+ }
+ Switch {
+  inputs 2
+  which {{"\[exists parent.input0] ? 1 : 0"}}
+  name Switch1
+  xpos 0
+  ypos -442
+ }
+ Dot {
+  name Dot1
+  xpos 34
+  ypos -374
+ }
+set N7fe76400 [stack 0]
+ Dot {
+  name Dot3
+  xpos 137
+  ypos -360
+ }
+set Ne9b4fc00 [stack 0]
+ Dot {
+  name Dot4
+  xpos 137
+  ypos -152
+ }
+push $Ne9b4fc00
+ Dot {
+  name Dot2
+  xpos 227
+  ypos -360
+ }
+ Unpremult {
+  name Unpremult1
+  xpos 193
+  ypos -335
+ }
+set N8433200 [stack 0]
+ Blur {
+  size {{parent.lap_size}}
+  name Blur_lap
+  xpos 345
+  ypos -277
+ }
+push $N8433200
+ Merge2 {
+  inputs 2
+  operation minus
+  name Merge_laplacian
+  xpos 193
+  ypos -271
+ }
+ Grade {
+  white {{parent.lap_gain}}
+  name Grade_boost
+  xpos 193
+  ypos -221
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 193
+  ypos -162
+ }
+ Premult {
+  name Premult1
+  xpos 193
+  ypos -124
+ }
+push $N7fe76400
+ Switch {
+  inputs 2
+  which {{parent.mode}}
+  name Switch_mode
+  xpos 0
+  ypos -101
+ }
+ Blur {
+  size {{parent.sample_scale}}
+  name Blur_sample_scale
+  xpos 0
+  ypos -49
+ }
+ BlinkScript {
+  recompileCount 3
+  ProgramGroup 1
+  KernelDescription "3 \"LumaToNormals\" iterate pixelWise 491a834acdb9432b6072abef429e176c214af06fe2a65325e46b6c5410acdda7 2 \"height\" Read Ranged2D \"dst\" Write Point 5 \"strength\" Float 1 AACAPw== \"use_luminance\" Bool 1 AQ== \"do_normalize\" Bool 1 AQ== \"flip_x\" Bool 1 AA== \"flip_y\" Bool 1 AA== 5 \"strength\" 1 1 Default \"use_luminance\" 1 1 Default \"do_normalize\" 1 1 Default \"flip_x\" 1 1 Default \"flip_y\" 1 1 Default 2 \"heightrangeMin\" Int 2 1 AAAAAAAAAAA= \"heightrangeMax\" Int 2 1 AAAAAAAAAAA="
+  EncodedSource "1 1560 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"
+  vectorize false
+  rebuild ""
+  LumaToNormals_strength {{parent.strength}}
+  LumaToNormals_use_luminance {{parent.use_luminance}}
+  LumaToNormals_do_normalize {{parent.normalize_output}}
+  LumaToNormals_flip_x {{parent.FlipX}}
+  LumaToNormals_flip_y {{parent.FlipY}}
+  rebuild_finalise ""
+  name LumaToNormals_Blink
+  xpos 0
+  ypos 8
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 100
+ }
+end_group
