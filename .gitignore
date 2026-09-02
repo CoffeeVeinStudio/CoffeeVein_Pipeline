@@ -17,6 +17,7 @@ Thumbs.db
 nuke/3rd_party/BackdropDraw/
 nuke/3rd_party/gizmos/05_Grade_Effects/oklch_nuke/
 tools/CoffeeBoard/
+nuke/3rd_party/cragl/
 
 # Nuke temporära filer
 *.nk~

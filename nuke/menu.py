@@ -1,6 +1,7 @@
 import nuke
 import sys
 import os
+import glob
 import contextlib
 import io
 from pathlib import Path
@@ -48,6 +49,87 @@ def build_recursive_menu(directory: Path, menu_obj, mode="gizmo"):
 # --- INITIALISERA MENYER ---
 nodes_menu = nuke.menu("Nodes")
 cv_menu = nodes_menu.addMenu("CoffeeVein", icon="coffeevein.png")
+
+# === 1a-PRE. CRAGL CONNECT QT6 BOOTSTRAP ===
+# cragl connect v3.17's native connect_w.pyd is compiled against PySide6/Qt6.
+# Nuke <=15 ships PySide2/Qt5, so connect_w's own QApplication check fails
+# ("QWidget: Must construct a QApplication before a QWidget") unless a Qt6
+# QApplication already exists in-process. We construct one here, borrowed
+# from a standalone PySide6 install, before cragl's menu (and its "connect"
+# command) is ever wired up. Nuke 16+ ships PySide6 natively and doesn't
+# need this.
+_cragl_qt6_app = None
+if nuke.NUKE_VERSION_MAJOR < 16 and (NUKE_ROOT / "3rd_party" / "cragl").exists():
+    print("\n[cragl Qt6 Bootstrap]")
+    _py_tag = f"Python{sys.version_info[0]}{sys.version_info[1]}"
+    _site_packages_candidates = glob.glob(
+        os.path.expandvars(rf"%LOCALAPPDATA%\Programs\Python\{_py_tag}\Lib\site-packages")
+    )
+    for _sp in _site_packages_candidates:
+        if os.path.isdir(os.path.join(_sp, "PySide6")):
+            if _sp not in sys.path:
+                sys.path.insert(0, _sp)
+            # Nuke's own Qt5 startup pins QT_QPA_PLATFORM_PLUGIN_PATH (often to an
+            # empty value) to keep Qt5 from picking up unrelated system Qt plugins.
+            # Qt6 inherits that same env var, finds no "windows" platform plugin at
+            # that (wrong/empty) path, and aborts the whole process. Point it at
+            # PySide6's own bundled plugin dir before constructing the Qt6 app.
+            _qt6_platforms = os.path.join(_sp, "PySide6", "plugins", "platforms")
+            if os.path.isdir(_qt6_platforms):
+                os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = _qt6_platforms
+            try:
+                from PySide6.QtWidgets import QApplication as _QApp6
+                _cragl_qt6_app = _QApp6.instance() or _QApp6(sys.argv)
+                print(f"  [OK]     PySide6 QApplication ready ({_sp})")
+            except Exception as e:
+                print(f"  [ERROR]  PySide6 bootstrap failed: {e}")
+
+            # cragl's own connect/*.py files (video.py at least, maybe others) branch
+            # on nuke.NUKE_VERSION_MAJOR at import time to decide both WHICH Qt
+            # binding to pull in (PySide2 vs PySide6) AND which API surface to call
+            # against it (e.g. QMediaPlayer.stateChanged on Qt5 vs
+            # .playbackStateChanged on Qt6) - a leftover from before connect_w.pyd
+            # required Qt6 unconditionally. Since connect_w.pyd itself is always
+            # Qt6, every one of those branches needs to agree on ">=16" even though
+            # the real Nuke here is <16, or we get a slow trickle of "wrong
+            # binding"/"wrong attribute" crashes as each branch gets hit. Rather
+            # than patch cragl's shipped files one crash at a time, make Nuke report
+            # itself as version 16 for the duration of importing cragl's own
+            # modules only, via an import hook - so every NK-gated branch in their
+            # code consistently takes the Qt6 path, matching the real Qt6
+            # QApplication we just constructed above. Nothing outside cragl's own
+            # "connect" package ever sees the spoofed version.
+            try:
+                import importlib.abc
+                import importlib.machinery
+
+                class _CraglNukeVersionSpoofFinder(importlib.abc.MetaPathFinder):
+                    def find_spec(self, name, path, target=None):
+                        if name != "connect" and not name.startswith("connect."):
+                            return None
+                        spec = importlib.machinery.PathFinder.find_spec(name, path, target)
+                        if spec is None or spec.loader is None or not spec.origin:
+                            return None
+                        if "cragl" not in spec.origin.replace("\\", "/"):
+                            return None
+                        real_exec_module = spec.loader.exec_module
+                        def exec_module(module, _real_exec_module=real_exec_module):
+                            _real_major = nuke.NUKE_VERSION_MAJOR
+                            nuke.NUKE_VERSION_MAJOR = 16
+                            try:
+                                _real_exec_module(module)
+                            finally:
+                                nuke.NUKE_VERSION_MAJOR = _real_major
+                        spec.loader.exec_module = exec_module
+                        return spec
+
+                sys.meta_path.insert(0, _CraglNukeVersionSpoofFinder())
+                print("  [OK]     cragl NUKE_VERSION_MAJOR spoof (import hook) installed")
+            except Exception as e:
+                print(f"  [WARN]   cragl NUKE_VERSION_MAJOR spoof failed: {e}")
+            break
+    else:
+        print("  [SKIP]   No PySide6 install found next to a matching Python version")
 
 # === 1a. LADDA PLUGINS (Internal & 3rd Party) ===
 print("\n[Loading Plugin Menus]")
